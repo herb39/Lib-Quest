@@ -32,6 +32,7 @@ export type QuestSummary = {
   estimatedMinutes: number | null;
   difficulty: string | null;
   libraryName: string;
+  libraryCode: string;
   steps: StepSummary[];
 };
 

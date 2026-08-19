@@ -4,8 +4,8 @@
   "description": "도서관 서가를 탐험하며 책을 발견하는 퀘스트 서비스",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#0f172a",
+  "background_color": "#faf6ee",
+  "theme_color": "#faf6ee",
   "icons": [
     {
       "src": "/next.svg",

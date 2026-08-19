@@ -10,13 +10,16 @@ export function Header() {
   const isHome = pathname === "/";
 
   return (
-    <header className="flex h-12 shrink-0 items-center border-b border-slate-200 bg-white">
+    <header className="flex h-12 shrink-0 items-center border-b border-stone-200 bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-4">
-        <Link href="/" className="text-sm font-bold text-slate-900">
-          Lib Quest
+        <Link href="/" className="flex items-center gap-1.5 text-sm font-bold text-stone-900">
+          <span aria-hidden>📚</span> Lib Quest
         </Link>
         {!isHome && (
-          <Link href="/" className="text-xs font-medium text-slate-500 active:text-slate-700">
+          <Link
+            href="/"
+            className="rounded-full px-2 py-1 text-xs font-semibold text-emerald-700 active:bg-emerald-50"
+          >
             홈
           </Link>
         )}

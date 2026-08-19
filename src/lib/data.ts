@@ -125,6 +125,7 @@ export async function getQuestDetail(id: string): Promise<QuestSummary | undefin
     estimatedMinutes: quest.estimatedMinutes,
     difficulty: quest.difficulty,
     libraryName: quest.library.name,
+    libraryCode: quest.library.code,
     steps: quest.steps.map((step) => ({
       id: step.id,
       order: step.order,

@@ -33,6 +33,7 @@ export const DEMO_QUESTS: QuestSummary[] = [
     estimatedMinutes: 15,
     difficulty: "easy",
     libraryName: "데모 도서관",
+    libraryCode: "demo",
     steps: [
       {
         id: "step-1",

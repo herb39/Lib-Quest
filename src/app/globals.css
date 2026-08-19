@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #faf6ee;
+  --foreground: #2b2620;
 }
 
 @theme inline {
@@ -11,6 +11,30 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 15% -10%, rgb(253 230 194 / 45%) 0%, transparent 40%),
+    radial-gradient(circle at 100% 0%, rgb(209 233 214 / 55%) 0%, transparent 40%),
+    var(--background);
   color: var(--foreground);
+}
+
+@keyframes lq-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.lq-animate-in {
+  animation: lq-pop-in 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lq-animate-in {
+    animation: none;
+  }
 }

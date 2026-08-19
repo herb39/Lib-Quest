@@ -93,24 +93,24 @@ export function BarcodeScanner({ onScanned }: { onScanned: (isbn: string) => voi
 
       {isActive ? (
         <>
-          {state === "starting" && <p className="mt-1 text-xs text-slate-400">카메라 준비 중...</p>}
+          {state === "starting" && <p className="mt-1 text-xs text-stone-400">카메라 준비 중...</p>}
           <button
             type="button"
             onClick={stopScanning}
-            className="mt-2 h-9 w-full rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 active:bg-slate-50"
+            className="mt-2 h-9 w-full rounded-xl border border-stone-300 text-xs font-semibold text-stone-600 active:bg-stone-50"
           >
             취소
           </button>
         </>
       ) : (
         <>
-          {errorMessage && <p className="mb-2 text-xs text-amber-600">{errorMessage}</p>}
+          {errorMessage && <p className="mb-2 text-xs text-amber-700">{errorMessage}</p>}
           <button
             type="button"
             onClick={startScanning}
-            className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 active:bg-slate-50"
+            className="flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-600 text-sm font-semibold text-white transition active:bg-emerald-700"
           >
-            카메라로 바코드 스캔
+            <span aria-hidden>📷</span> 바코드 스캔하기
           </button>
         </>
       )}
