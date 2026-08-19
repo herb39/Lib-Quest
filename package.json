@@ -10,6 +10,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
+    "lookup:library": "tsx scripts/lookup-library.ts",
     "fetch:books": "tsx scripts/fetch-library-books.ts",
     "postinstall": "prisma generate"
   },

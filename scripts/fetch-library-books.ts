@@ -1,9 +1,11 @@
 /**
  * 도서관정보나루(Data4Library) itemSrch API로 대표 도서관의 실제 등록 도서를 수집한다.
  *
+ * libCode는 하드코딩하지 않는다. scripts/lookup-library.ts로 확인한 실제 값을 --libCode로 넘겨야 한다.
+ *
  * 사용법:
  *   DATA4LIBRARY_API_KEY=발급받은키 npx tsx scripts/fetch-library-books.ts \
- *     --libCode=143136 --startDt=2026-01-01 --endDt=2026-08-19
+ *     --libCode=확인된실제코드 --startDt=2026-01-01 --endDt=2026-08-19
  *
  * 결과:
  *   - data/snapshots/itemSrch-<libCode>-<startDt>_<endDt>-<실행시각>.json  (원본 API 응답, 출처 추적용)
@@ -127,7 +129,13 @@ async function main() {
     );
   }
 
-  const libCode = args.libCode ?? "143136";
+  const libCode = args.libCode;
+  if (!libCode) {
+    throw new Error(
+      "--libCode=실제코드 인자가 필요합니다. libCode를 추측하지 말고 " +
+        "scripts/lookup-library.ts로 확인한 값을 사용하세요."
+    );
+  }
   const startDt = args.startDt ?? daysAgoIso(180);
   const endDt = args.endDt ?? todayIso();
 

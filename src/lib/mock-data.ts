@@ -6,11 +6,6 @@
 // prisma/seed.ts 로 Neon DB에 저장하고, 화면은 항상 DB(src/lib/data.ts)를 우선 사용한다.
 import type { QuestSummary, BookSummary } from "@/lib/types";
 
-export const LIBRARY = {
-  code: "143136",
-  name: "청주가로수도서관",
-};
-
 function book(
   isbn13: string,
   title: string,

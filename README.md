@@ -3,7 +3,7 @@
 2026 도서관 데이터 활용 공모전 발표심사용 모바일 웹 프로토타입.
 도서관 실제 소장 도서를 기반으로 서가를 탐색하고 ISBN을 확인하며 퀘스트를 완료하는 서비스.
 
-대표 도서관: 청주가로수도서관 (libCode `143136`)
+대표 도서관: 대전 원신흥도서관 (libCode ⚠️ 미확인 — 아래 "실제 데이터 수집" 1단계 참고)
 
 - GitHub: https://github.com/herb39/Lib-Quest
 - 배포 도메인: https://lib-quest.lib.lc (Vercel Hobby)
@@ -37,19 +37,26 @@ npm run dev
 
 ## 실제 데이터 수집 → Neon 반영 절차
 
-### 1) Data4Library API 키 발급
+### 1) Data4Library API 키 발급 + libCode 확인
 
 https://data4library.kr 에서 `authKey`를 발급받는다.
+
+**libCode는 절대 추측/하드코딩하지 않는다.** 아래 스크립트로 실제 값을 조회해 결과 목록에서 "대전광역시 유성구 원신흥도서관"이 맞는지 도서관명/주소로 직접 확인한 뒤, 확인된 값만 [src/lib/config.ts](src/lib/config.ts)의 `LIBRARY_CODE`에 반영한다.
+
+```bash
+DATA4LIBRARY_API_KEY=발급받은키 npm run lookup:library -- --keyword=원신흥도서관
+```
 
 ### 2) 실제 도서 수집
 
 ```bash
-DATA4LIBRARY_API_KEY=발급받은키 npm run fetch:books -- --libCode=143136 --startDt=2026-01-01 --endDt=2026-08-19
+DATA4LIBRARY_API_KEY=발급받은키 npm run fetch:books -- --libCode=확인된실제코드 --startDt=2026-01-01 --endDt=2026-08-19
 ```
 
 - 원본 API 응답: `data/snapshots/`
 - 정규화된 도서 목록: `data/collected-books.json` (ISBN13 없는 항목 제외, 중복 제거)
 - 수집된 도서가 30권 미만이면 콘솔에 경고가 출력된다. 이때는 `startDt`를 앞으로 당겨 기간을 넓혀 재실행한다. **가짜 데이터로 채우지 않는다.**
+- 문학/인문사회/과학·예술 등 분류가 고르게 섞이도록 기간을 나눠 여러 번 수집해도 된다 (같은 `collected-books.json`에 누적하려면 스크립트 재실행 전 결과를 병합하는 절차가 아직 없으므로, 현재는 한 번의 넓은 기간으로 수집하는 것을 권장한다).
 
 ### 3) 퀘스트 큐레이션 (사람이 직접 작성)
 
@@ -85,6 +92,17 @@ npm run db:seed             # data/collected-books.json + data/quest-curation.js
 - 서버 세션을 붙이면 생성 실패, 만료, 여러 기기 충돌 등 시연 중 장애 가능성이 늘어난다. 로컬 상태는 이런 실패 지점이 없다.
 - `QuestSession` 모델은 스키마에 남겨두어 추후 필요해지면 확장한다 (지금은 사용하지 않음).
 
+## Production mock fallback 정책
+
+`src/lib/data.ts`는 `DATABASE_URL`이 **설정되어 있지 않을 때만** 데모 데이터를 반환한다. `DATABASE_URL`이 설정된 상태에서 Prisma 쿼리가 실패하면(연결 실패, 인증 실패 등) 그 에러를 그대로 던지며, 데모 데이터로 조용히 대체하지 않는다 — Next.js가 기본 에러 화면을 표시한다.
+
+즉:
+
+- 로컬 개발(환경변수 없음): 데모 데이터 fallback 허용, 화면에 배너로 명시
+- Production(Vercel, `DATABASE_URL` 설정됨): DB 연결 실패 시 오류 화면 표시. mock으로 자동 전환되지 않는다.
+
+Vercel에 `DATABASE_URL`을 등록하는 순간부터 이 정책이 적용되므로 별도 조치가 필요 없다.
+
 ## Vercel 배포
 
 1. GitHub `herb39/Lib-Quest`를 Vercel 프로젝트로 Import (Framework: Next.js 자동 인식)
@@ -115,6 +133,7 @@ npm run db:seed             # data/collected-books.json + data/quest-curation.js
 
 ## 아직 미구현인 항목
 
+- **`src/lib/config.ts`의 `LIBRARY_CODE` 확인** — `DATA4LIBRARY_API_KEY`가 없어 `scripts/lookup-library.ts`로 대전 원신흥도서관의 실제 libCode를 아직 조회하지 못함. 현재 빈 문자열(`""`)로 두어 잘못된 코드가 섞이지 않도록 했다.
 - 최소 운영자 검수 화면
 - 데이터 출처 확인 화면
 - 실제 Data4Library 수집 실행 및 `data/quest-curation.json` 작성 (API 키 필요, 아직 미보유)
@@ -124,8 +143,8 @@ npm run db:seed             # data/collected-books.json + data/quest-curation.js
 
 ## 다음 작업
 
-1. Data4Library `authKey` 발급 → `npm run fetch:books` 실행 → `data/collected-books.json` 검토
-2. 수집된 실제 도서 중 퀘스트 3개 분량을 골라 `data/quest-curation.json` 작성
+1. `DATA4LIBRARY_API_KEY` 발급 → `npm run lookup:library -- --keyword=원신흥도서관` 실행 → 정확한 libCode 확인 후 `src/lib/config.ts`에 반영
+2. `npm run fetch:books -- --libCode=확인된코드 ...` 로 실제 도서 수집(30~50권 목표, 분류 분산 확인) → `data/quest-curation.json` 작성
 3. Neon 프로젝트 생성 → `migrate deploy` + `db:seed` 실행 → Vercel 배포 → Cloudflare CNAME 연결
 
 ## 기술 스택
