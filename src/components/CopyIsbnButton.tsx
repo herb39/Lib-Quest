@@ -22,14 +22,14 @@ export function CopyIsbnButton({ isbn13 }: { isbn13: string }) {
       <button
         type="button"
         onClick={handleCopy}
-        className="rounded border border-slate-300 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+        className="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-slate-300 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
       >
         복사
       </button>
       {status === "copied" && (
-        <span className="text-[11px] text-emerald-600">ISBN을 복사했습니다.</span>
+        <span className="whitespace-nowrap text-[11px] text-emerald-600">복사됨</span>
       )}
-      {status === "error" && <span className="text-[11px] text-red-500">복사 실패</span>}
+      {status === "error" && <span className="whitespace-nowrap text-[11px] text-red-500">복사 실패</span>}
     </span>
   );
 }

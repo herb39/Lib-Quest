@@ -11,7 +11,7 @@ export function Header() {
 
   return (
     <header className="flex h-12 shrink-0 items-center border-b border-slate-200 bg-white">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-4">
         <Link href="/" className="text-sm font-bold text-slate-900">
           Lib Quest
         </Link>
