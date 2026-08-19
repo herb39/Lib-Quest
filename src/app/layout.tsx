@@ -2,9 +2,18 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://quest.lib.lc"),
   title: "Lib Quest",
   description: "도서관 서가를 탐험하며 책을 발견하는 퀘스트 서비스",
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Lib Quest",
+    description: "도서관 서가를 탐험하며 책을 발견하는 퀘스트 서비스",
+    url: "/",
+  },
 };
 
 export const viewport: Viewport = {

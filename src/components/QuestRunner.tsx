@@ -47,10 +47,14 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
 
   useEffect(() => {
     // localStorage 기반 익명 세션은 클라이언트에서만 읽을 수 있어 마운트 시 1회 동기화한다.
+    const loaded = loadSession(quest.id);
+    // 큐레이션이 바뀌어 저장된 단계 인덱스가 더 이상 유효하지 않으면 처음부터 다시 시작한다
+    // (그렇지 않으면 존재하지 않는 단계를 기다리며 "불러오는 중..."에서 멈춘다).
+    const isValid = loaded.completedAt !== null || loaded.currentStep < quest.steps.length;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSession(loadSession(quest.id));
+    setSession(isValid ? loaded : { currentStep: 0, foundBookIds: [], completedAt: null });
     setHydrated(true);
-  }, [quest.id]);
+  }, [quest.id, quest.steps.length]);
 
   useEffect(() => {
     // 단계가 바뀔 때마다 단계 전용 UI 상태를 초기화한다.

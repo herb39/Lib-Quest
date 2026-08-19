@@ -6,7 +6,7 @@
 대표 도서관: 대전 원신흥도서관 (libCode `130026`, Data4Library `libSrch`로 확인)
 
 - GitHub: https://github.com/herb39/Lib-Quest
-- 배포 도메인: https://lib-quest.lib.lc (Vercel Hobby)
+- 배포 도메인: https://quest.lib.lc (Vercel Hobby)
 - DB: Neon PostgreSQL (Free)
 
 ## 현재 상태
@@ -19,6 +19,8 @@
 - ISBN 판정은 서버 API에서 규칙 기반으로 수행한다 (`POST /api/quests/[questId]/steps/[stepId]/verify`, [route.ts](src/app/api/quests/%5BquestId%5D/steps/%5BstepId%5D/verify/route.ts)). 클라이언트는 판정 로직을 갖지 않는다.
 - 진행 상태(QuestSession)는 익명 `localStorage` 세션으로 유지한다. (선택 근거는 아래 "QuestSession 설계" 참고)
 - 실제 장서 데이터 수집 스크립트: [scripts/fetch-library-books.ts](scripts/fetch-library-books.ts) — Data4Library `itemSrch` API 호출, 정규화, 원본 스냅샷 보관
+- 운영자 검수 화면 `/admin/review`, 데이터 출처 화면 `/data-source` (읽기 전용, 로그인/CRUD 없음)
+- Neon 마이그레이션 적용 + 실데이터 시드 완료, Vercel + Cloudflare(`quest.lib.lc`)로 배포 완료
 
 ## ⚠️ 데이터 출처 관련 중요 사항
 
@@ -107,24 +109,25 @@ npm run db:seed             # data/collected-books.json + data/quest-curation.js
 
 Vercel에 `DATABASE_URL`을 등록하는 순간부터 이 정책이 적용되므로 별도 조치가 필요 없다.
 
-## Vercel 배포
+## Vercel 배포 (완료, 정보 기록용)
 
 1. GitHub `herb39/Lib-Quest`를 Vercel 프로젝트로 Import (Framework: Next.js 자동 인식)
 2. 프로젝트 환경변수에 `DATABASE_URL`만 등록한다 (Neon pooled connection string)
    - `DATA4LIBRARY_API_KEY`는 **등록하지 않는다**. 데이터는 사전 수집 방식이라 런타임에 필요 없다.
 3. Neon DB에 대해 로컬에서 `npx prisma migrate deploy`와 `npm run db:seed`를 먼저 실행해 실제 데이터를 반영한 뒤 배포한다.
 4. 빌드 명령은 기본값(`next build`) 그대로 사용, `postinstall`에서 `prisma generate`가 자동 실행된다.
-5. Custom Domain에 `lib-quest.lib.lc` 추가 → Vercel이 요구하는 CNAME 대상 확인 (Vercel 대시보드 Domains 화면에 표시됨, 보통 `cname.vercel-dns.com`)
+5. Custom Domain에 `quest.lib.lc` 추가 → Vercel이 요구하는 CNAME 대상 확인 (Vercel 대시보드 Domains 화면에 표시됨, 보통 `cname.vercel-dns.com`)
 
-## Cloudflare DNS 설정 (lib.lc)
+## Cloudflare DNS 설정 (lib.lc) — 완료, 정보 기록용
 
 - Cloudflare에서 관리 중인 `lib.lc` 존은 그대로 유지한다.
-- `lib-quest` 서브도메인에 대해 CNAME 레코드 추가:
+- `quest` 서브도메인에 대해 CNAME 레코드 추가:
   - Type: `CNAME`
-  - Name: `lib-quest`
+  - Name: `quest`
   - Target: Vercel이 제시하는 CNAME 값 (Vercel Domains 설정 화면 확인)
   - Proxy status: **DNS only (회색 구름)** — Vercel의 자동 HTTPS 인증서 발급이 Cloudflare 프록시와 충돌하지 않도록 우선 DNS only로 구성한다.
 - 유료 Cloudflare 기능(WAF 룰, Workers 등)은 사용하지 않는다.
+- 이전에 사용하던 `lib-quest.lib.lc`(Vercel/Cloudflare 설정)는 삭제되었다. 공식 production URL은 `https://quest.lib.lc` 하나다.
 
 ## 필요한 환경 변수
 
@@ -137,17 +140,13 @@ Vercel에 `DATABASE_URL`을 등록하는 순간부터 이 정책이 적용되므
 
 ## 아직 미구현인 항목
 
-- 최소 운영자 검수 화면
-- 데이터 출처 확인 화면
-- Neon 프로젝트 생성 및 마이그레이션 실제 적용 (DB 자격증명 필요 — `data/collected-books.json`/`quest-curation.json`은 준비되었으므로 `migrate deploy` + `db:seed`만 실행하면 됨)
-- Vercel 프로젝트 연결 및 배포 (Vercel 계정 접근 필요)
-- Cloudflare CNAME 레코드 등록 (Cloudflare 계정 접근 필요)
+- 없음 (발표용 MVP 필수 화면·배포는 모두 완료). 이후 확장은 "다음 작업" 참고.
 
 ## 다음 작업
 
-1. Neon 프로젝트 생성 → 로컬 `.env`에 실제 `DATABASE_URL` 설정 → `npx prisma migrate deploy` → `npm run db:seed` (실제 36권 + 퀘스트 3개 반영)
-2. Vercel 프로젝트 Import → `DATABASE_URL` 환경변수 등록 → 배포
-3. Cloudflare에서 `lib-quest` CNAME(DNS only) 등록 → `lib-quest.lib.lc` 접속 확인
+1. `https://quest.lib.lc`, `/quests`, `/admin/review`, `/data-source`를 실제 모바일 기기로 최종 리허설
+2. 발표 직전 Neon(Free) 컴퓨트가 슬립되어 있지 않은지 미리 한 번 접속해 확인
+3. 발표 이후 필요 시 다른 도서관/퀘스트 확장 (현재는 단일 도서관·퀘스트 3개로 의도적으로 한정)
 
 ## 기술 스택
 

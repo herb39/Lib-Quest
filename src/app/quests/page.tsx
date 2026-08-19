@@ -65,6 +65,13 @@ export default async function QuestsPage() {
           );
         })}
       </ul>
+
+      <Link
+        href="/data-source"
+        className="mt-8 self-center text-xs text-slate-300 underline underline-offset-2"
+      >
+        데이터 출처
+      </Link>
     </main>
   );
 }
