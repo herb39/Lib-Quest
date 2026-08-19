@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getDataSourceInfo } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
@@ -26,11 +25,8 @@ export default async function DataSourcePage() {
   const info = await getDataSourceInfo();
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-1 flex-col px-5 py-8">
-      <Link href="/" className="text-xs text-slate-400">
-        ← 홈
-      </Link>
-      <h1 className="mt-2 text-xl font-bold">데이터 출처</h1>
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-5 py-8">
+      <h1 className="text-xl font-bold">데이터 출처</h1>
       <p className="mt-1 text-sm text-slate-500">
         Lib Quest가 사용하는 도서 데이터가 어디서 왔는지 설명합니다.
       </p>

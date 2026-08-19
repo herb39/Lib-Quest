@@ -3,9 +3,8 @@ import { LIBRARY_CODE, LIBRARY_NAME } from "@/lib/config";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col justify-between px-5 py-10">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between px-5 py-8">
       <div>
-        <p className="text-sm font-medium text-slate-500">Lib Quest</p>
         <h1 className="mt-2 text-2xl font-bold leading-snug">
           서가를 걸으며
           <br />책을 발견하는 여정
@@ -22,6 +21,21 @@ export default function Home() {
           className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-slate-900 text-sm font-semibold text-white active:bg-slate-800"
         >
           퀘스트 보러가기
+        </Link>
+      </div>
+
+      <div className="mt-6 flex gap-2">
+        <Link
+          href="/admin/review"
+          className="flex h-10 flex-1 items-center justify-center rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 active:bg-slate-50"
+        >
+          운영자 검수
+        </Link>
+        <Link
+          href="/data-source"
+          className="flex h-10 flex-1 items-center justify-center rounded-xl border border-slate-300 text-xs font-semibold text-slate-600 active:bg-slate-50"
+        >
+          데이터 출처
         </Link>
       </div>
 

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://quest.lib.lc"),
@@ -27,7 +28,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased">
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col">{children}</div>
+        <Header />
+        <div className="flex flex-1 flex-col">{children}</div>
       </body>
     </html>
   );

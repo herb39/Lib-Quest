@@ -78,7 +78,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
 
   if (isCompleted) {
     return (
-      <main className="flex flex-1 flex-col px-5 py-8">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
           <p className="text-xs font-semibold text-emerald-600">퀘스트 완료</p>
           <h1 className="mt-2 text-xl font-bold">{quest.title}</h1>
@@ -109,7 +109,11 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   }
 
   if (!hydrated || !currentStep) {
-    return <main className="flex flex-1 items-center justify-center px-5 py-8 text-sm text-slate-400">불러오는 중...</main>;
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 items-center justify-center px-5 py-8 text-sm text-slate-400">
+        불러오는 중...
+      </main>
+    );
   }
 
   const candidate = currentStep.candidates[candidateIndex];
@@ -155,7 +159,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   }
 
   return (
-    <main className="flex flex-1 flex-col px-5 py-8">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
       <div className="flex items-center justify-between">
         <Link href="/quests" className="text-xs text-slate-400">
           ← 퀘스트 목록

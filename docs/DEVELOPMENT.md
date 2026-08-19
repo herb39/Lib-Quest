@@ -1,6 +1,12 @@
 # Lib Quest Development Guide
 
-발표용 MVP의 기술 구조와 로컬 개발/데이터 수집/배포 절차를 정리한 개발자 문서. 사용자/심사자 대상 설명은 [README.md](../README.md) 참고.
+**대상: 개발자 / 시스템 관리자** (코드/DB/인프라를 유지보수하는 사람)
+
+발표용 MVP의 기술 구조와 로컬 개발/데이터 수집/배포 절차를 정리한 개발자 문서. 이 문서에는 기술적인 정보만 둔다.
+
+- 서비스 소개, 이용 방법: [README.md](../README.md)
+- 사서/운영자를 위한 검수 안내: [OPERATOR_GUIDE.md](OPERATOR_GUIDE.md)
+- 심사자/발표자를 위한 시연 시나리오: [DEMO_GUIDE.md](DEMO_GUIDE.md)
 
 ## 기술 스택
 
@@ -49,8 +55,10 @@ src/
     data-source/page.tsx     # 데이터 출처 화면
     api/quests/[questId]/steps/[stepId]/verify/route.ts  # ISBN 서버 판정 API
   components/
+    Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: 홈이 아닐 때만 "홈" 버튼)
     QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션)
     BarcodeScanner.tsx         # ZXing 기반 카메라 바코드 스캐너
+    CopyIsbnButton.tsx          # /admin/review 전용 ISBN 클립보드 복사 버튼
   lib/
     config.ts                 # 대표 도서관 식별자(LIBRARY_CODE/LIBRARY_NAME)
     data.ts                   # /quests, /quests/[id]용 DB 조회 (DB 없으면 데모 데이터)
@@ -70,6 +78,10 @@ data/
   snapshots/                  # itemSrch 원본 응답 (authKey 미포함)
   collected-books.json        # 정규화·큐레이션된 실제 도서 목록
   quest-curation.json         # 퀘스트/단계/후보 구성 (collected-books의 ISBN만 참조)
+docs/
+  DEVELOPMENT.md               # 이 문서 (개발자/시스템 관리자용)
+  OPERATOR_GUIDE.md            # 사서/운영자용 검수 가이드
+  DEMO_GUIDE.md                 # 심사자/발표자용 시연 시나리오
 ```
 
 ## 환경변수

@@ -39,6 +39,8 @@ export type AdminReviewData =
       library: { code: string; name: string };
       quests: AdminQuest[];
       bookCount: number;
+      stepCount: number;
+      candidateCount: number;
     };
 
 export async function getAdminReviewData(): Promise<AdminReviewData> {
@@ -67,10 +69,18 @@ export async function getAdminReviewData(): Promise<AdminReviewData> {
     prisma.book.count({ where: { libraryId: library.id } }),
   ]);
 
+  const stepCount = quests.reduce((sum, q) => sum + q.steps.length, 0);
+  const candidateCount = quests.reduce(
+    (sum, q) => sum + q.steps.reduce((s, step) => s + step.candidates.length, 0),
+    0
+  );
+
   return {
     available: true,
     library: { code: library.code, name: library.name },
     bookCount,
+    stepCount,
+    candidateCount,
     quests: quests.map((q) => ({
       title: q.title,
       theme: q.theme,

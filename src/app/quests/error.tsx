@@ -10,7 +10,7 @@ export default function QuestsError({ error, reset }: { error: Error & { digest?
   }, [error]);
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-5 py-8 text-center">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-5 py-8 text-center">
       <p className="text-sm font-semibold text-slate-700">데이터를 불러오지 못했습니다.</p>
       <p className="mt-1 text-sm text-slate-500">잠시 후 다시 시도해 주세요.</p>
       <div className="mt-6 flex gap-2">
