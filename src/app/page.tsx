@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LIBRARY } from "@/lib/mock-data";
+import { LIBRARY_CODE, LIBRARY_NAME } from "@/lib/config";
 
 export default function Home() {
   return (
@@ -14,8 +14,8 @@ export default function Home() {
 
       <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-xs font-medium text-slate-400">대표 도서관</p>
-        <h2 className="mt-1 text-lg font-semibold">{LIBRARY.name}</h2>
-        <p className="mt-1 text-xs text-slate-400">libCode {LIBRARY.code}</p>
+        <h2 className="mt-1 text-lg font-semibold">{LIBRARY_NAME}</h2>
+        <p className="mt-1 text-xs text-slate-400">libCode {LIBRARY_CODE}</p>
 
         <Link
           href="/quests"

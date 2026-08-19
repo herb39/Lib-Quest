@@ -1,41 +1,10 @@
-// 발표용 임시 데이터
-// 실제 화면 흐름(퀘스트 선택 -> 미션 -> ISBN 검증 -> 결과 카드)을 DB 연결 전에 검증하기 위한 목데이터.
-// 스키마(Library/Book/Quest/QuestStep/QuestCandidate)와 형태를 동일하게 맞춰 향후 Prisma 조회로 손쉽게 교체한다.
-
-export type MockBook = {
-  id: string;
-  isbn13: string;
-  title: string;
-  author: string;
-  classNo: string;
-  className: string;
-  callNumber: string;
-  shelfLocation: string;
-};
-
-export type MockCandidate = {
-  book: MockBook;
-  isPrimary: boolean;
-};
-
-export type MockStep = {
-  id: string;
-  order: number;
-  title: string;
-  description: string;
-  hint: string;
-  candidates: MockCandidate[];
-};
-
-export type MockQuest = {
-  id: string;
-  title: string;
-  description: string;
-  theme: string;
-  estimatedMinutes: number;
-  difficulty: "easy" | "normal" | "hard";
-  steps: MockStep[];
-};
+// ⚠️ DEMO/개발 전용 fallback 데이터.
+//
+// 여기 있는 책 정보(청구기호/서가 위치/등록일 등)는 실제 도서관정보나루(Data4Library) API 응답이 아니다.
+// DB(DATABASE_URL)가 설정되지 않은 로컬 환경에서 화면 흐름만 확인할 수 있도록 만든 임시 데이터이며,
+// 발표/운영에서는 절대 사용하지 않는다. 실제 데이터는 scripts/fetch-library-books.ts 로 수집한 뒤
+// prisma/seed.ts 로 Neon DB에 저장하고, 화면은 항상 DB(src/lib/data.ts)를 우선 사용한다.
+import type { QuestSummary, BookSummary } from "@/lib/types";
 
 export const LIBRARY = {
   code: "143136",
@@ -46,32 +15,21 @@ function book(
   isbn13: string,
   title: string,
   author: string,
-  classNo: string,
-  className: string,
   callNumber: string,
   shelfLocation: string
-): MockBook {
-  return {
-    id: isbn13,
-    isbn13,
-    title,
-    author,
-    classNo,
-    className,
-    callNumber,
-    shelfLocation,
-  };
+): BookSummary {
+  return { id: isbn13, isbn13, title, author, callNumber, shelfLocation };
 }
 
-const 채식주의자 = book("9788936434120", "채식주의자", "한강", "813.7", "한국소설", "813.7-한15ㅊ", "종합자료실 2층");
-const 소년이온다 = book("9788936433598", "소년이 온다", "한강", "813.7", "한국소설", "813.7-한15ㅅ", "종합자료실 2층");
-const 흰 = book("9788936434175", "흰", "한강", "813.7", "한국소설", "813.7-한15흰", "종합자료실 2층");
-const 김지영 = book("9788954672178", "82년생 김지영", "조남주", "813.7", "한국소설", "813.7-조67ㅍ", "종합자료실 2층");
-const 달러구트 = book("9791165341909", "달러구트 꿈 백화점", "이미예", "813.7", "한국소설", "813.7-이67ㄷ", "종합자료실 2층");
-const 온실 = book("9791165342111", "지구 끝의 온실", "김초엽", "813.7", "한국소설", "813.7-김23ㅈ", "종합자료실 2층");
-const 빛의속도 = book("9791165341084", "우리가 빛의 속도로 갈 수 없다면", "김초엽", "813.7", "한국소설", "813.7-김23ㅇ", "종합자료실 2층");
+const 채식주의자 = book("9788936434120", "채식주의자", "한강", "813.7-한15ㅊ", "종합자료실 2층");
+const 소년이온다 = book("9788936433598", "소년이 온다", "한강", "813.7-한15ㅅ", "종합자료실 2층");
+const 흰 = book("9788936434175", "흰", "한강", "813.7-한15흰", "종합자료실 2층");
+const 김지영 = book("9788954672178", "82년생 김지영", "조남주", "813.7-조67ㅍ", "종합자료실 2층");
+const 달러구트 = book("9791165341909", "달러구트 꿈 백화점", "이미예", "813.7-이67ㄷ", "종합자료실 2층");
+const 온실 = book("9791165342111", "지구 끝의 온실", "김초엽", "813.7-김23ㅈ", "종합자료실 2층");
+const 빛의속도 = book("9791165341084", "우리가 빛의 속도로 갈 수 없다면", "김초엽", "813.7-김23ㅇ", "종합자료실 2층");
 
-export const QUESTS: MockQuest[] = [
+export const DEMO_QUESTS: QuestSummary[] = [
   {
     id: "korean-novel-quest",
     title: "한국 소설 탐험",
@@ -116,37 +74,13 @@ export const QUESTS: MockQuest[] = [
       },
     ],
   },
-  {
-    id: "world-classic-quest",
-    title: "세계 고전 산책",
-    description: "종합자료실을 돌며 세계 고전 소설 세 권을 만나보는 퀘스트입니다.",
-    theme: "세계고전",
-    estimatedMinutes: 20,
-    difficulty: "normal",
-    steps: [],
-  },
-  {
-    id: "healing-essay-quest",
-    title: "마음을 다독이는 책",
-    description: "종합자료실 1층에서 심리·에세이 분야의 책 세 권을 찾아보는 퀘스트입니다.",
-    theme: "심리에세이",
-    estimatedMinutes: 15,
-    difficulty: "easy",
-    steps: [],
-  },
 ];
 
-export function getQuestById(id: string): MockQuest | undefined {
-  return QUESTS.find((q) => q.id === id);
+export function getDemoQuestById(id: string): QuestSummary | undefined {
+  return DEMO_QUESTS.find((q) => q.id === id);
 }
 
 /** ISBN 문자열을 정규화한다 (하이픈/공백 제거). */
 export function normalizeIsbn(raw: string): string {
   return raw.replace(/[^0-9Xx]/g, "").toUpperCase();
-}
-
-/** 규칙 기반 판정: 현재 단계의 후보 도서 ISBN과 정확히 일치하는지만 확인한다. */
-export function matchCandidate(step: MockStep, rawIsbn: string): MockCandidate | undefined {
-  const normalized = normalizeIsbn(rawIsbn);
-  return step.candidates.find((c) => c.book.isbn13 === normalized);
 }

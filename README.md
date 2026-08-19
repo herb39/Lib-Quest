@@ -3,65 +3,130 @@
 2026 도서관 데이터 활용 공모전 발표심사용 모바일 웹 프로토타입.
 도서관 실제 소장 도서를 기반으로 서가를 탐색하고 ISBN을 확인하며 퀘스트를 완료하는 서비스.
 
-대표 도서관: 청주가로수도서관 (libCode 143136)
+대표 도서관: 청주가로수도서관 (libCode `143136`)
 
-## 현재 상태 (이번 단계 완료 범위)
+- GitHub: https://github.com/herb39/Lib-Quest
+- 배포 도메인: https://lib-quest.lib.lc (Vercel Hobby)
+- DB: Neon PostgreSQL (Free)
 
-- Next.js 16 (App Router) + TypeScript + Tailwind CSS 초기화
-- Prisma 7 + PostgreSQL(Neon) 연결 구조 추가 (`@prisma/adapter-pg` 드라이버 어댑터 방식)
-- 데이터 모델 초안 작성: `Library`, `Book`, `Quest`, `QuestStep`, `QuestCandidate`, `QuestSession` ([prisma/schema.prisma](prisma/schema.prisma))
-- 시드 스크립트 작성: 청주가로수도서관 + 도서 32권 + 퀘스트 3개(그중 "한국 소설 탐험"은 3단계 모두 구성) ([prisma/seed.ts](prisma/seed.ts))
-- 모바일 우선 레이아웃, 최소 PWA manifest ([src/app/layout.tsx](src/app/layout.tsx), [public/manifest.json](public/manifest.json))
-- 라우트: `/`, `/quests`, `/quests/[id]`
-- **퀘스트 1개("한국 소설 탐험")를 임시(mock) 데이터로 처음부터 끝까지 진행 가능**
-  - 퀘스트 선택 → 미션 확인 → 서가 안내 확인 → ISBN 확인(수동 입력 + 카메라 스캔 최소 구현) → 성공/실패 판정 → 다음 단계 해금 → 최종 결과 카드
-  - ISBN 판정은 전부 규칙 기반(정확 일치 비교)이며 AI가 정답 여부를 판단하지 않음
-  - "다른 책 보기"로 같은 단계의 다른 후보 도서 확인 가능
-  - 익명 세션은 `localStorage` 기반으로 진행 상태를 유지 (새로고침/재방문 시 이어짐)
+## 현재 상태
 
-이번 단계에서는 실제 Prisma 조회 대신 [src/lib/mock-data.ts](src/lib/mock-data.ts)의 임시 데이터로 화면 흐름만 검증했다. DB 연결 후에는 이 모듈을 Prisma 조회로 교체하면 된다.
+- Next.js 16(App Router) + TypeScript + Tailwind CSS
+- Prisma 7 + PostgreSQL(Neon), `@prisma/adapter-pg` 드라이버 어댑터 방식
+- 데이터 모델: `Library`, `Book`, `Quest`, `QuestStep`, `QuestCandidate`, `QuestSession` ([prisma/schema.prisma](prisma/schema.prisma))
+- 초기 마이그레이션 생성 완료 ([prisma/migrations](prisma/migrations)) — 라이브 DB 연결 없이 `prisma migrate diff`로 생성
+- `/quests`, `/quests/[id]`는 **Prisma로 실조회**한다 ([src/lib/data.ts](src/lib/data.ts)). `DATABASE_URL`이 없을 때만 데모 데이터로 자동 대체된다.
+- ISBN 판정은 서버 API에서 규칙 기반으로 수행한다 (`POST /api/quests/[questId]/steps/[stepId]/verify`, [route.ts](src/app/api/quests/%5BquestId%5D/steps/%5BstepId%5D/verify/route.ts)). 클라이언트는 판정 로직을 갖지 않는다.
+- 진행 상태(QuestSession)는 익명 `localStorage` 세션으로 유지한다. (선택 근거는 아래 "QuestSession 설계" 참고)
+- 실제 장서 데이터 수집 스크립트: [scripts/fetch-library-books.ts](scripts/fetch-library-books.ts) — Data4Library `itemSrch` API 호출, 정규화, 원본 스냅샷 보관
 
-## 실행 방법
+## ⚠️ 데이터 출처 관련 중요 사항
+
+**현재 `prisma/seed.ts`는 `data/collected-books.json`이 없으면 실행되지 않는다.** 즉 실제 API로 수집한 데이터가 없는 상태에서는 DB에 어떤 도서도 들어가지 않는다 (가짜 데이터를 절대 만들지 않기 위함).
+
+로컬에서 DB 없이 화면 흐름만 보고 싶을 때는 `DATABASE_URL`을 비워두면 [src/lib/mock-data.ts](src/lib/mock-data.ts)의 데모 데이터(실제 API 데이터 아님, 화면 표시에 "데모 데이터" 배너 표시됨)로 자동 대체된다.
+
+## 실행 방법 (로컬, DB 없이 화면만 확인)
 
 ```bash
 npm install
 npm run dev
 ```
 
-`http://localhost:3000` 접속. 모바일 폭(375px 등)에서 확인 권장.
+`http://localhost:3000` 접속. `DATABASE_URL`을 비워두면 데모 데이터로 전체 흐름(퀘스트 선택 → 3단계 → 결과 카드)을 확인할 수 있다.
 
-### Prisma / DB (선택, 아직 미연결 상태로도 위 데모는 동작함)
+## 실제 데이터 수집 → Neon 반영 절차
+
+### 1) Data4Library API 키 발급
+
+https://data4library.kr 에서 `authKey`를 발급받는다.
+
+### 2) 실제 도서 수집
 
 ```bash
-# .env에 DATABASE_URL 설정 후
-npx prisma migrate dev --name init
-npm run db:seed
-npm run db:studio
+DATA4LIBRARY_API_KEY=발급받은키 npm run fetch:books -- --libCode=143136 --startDt=2026-01-01 --endDt=2026-08-19
 ```
+
+- 원본 API 응답: `data/snapshots/`
+- 정규화된 도서 목록: `data/collected-books.json` (ISBN13 없는 항목 제외, 중복 제거)
+- 수집된 도서가 30권 미만이면 콘솔에 경고가 출력된다. 이때는 `startDt`를 앞으로 당겨 기간을 넓혀 재실행한다. **가짜 데이터로 채우지 않는다.**
+
+### 3) 퀘스트 큐레이션 (사람이 직접 작성)
+
+`data/collected-books.json`을 열어 실제로 어떤 책이 있는지 확인한 뒤, 그 중 ISBN13만 참조해서 `data/quest-curation.json`을 작성한다. 형식은 [prisma/seed.ts](prisma/seed.ts)의 `CurationFile` 타입 참고. 이 단계 전까지는 DB에 `Book`만 있고 `Quest`는 생성되지 않는다.
+
+### 4) Neon에 반영
+
+```bash
+# .env 에 Neon DATABASE_URL 설정 후
+npx prisma generate
+npx prisma migrate deploy   # 이미 생성된 초기 마이그레이션을 적용 (destructive 아님)
+npm run db:seed             # data/collected-books.json + data/quest-curation.json 시드
+```
+
+`prisma migrate deploy`는 존재하는 마이그레이션 파일만 순서대로 적용하며 스키마를 자동으로 새로 생성/추론하지 않는다. Production DB에 대해 자동으로 destructive migration을 실행하는 스크립트는 두지 않았다.
+
+## itemSrch 관련 주의
+
+`itemSrch`는 **등록 기간(startDt~endDt) 기준 조회**이며 실시간 대출 가능 여부가 아니다. 이 프로젝트는 `registeredAt`(등록일)으로만 사용하며, 화면 어디에도 "지금 대출 가능"처럼 표현하지 않는다.
+
+## QuestSession 설계: localStorage + 서버 ISBN 검증 (B안 채택)
+
+검토한 두 안:
+
+- A. 서버 anonymous session (세션 생성/조회 API, 서버 상태 저장)
+- B. localStorage 진행 상태 + 서버 ISBN 검증 API (판정만 서버, 진행 상태는 클라이언트)
+
+**B안을 채택했다.** 이유:
+
+- 8/26 발표 제출까지 시간이 촉박해 세션 생성/만료/충돌 처리 같은 부가 로직을 새로 만들 여유가 없다.
+- 발표 시연은 보통 한 기기에서 진행되므로 로그인 없는 로컬 진행 상태로 충분하다.
+- 판정 로직만 서버로 옮기면 "AI/클라이언트가 정답을 판정하지 않는다"는 핵심 원칙은 그대로 지킬 수 있다.
+- 서버 세션을 붙이면 생성 실패, 만료, 여러 기기 충돌 등 시연 중 장애 가능성이 늘어난다. 로컬 상태는 이런 실패 지점이 없다.
+- `QuestSession` 모델은 스키마에 남겨두어 추후 필요해지면 확장한다 (지금은 사용하지 않음).
+
+## Vercel 배포
+
+1. GitHub `herb39/Lib-Quest`를 Vercel 프로젝트로 Import (Framework: Next.js 자동 인식)
+2. 프로젝트 환경변수에 `DATABASE_URL`만 등록한다 (Neon pooled connection string)
+   - `DATA4LIBRARY_API_KEY`는 **등록하지 않는다**. 데이터는 사전 수집 방식이라 런타임에 필요 없다.
+3. Neon DB에 대해 로컬에서 `npx prisma migrate deploy`와 `npm run db:seed`를 먼저 실행해 실제 데이터를 반영한 뒤 배포한다.
+4. 빌드 명령은 기본값(`next build`) 그대로 사용, `postinstall`에서 `prisma generate`가 자동 실행된다.
+5. Custom Domain에 `lib-quest.lib.lc` 추가 → Vercel이 요구하는 CNAME 대상 확인 (Vercel 대시보드 Domains 화면에 표시됨, 보통 `cname.vercel-dns.com`)
+
+## Cloudflare DNS 설정 (lib.lc)
+
+- Cloudflare에서 관리 중인 `lib.lc` 존은 그대로 유지한다.
+- `lib-quest` 서브도메인에 대해 CNAME 레코드 추가:
+  - Type: `CNAME`
+  - Name: `lib-quest`
+  - Target: Vercel이 제시하는 CNAME 값 (Vercel Domains 설정 화면 확인)
+  - Proxy status: **DNS only (회색 구름)** — Vercel의 자동 HTTPS 인증서 발급이 Cloudflare 프록시와 충돌하지 않도록 우선 DNS only로 구성한다.
+- 유료 Cloudflare 기능(WAF 룰, Workers 등)은 사용하지 않는다.
 
 ## 필요한 환경 변수
 
-`.env.example` 참고.
+| 변수 | 필요 시점 | 설명 |
+| --- | --- | --- |
+| `DATABASE_URL` | 로컬 DB 연결 시 / Vercel 운영 | Neon PostgreSQL 연결 문자열. 비어 있으면 데모 데이터로 자동 대체 |
+| `DATA4LIBRARY_API_KEY` | 로컬 데이터 수집 시에만 | `scripts/fetch-library-books.ts` 실행에만 필요. **Vercel에는 등록하지 않는다** |
 
-| 변수 | 설명 |
-| --- | --- |
-| `DATABASE_URL` | Neon PostgreSQL 연결 문자열 (pooled) |
+`.env.example` 참고. API 키는 절대 커밋하지 않는다 (`.env*`는 `.gitignore`에 포함됨).
 
 ## 아직 미구현인 항목
 
-- 실제 Prisma 데이터 조회로 `/quests`, `/quests/[id]` 연결 (현재는 mock 데이터)
-- 퀘스트 2, 3("세계 고전 산책", "마음을 다독이는 책")의 단계/후보 화면 연결 (시드에는 있으나 화면용 mock에는 미반영, 목록에 "준비 중"으로 표시됨)
-- ISBN 검증 API 라우트(서버 판정)로 전환 — 현재는 클라이언트에서 mock 데이터 기준 판정
-- 카메라 바코드 스캔 고도화 (현재는 브라우저 내장 `BarcodeDetector` API만 사용, 미지원 브라우저는 수동 입력만 안내)
 - 최소 운영자 검수 화면
 - 데이터 출처 확인 화면
-- 실제 도서관 정보나루 API 연동 및 시드 데이터 최신화
+- 실제 Data4Library 수집 실행 및 `data/quest-curation.json` 작성 (API 키 필요, 아직 미보유)
+- Neon 프로젝트 생성 및 마이그레이션 실제 적용 (DB 자격증명 필요)
+- Vercel 프로젝트 연결 및 배포 (Vercel 계정 접근 필요)
+- Cloudflare CNAME 레코드 등록 (Cloudflare 계정 접근 필요)
 
-## 다음 작업 (제안)
+## 다음 작업
 
-1. `/api/quests`, `/api/quests/[id]`, `/api/verify` 등 API 라우트를 추가해 Prisma로 실제 데이터 조회 및 서버 측 ISBN 판정으로 전환
-2. `QuestSession`을 서버에 실제로 생성/갱신하도록 연결 (현재 localStorage는 임시 방편)
-3. 최소 운영자 검수 화면 + 데이터 출처 확인 화면 추가
+1. Data4Library `authKey` 발급 → `npm run fetch:books` 실행 → `data/collected-books.json` 검토
+2. 수집된 실제 도서 중 퀘스트 3개 분량을 골라 `data/quest-curation.json` 작성
+3. Neon 프로젝트 생성 → `migrate deploy` + `db:seed` 실행 → Vercel 배포 → Cloudflare CNAME 연결
 
 ## 기술 스택
 

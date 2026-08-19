@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { matchCandidate, type MockBook, type MockQuest } from "@/lib/mock-data";
+import type { BookSummary, QuestSummary } from "@/lib/types";
 
 type SessionState = {
   currentStep: number; // 0-based index of the step currently in progress
@@ -32,7 +32,7 @@ function saveSession(questId: string, state: SessionState) {
   window.localStorage.setItem(sessionKey(questId), JSON.stringify(state));
 }
 
-export function QuestRunner({ quest }: { quest: MockQuest }) {
+export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const [session, setSession] = useState<SessionState>({
     currentStep: 0,
     foundBookIds: [],
@@ -43,6 +43,7 @@ export function QuestRunner({ quest }: { quest: MockQuest }) {
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [candidateIndex, setCandidateIndex] = useState(0);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     // localStorage 기반 익명 세션은 클라이언트에서만 읽을 수 있어 마운트 시 1회 동기화한다.
@@ -63,11 +64,11 @@ export function QuestRunner({ quest }: { quest: MockQuest }) {
   const totalSteps = quest.steps.length;
   const isCompleted = session.completedAt !== null;
   const currentStep = quest.steps[session.currentStep];
-  const foundBooks: MockBook[] = useMemo(() => {
+  const foundBooks: BookSummary[] = useMemo(() => {
     const all = quest.steps.flatMap((s) => s.candidates.map((c) => c.book));
     return session.foundBookIds
       .map((id) => all.find((b) => b.id === id))
-      .filter((b): b is MockBook => Boolean(b));
+      .filter((b): b is BookSummary => Boolean(b));
   }, [quest.steps, session.foundBookIds]);
 
   if (isCompleted) {
@@ -108,26 +109,40 @@ export function QuestRunner({ quest }: { quest: MockQuest }) {
 
   const candidate = currentStep.candidates[candidateIndex];
 
-  function handleVerify() {
+  async function handleVerify() {
     if (!isbnInput.trim()) {
       setFeedback({ type: "error", message: "ISBN을 입력하거나 스캔해주세요." });
       return;
     }
-    const matched = matchCandidate(currentStep, isbnInput);
-    if (!matched) {
-      setFeedback({ type: "error", message: "이 단계의 후보 도서가 아니에요. 다시 확인해주세요." });
-      return;
-    }
 
-    const isLastStep = session.currentStep === totalSteps - 1;
-    const next: SessionState = {
-      currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
-      foundBookIds: [...session.foundBookIds, matched.book.id],
-      completedAt: isLastStep ? new Date().toISOString() : null,
-    };
-    saveSession(quest.id, next);
-    setFeedback({ type: "success", message: `"${matched.book.title}" 확인 완료!` });
-    setSession(next);
+    setVerifying(true);
+    try {
+      const res = await fetch(`/api/quests/${quest.id}/steps/${currentStep.id}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isbn13: isbnInput }),
+      });
+      const result = await res.json();
+
+      if (!result.success) {
+        setFeedback({ type: "error", message: result.message ?? "확인할 수 없어요. 다시 시도해주세요." });
+        return;
+      }
+
+      const isLastStep = session.currentStep === totalSteps - 1;
+      const next: SessionState = {
+        currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
+        foundBookIds: [...session.foundBookIds, result.bookId as string],
+        completedAt: isLastStep ? new Date().toISOString() : null,
+      };
+      saveSession(quest.id, next);
+      setFeedback({ type: "success", message: `"${result.bookTitle}" 확인 완료!` });
+      setSession(next);
+    } catch {
+      setFeedback({ type: "error", message: "서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요." });
+    } finally {
+      setVerifying(false);
+    }
   }
 
   function handleShowAnother() {
@@ -203,9 +218,10 @@ export function QuestRunner({ quest }: { quest: MockQuest }) {
           <button
             type="button"
             onClick={handleVerify}
-            className="h-11 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white active:bg-slate-800"
+            disabled={verifying}
+            className="h-11 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white active:bg-slate-800 disabled:opacity-60"
           >
-            확인
+            {verifying ? "확인 중..." : "확인"}
           </button>
         </div>
 

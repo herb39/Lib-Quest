@@ -1,6 +1,6 @@
 {
   "name": "Lib Quest",
-  "short_name": "LibQuest",
+  "short_name": "Lib Quest",
   "description": "도서관 서가를 탐험하며 책을 발견하는 퀘스트 서비스",
   "start_url": "/",
   "display": "standalone",
