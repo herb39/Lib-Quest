@@ -1,0 +1,98 @@
+// Lib Quest - MVP data model
+// 초기 MVP: 대표 도서관 1곳, 퀘스트 3개, 도서 30~50권 규모를 가정한 최소 스키마
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Library {
+  id    String @id @default(cuid())
+  code  String @unique // 도서관 정보나루 libCode
+  name  String
+
+  books  Book[]
+  quests Quest[]
+
+  createdAt DateTime @default(now())
+}
+
+model Book {
+  id             String   @id @default(cuid())
+  libraryId      String
+  library        Library  @relation(fields: [libraryId], references: [id])
+  isbn13         String
+  title          String
+  author         String?
+  classNo        String? // 분류번호
+  className      String? // 분류명
+  callNumber     String? // 청구기호
+  shelfLocation  String? // 자료실/층 위치
+  registeredAt   DateTime? // 등록일 (원본 데이터 기준)
+  source         String   // 데이터 출처 (예: "도서관정보나루 API")
+
+  candidates QuestCandidate[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([libraryId, isbn13])
+  @@index([libraryId])
+}
+
+model Quest {
+  id                String   @id @default(cuid())
+  libraryId         String
+  library           Library  @relation(fields: [libraryId], references: [id])
+  title             String
+  description       String
+  theme             String?
+  estimatedMinutes  Int?
+  difficulty        String? // easy | normal | hard
+  published         Boolean  @default(false)
+
+  steps    QuestStep[]
+  sessions QuestSession[]
+
+  createdAt DateTime @default(now())
+
+  @@index([libraryId])
+}
+
+model QuestStep {
+  id          String @id @default(cuid())
+  questId     String
+  quest       Quest  @relation(fields: [questId], references: [id])
+  order       Int
+  title       String
+  description String
+  hint        String?
+
+  candidates QuestCandidate[]
+
+  @@unique([questId, order])
+}
+
+model QuestCandidate {
+  id          String    @id @default(cuid())
+  questStepId String
+  questStep   QuestStep @relation(fields: [questStepId], references: [id])
+  bookId      String
+  book        Book      @relation(fields: [bookId], references: [id])
+  isPrimary   Boolean   @default(false)
+
+  @@unique([questStepId, bookId])
+}
+
+model QuestSession {
+  id          String    @id @default(cuid())
+  questId     String
+  quest       Quest     @relation(fields: [questId], references: [id])
+  currentStep Int       @default(1)
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+}
