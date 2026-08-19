@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { BookSummary, QuestSummary } from "@/lib/types";
+import { BarcodeScanner } from "@/components/BarcodeScanner";
 
 type SessionState = {
   currentStep: number; // 0-based index of the step currently in progress
@@ -209,7 +210,8 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           책 뒷면의 바코드를 스캔하거나 ISBN을 직접 입력하세요.
         </p>
 
-        <IsbnScanButton onScanned={(value) => setIsbnInput(value)} />
+        {/* key로 단계마다 새 인스턴스를 만들어 단계 이동 시 이전 카메라 스트림이 확실히 종료되게 한다. */}
+        <BarcodeScanner key={currentStep.id} onScanned={(value) => setIsbnInput(value)} />
 
         <div className="mt-3 flex gap-2">
           <input
@@ -240,76 +242,5 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         )}
       </section>
     </main>
-  );
-}
-
-function IsbnScanButton({ onScanned }: { onScanned: (isbn: string) => void }) {
-  const [scanning, setScanning] = useState(false);
-  const [supported, setSupported] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // BarcodeDetector 지원 여부는 클라이언트 런타임에서만 판단할 수 있다.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSupported(typeof window !== "undefined" && "BarcodeDetector" in window);
-  }, []);
-
-  async function startScan() {
-    setScanning(true);
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const Detector = (window as any).BarcodeDetector;
-      const detector = new Detector({ formats: ["ean_13"] });
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      const video = document.createElement("video");
-      video.srcObject = stream;
-      await video.play();
-
-      const stop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        setScanning(false);
-      };
-
-      const tick = async () => {
-        if (video.readyState < 2) {
-          requestAnimationFrame(tick);
-          return;
-        }
-        try {
-          const codes = await detector.detect(video);
-          if (codes.length > 0) {
-            onScanned(codes[0].rawValue);
-            stop();
-            return;
-          }
-        } catch {
-          // detect가 일시적으로 실패해도 계속 시도
-        }
-        requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-
-      setTimeout(stop, 15000);
-    } catch {
-      setScanning(false);
-    }
-  }
-
-  if (supported === false) {
-    return (
-      <p className="mt-2 text-xs text-amber-600">
-        이 브라우저는 카메라 바코드 인식을 지원하지 않아요. 아래에 ISBN을 직접 입력해주세요.
-      </p>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={startScan}
-      disabled={scanning}
-      className="mt-2 flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 active:bg-slate-50 disabled:opacity-60"
-    >
-      {scanning ? "스캔 중... (카메라를 바코드에 비춰주세요)" : "카메라로 바코드 스캔"}
-    </button>
   );
 }
