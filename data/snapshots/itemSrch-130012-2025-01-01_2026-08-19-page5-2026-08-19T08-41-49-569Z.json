@@ -1,0 +1,859 @@
+{
+  "response": {
+    "request": {
+      "libCode": "130012",
+      "startDt": "2025-01-01",
+      "endDt": "2026-08-19",
+      "pageNo": "5",
+      "pageSize": "30",
+      "format": "json"
+    },
+    "libNm": "노은도서관",
+    "pageNo": 5,
+    "pageSize": 30,
+    "numFound": 7746,
+    "resultNum": 30,
+    "docs": [
+      {
+        "doc": {
+          "bookname": "포켓 베어",
+          "authors": "애플게이트, 캐서린",
+          "publisher": "가람어린이",
+          "publication_year": "2026",
+          "isbn13": "9791165184599",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39128/63/cover200/k682137457_1.jpg",
+          "addition_symbol": "",
+          "vol": "11",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "책356ㄱ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(조물조물) 우동냥 :스케랏코 동화 .2: ,최고의 피자를 찾아라냥!",
+          "authors": "스케랏코",
+          "publisher": "책읽는곰",
+          "publication_year": "2026",
+          "isbn13": "9791158366339",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39469/86/cover200/k622139217_1.jpg",
+          "addition_symbol": "",
+          "vol": "13",
+          "class_no": "808.3",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "큰578차",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "요주의 인물",
+          "authors": "황지영",
+          "publisher": "특서주니어(특별한서재)",
+          "publication_year": "2026",
+          "isbn13": "9791167032102",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6050318/60503183785.20260618152421.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "황694ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "애니캔 :은경 장편동화 .2: ,수명을 늘려 드립니다",
+          "authors": "은경",
+          "publisher": "별숲",
+          "publication_year": "2026",
+          "isbn13": "9791124605004",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39493/96/cover200/k012139417_1.jpg",
+          "addition_symbol": "",
+          "vol": "68",
+          "class_no": "808.3",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "별388ㅂ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(사고뭉치 소방관) 오케이 .3: ,극장 화재의 비밀을 밝혀라!",
+          "authors": "강효미",
+          "publisher": "길벗스쿨",
+          "publication_year": "2026",
+          "isbn13": "9791174671967",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39799/56/cover200/k992130407_2.jpg",
+          "addition_symbol": "",
+          "vol": "3",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "강884ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "마이 가디언 .5: ,단단한 마음",
+          "authors": "이재문",
+          "publisher": "이지북",
+          "publication_year": "2026",
+          "isbn13": "9791124035337",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39402/30/cover200/k252139975_1.jpg",
+          "addition_symbol": "",
+          "vol": "63",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "책359ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "다판다 편의점 .4: ,우정 두 배 두둥 쫀득 쿠키",
+          "authors": "강효미",
+          "publisher": "다산어린이",
+          "publication_year": "2026",
+          "isbn13": "9791130677415",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39448/53/cover200/k752139497_1.jpg",
+          "addition_symbol": "",
+          "vol": "4",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "강884ㄷ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "과학 덕후 젤라토 .2: ,식중독의 원인을 밝혀라!",
+          "authors": "고희정",
+          "publisher": "토토북",
+          "publication_year": "2026",
+          "isbn13": "9788964965566",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6045167/60451679187.20260615125826.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "고664ㄱ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(알면 알수록 너~무 재밌어서) 위험한 명화 .1",
+          "authors": "위험한 명화",
+          "publisher": "탐탐북스",
+          "publication_year": "2026",
+          "isbn13": "9791199931916",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39837/55/cover200/k972130912_2.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "650.8",
+          "class_nm": "예술 > 회화, 도화 > 회화, 도화",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "위372ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "질문 하나에 과학이 와르르 :AI보다 먼저 답하게 되는 엉뚱한 과학책",
+          "authors": "이민환",
+          "publisher": "체인지업",
+          "publication_year": "2026",
+          "isbn13": "9791191378962",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39381/1/cover200/k652139871_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "이321ㅈ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(와글와글) 화학 탐험 :100일이면 과학에 푹 빠지게 되는 화학 이야기",
+          "authors": "사마키 다케오",
+          "publisher": "시그마북스",
+          "publication_year": "",
+          "isbn13": "9791168624993",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6055035/60550358745.20260622123939.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "430",
+          "class_nm": "자연과학 > 화학 > 화학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "사211ㅎ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "궁금했어, 전기와 자기",
+          "authors": "정창훈",
+          "publisher": "나무생각",
+          "publication_year": "2026",
+          "isbn13": "9791162184028",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39536/8/cover200/k802139637_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "427",
+          "class_nm": "자연과학 > 물리학 > 전기학 및 전자학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "정464ㄱ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "변호사 어벤저스 .12: ,환경법, 환경 지킴이가 되어라!",
+          "authors": "고희정",
+          "publisher": "가나출판사",
+          "publication_year": "2026",
+          "isbn13": "9791168092341",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39876/72/cover200/k772130414_1.jpg",
+          "addition_symbol": "",
+          "vol": "12",
+          "class_no": "360",
+          "class_nm": "사회과학 > 법학 > 법학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "변379ㄱ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "왜 어떤 말은 상처가 될까? :나의 말을 돌아보는 시간",
+          "authors": "공주영",
+          "publisher": "나무의말",
+          "publication_year": "2026",
+          "isbn13": "9791199605350",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39474/71/cover200/k872139313_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "714",
+          "class_nm": "언어 > 한국어 > 어휘",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "공781ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "엘리베이터에 갇힌 고고학자 :3천 년 고대 그리스를 탐사하는 유쾌한 고고학",
+          "authors": "파파코스타스, 테오도로스",
+          "publisher": "교양인",
+          "publication_year": "2026",
+          "isbn13": "9791193154632",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39738/64/cover200/k262130900_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "902.5",
+          "class_nm": "역사 > 역사 > 역사보조학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "파174ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "패싱 :넬라 라슨 지음",
+          "authors": "라슨, 넬라",
+          "publisher": "민음사",
+          "publication_year": "2026",
+          "isbn13": "9788937464935",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6055172/60551725608.20260623071211.jpg",
+          "addition_symbol": "",
+          "vol": "493",
+          "class_no": "808",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "세238ㅁ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "죽은 자의 스토킹",
+          "authors": "안도릴, 알렉스",
+          "publisher": "필름",
+          "publication_year": "2026",
+          "isbn13": "9791124468197",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39380/71/cover200/k152139870_1.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "859.7",
+          "class_nm": "문학 > 독일문학 > 기타 게르만 문학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "율926ㅍ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "인비인 :성해나 기담집",
+          "authors": "성해나",
+          "publisher": "한겨레출판",
+          "publication_year": "2026",
+          "isbn13": "9791172134297",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39581/25/cover200/k692139247_2.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "성218ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "우리 세희 :조해진 소설",
+          "authors": "조해진",
+          "publisher": "H(현대문학)",
+          "publication_year": "2026",
+          "isbn13": "9791167903594",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39295/47/cover200/k712138606_2.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "조935ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "아코디언 :천명관 장편소설",
+          "authors": "천명관",
+          "publisher": "창비",
+          "publication_year": "2026",
+          "isbn13": "9788936439965",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6041993/60419931459.20260612143521.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "천423ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "싫을 땐 싫다고 말해요",
+          "authors": "가이슬러, 다그마",
+          "publisher": "윌마",
+          "publication_year": "2026",
+          "isbn13": "9791199757653",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6058420/60584207893.20260625071202.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "853",
+          "class_nm": "문학 > 독일문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "가432ㅅ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "보석 아이스크림 대모험 :미란 그림책",
+          "authors": "미란",
+          "publisher": "",
+          "publication_year": "2004",
+          "isbn13": "9788936429683",
+          "set_isbn13": "",
+          "bookImageURL": "",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "미735ㅂ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "도깨비 임금님 납시오 :강혜숙 그림책",
+          "authors": "강혜숙",
+          "publisher": "초록귤(우리학교)",
+          "publication_year": "2026",
+          "isbn13": "9791167553881",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6067761/60677617797.20260701143234.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "강879ㄷ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "꽃처럼 말해요 :최숙희 그림책",
+          "authors": "최숙희",
+          "publisher": "책읽는곰",
+          "publication_year": "2026",
+          "isbn13": "9791158366230",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39377/65/cover200/k422139773_2.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "최781ㄲ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(한눈에 이해되는) 한국사, 세계사 미리보기 .5",
+          "authors": "문재갑",
+          "publisher": "북장단",
+          "publication_year": "2026",
+          "isbn13": "9791199316867",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39372/9/cover200/k892139661_1.jpg",
+          "addition_symbol": "",
+          "vol": "5",
+          "class_no": "909",
+          "class_nm": "역사 > 역사 > 세계사, 세계문화사",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "문623ㅎ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "지리 톡 세계 talk .4: ,서남부 유럽",
+          "authors": "조우영",
+          "publisher": "스푼북",
+          "publication_year": "2026",
+          "isbn13": "9791165816605",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39137/26/cover200/k472137655_1.jpg",
+          "addition_symbol": "",
+          "vol": "4",
+          "class_no": "980",
+          "class_nm": "역사 > 지리 > 지리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "조879ㅈ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "푸른 사자 와니니 :이현 장편동화 .10: ,초원으로 가는 길",
+          "authors": "이현",
+          "publisher": "창비",
+          "publication_year": "2026",
+          "isbn13": "9788936443542",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39769/52/cover200/8936443542_2.jpg",
+          "addition_symbol": "",
+          "vol": "354",
+          "class_no": "082",
+          "class_nm": "총류 > 일반 전집, 총서 > 2인 이상의 일반 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "창281ㅊ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "진짜 나로 변신",
+          "authors": "야마세 다카유키",
+          "publisher": "책속물고기",
+          "publication_year": "2026",
+          "isbn13": "9791163272014",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6064273/60642736464.20260701071833.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "833.8",
+          "class_nm": "문학 > 일본문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "야783ㅈ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "우리는 매일매일 마음이 자라요",
+          "authors": "이주희",
+          "publisher": "개암나무",
+          "publication_year": "2026",
+          "isbn13": "9788968309533",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6055447/60554471102.20260623084217.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "이645ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(야흥 야흥!) 운명 해결사 천호냥 .2: ,뒤틀린 운명의 쌍둥이",
+          "authors": "이현아",
+          "publisher": "미래엔아이세움",
+          "publication_year": "2026",
+          "isbn13": "9791175488199",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6048765/60487653574.20260617155041.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "이783ㅇ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      }
+    ]
+  }
+}

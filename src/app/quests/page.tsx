@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { DEFAULT_LIBRARY_CODE } from "@/lib/config";
 import { getQuestList } from "@/lib/data";
 
 // DB 상태를 항상 최신으로 보여줘야 하므로 빌드 시점 정적 생성 대신 요청마다 조회한다.
@@ -10,12 +12,26 @@ const DIFFICULTY_LABEL: Record<string, string> = {
   hard: "어려움",
 };
 
-export default async function QuestsPage() {
-  const { quests, usingDemoData } = await getQuestList();
+export default async function QuestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ library?: string }>;
+}) {
+  const { library } = await searchParams;
+  const libraryCode = library ?? DEFAULT_LIBRARY_CODE;
+  const { quests, usingDemoData, libraryName } = await getQuestList(libraryCode);
+
+  // library 쿼리로 들어온 코드가 DB에 없는 도서관이면(잘못된 코드 등) 명확히 404 처리한다.
+  if (!usingDemoData && libraryName === null) {
+    notFound();
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
-      <h1 className="text-xl font-bold">퀘스트 선택</h1>
+      <Link href="/" className="text-xs text-slate-400">
+        ← 도서관 선택
+      </Link>
+      <h1 className="mt-2 text-xl font-bold">{libraryName ?? "퀘스트"} 퀘스트</h1>
       <p className="mt-1 text-sm text-slate-500">
         원하는 퀘스트를 골라 서가 탐험을 시작하세요.
       </p>

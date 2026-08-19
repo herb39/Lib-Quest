@@ -1,6 +1,7 @@
 // 운영자 검수 화면 / 데이터 출처 화면 전용 조회.
 // 두 화면 모두 발표 중 검수·출처 확인이 목적이므로 데모 데이터로 대체하지 않는다.
 // DATABASE_URL이 없으면 명시적으로 "DB 연결 필요" 상태를 반환한다.
+import { DEFAULT_LIBRARY_CODE } from "@/lib/config";
 
 export type AdminBook = {
   isbn13: string;
@@ -32,25 +33,34 @@ export type AdminQuest = {
   steps: AdminStep[];
 };
 
+export type AdminLibraryOption = { code: string; name: string };
+
 export type AdminReviewData =
   | { available: false }
   | {
       available: true;
       library: { code: string; name: string };
+      libraryOptions: AdminLibraryOption[];
       quests: AdminQuest[];
       bookCount: number;
       stepCount: number;
       candidateCount: number;
     };
 
-export async function getAdminReviewData(): Promise<AdminReviewData> {
+export async function getAdminReviewData(
+  libraryCode: string = DEFAULT_LIBRARY_CODE
+): Promise<AdminReviewData> {
   if (!process.env.DATABASE_URL) {
     return { available: false };
   }
 
   const { prisma } = await import("@/lib/prisma");
 
-  const library = await prisma.library.findFirst();
+  const [libraryOptions, library] = await Promise.all([
+    prisma.library.findMany({ orderBy: { createdAt: "asc" }, select: { code: true, name: true } }),
+    prisma.library.findUnique({ where: { code: libraryCode } }),
+  ]);
+
   if (!library) {
     return { available: false };
   }
@@ -78,6 +88,7 @@ export async function getAdminReviewData(): Promise<AdminReviewData> {
   return {
     available: true,
     library: { code: library.code, name: library.name },
+    libraryOptions,
     bookCount,
     stepCount,
     candidateCount,
@@ -107,13 +118,20 @@ export async function getAdminReviewData(): Promise<AdminReviewData> {
   };
 }
 
+export type DataSourceLibraryStat = {
+  code: string;
+  name: string;
+  bookCount: number;
+  questCount: number;
+};
+
 export type DataSourceInfo =
   | { available: false }
   | {
       available: true;
-      library: { code: string; name: string };
-      bookCount: number;
-      questCount: number;
+      libraries: DataSourceLibraryStat[];
+      totalBookCount: number;
+      totalQuestCount: number;
     };
 
 export async function getDataSourceInfo(): Promise<DataSourceInfo> {
@@ -122,20 +140,26 @@ export async function getDataSourceInfo(): Promise<DataSourceInfo> {
   }
 
   const { prisma } = await import("@/lib/prisma");
-  const library = await prisma.library.findFirst();
-  if (!library) {
+  const dbLibraries = await prisma.library.findMany({
+    orderBy: { createdAt: "asc" },
+    include: { _count: { select: { books: true, quests: true } } },
+  });
+
+  if (dbLibraries.length === 0) {
     return { available: false };
   }
 
-  const [bookCount, questCount] = await Promise.all([
-    prisma.book.count({ where: { libraryId: library.id } }),
-    prisma.quest.count({ where: { libraryId: library.id } }),
-  ]);
+  const libraries = dbLibraries.map((lib) => ({
+    code: lib.code,
+    name: lib.name,
+    bookCount: lib._count.books,
+    questCount: lib._count.quests,
+  }));
 
   return {
     available: true,
-    library: { code: library.code, name: library.name },
-    bookCount,
-    questCount,
+    libraries,
+    totalBookCount: libraries.reduce((sum, l) => sum + l.bookCount, 0),
+    totalQuestCount: libraries.reduce((sum, l) => sum + l.questCount, 0),
   };
 }

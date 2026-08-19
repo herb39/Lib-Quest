@@ -1,0 +1,859 @@
+{
+  "response": {
+    "request": {
+      "libCode": "130012",
+      "startDt": "2025-01-01",
+      "endDt": "2026-08-19",
+      "pageNo": "15",
+      "pageSize": "30",
+      "format": "json"
+    },
+    "libNm": "노은도서관",
+    "pageNo": 15,
+    "pageSize": 30,
+    "numFound": 7746,
+    "resultNum": 30,
+    "docs": [
+      {
+        "doc": {
+          "bookname": "남달리 멍멍타로",
+          "authors": "은소홀",
+          "publisher": "문학동네",
+          "publication_year": "2026",
+          "isbn13": "9791141617592",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39835/1/cover200/k352130814_1.jpg",
+          "addition_symbol": "",
+          "vol": "106",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "보433ㅁ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-04"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "어떤 결심 :윤슬빛 장편소설",
+          "authors": "윤슬빛",
+          "publisher": "책폴",
+          "publication_year": "2026",
+          "isbn13": "9791193162668",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6050077/60500771996.20260619071422.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "윤723ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-04"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "너무 늦은 안녕은 없다 :김하연 장편소설",
+          "authors": "김하연",
+          "publisher": "위즈덤하우스",
+          "publication_year": "2026",
+          "isbn13": "9791175910812",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39517/69/cover200/k202139619_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김928ㄴ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-04"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "입말음식 :제주 우영팟",
+          "authors": "하미현",
+          "publisher": "Spoken Books",
+          "publication_year": "2020",
+          "isbn13": "9791197285608",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/26014/27/cover/k262737838_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "594.51",
+          "class_nm": "기술과학 > 가정학 및 가정생활 > 식품과 식료",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "하182ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-04"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "주식투자 불패의 법칙 :부의 체급을 바꾸는 고수익 투자의 정석",
+          "authors": "조진표",
+          "publisher": "오아시스",
+          "publication_year": "2026",
+          "isbn13": "9791168274730",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6058420/60584208012.20260624155042.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "327.856",
+          "class_nm": "사회과학 > 경제학 > 금융",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "조888ㅈ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "지금부터 주식공부 다시 시작이다 :투자에 성공한 감은숙 따라하기",
+          "authors": "감은숙",
+          "publisher": "타래(도서출판)",
+          "publication_year": "2026",
+          "isbn13": "9791193984536",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39422/90/cover200/k602139296_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "327.856",
+          "class_nm": "사회과학 > 경제학 > 금융",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "감636ㅈ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "가장 뜨거운 여름에 우리는 죽기로 했다",
+          "authors": "다카야마 간",
+          "publisher": "허밍북스",
+          "publication_year": "2026",
+          "isbn13": "9791199175280",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39768/97/cover200/k282130108_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "833.6",
+          "class_nm": "문학 > 일본문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "다253ㄱ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "휴대폰과 독화살 :역마살로드, 사라져가는 세계의 마지막 기록",
+          "authors": "장준호",
+          "publisher": "시월",
+          "publication_year": "2026",
+          "isbn13": "9791191975376",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39789/57/cover200/k732130303_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "980.24",
+          "class_nm": "역사 > 지리 > 지리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "장521ㅎ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "영혼의 왈츠 :베르나르 베르베르 장편소설 .2",
+          "authors": "베르베르, 베르나르",
+          "publisher": "열린책들",
+          "publication_year": "2026",
+          "isbn13": "9788932925790",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6045614/60456148386.20260615201916.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "863",
+          "class_nm": "문학 > 프랑스문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "베198ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "생리를 시작했어요",
+          "authors": "송소정",
+          "publisher": "블루무스어린이",
+          "publication_year": "2022",
+          "isbn13": "9791191426489",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/29501/79/cover/k032837149_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "516.41",
+          "class_nm": "기술과학 > 의학 > 부인과, 산과학, 소아과학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "송623ㅅ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "난 늘 첫사랑만 해요 :김광명 시집",
+          "authors": "김광명",
+          "publisher": "시인의일요일",
+          "publication_year": "2025",
+          "isbn13": "9791192732299",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37063/28/cover200/k982030333_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "811.7",
+          "class_nm": "문학 > 한국문학 > 시",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김183ㄴ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(냉장고 히어로) 김치치 .2: ,동치미 합창단 대소동",
+          "authors": "권정아",
+          "publisher": "웅진주니어",
+          "publication_year": "2025",
+          "isbn13": "9788901299761",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39262/84/cover200/8901299763_1.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "권681ㄱ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "IB를 넘어 KB로 :대한민국 교육을 다시 설계하다",
+          "authors": "이혜정",
+          "publisher": "창비교육",
+          "publication_year": "2026",
+          "isbn13": "9791165704315",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6027652/60276523184.20260603084222.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "371",
+          "class_nm": "사회과학 > 교육학 > 교육정책 및 행정",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "이792ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "필사의 쓸모 .1: ,논어편",
+          "authors": "공자",
+          "publisher": "홍익",
+          "publication_year": "2026",
+          "isbn13": "9791199764033",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39380/15/cover200/k932139777_1.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "802",
+          "class_nm": "문학 > 문학 > 문장작법, 수사학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "공773ㅍ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "영혼들의 운명 :삶과 삶 사이의 새로운 사례 연구 .1",
+          "authors": "뉴턴, 마이클",
+          "publisher": "나무생각",
+          "publication_year": "2025",
+          "isbn13": "9791162183298",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/35537/40/cover200/k532036172_1.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "184.4",
+          "class_nm": "철학 > 심리학 > 이상심리학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "뉴961ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "나 없이도 살아가는 네가 되기를 너 없이는 못 사는 내가 바란다 :파선강 에세이",
+          "authors": "파선강",
+          "publisher": "달먹는토끼",
+          "publication_year": "2026",
+          "isbn13": "9791199642041",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38992/91/cover200/k672137124_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "818",
+          "class_nm": "문학 > 한국문학 > 르포르타주 및 기타",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "파136ㄴ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "마법에 걸린 집을 길들이는 법",
+          "authors": "홈버그, 찰리 N",
+          "publisher": "Book Plaza(북플라자)",
+          "publication_year": "2024",
+          "isbn13": "9791193324271",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/35144/87/cover200/k192934816_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "843.6",
+          "class_nm": "문학 > 영미문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "홈439ㅁ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "윗집 부부 :황보름 장편소설",
+          "authors": "황보름",
+          "publisher": "클레이하우스",
+          "publication_year": "2026",
+          "isbn13": "9791193235966",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39532/5/cover200/k602139634_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "황652ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "질문이 스펙이다 :합격을 설계하는 100개의 질문",
+          "authors": "이원",
+          "publisher": "좋은땅",
+          "publication_year": "2026",
+          "isbn13": "9791138862400",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39841/96/cover200/k432130115_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.337",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "이532ㅈ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "계절 쓰기",
+          "authors": "김연수",
+          "publisher": "물결점",
+          "publication_year": "2026",
+          "isbn13": "9791199533240",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39759/35/cover200/k092130907_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "818",
+          "class_nm": "문학 > 한국문학 > 르포르타주 및 기타",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김649ㄱ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "보다",
+          "authors": "김남숙",
+          "publisher": "열린책들",
+          "publication_year": "2025",
+          "isbn13": "9788932925394",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37536/47/cover200/8932925399_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김332ㅂ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "체호프 단편선",
+          "authors": "체호프, 안톤",
+          "publisher": "문예출판사",
+          "publication_year": "2025",
+          "isbn13": "9788931025491",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/36973/34/cover200/8931025491_1.jpg",
+          "addition_symbol": "",
+          "vol": "35",
+          "class_no": "808.8",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "문598ㅁ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "최소한의 기획 공식 :기획자, 마케터를 지름길로 안내하는 초간단 프레임워크",
+          "authors": "야스오카 히로미치",
+          "publisher": "RHK(알에이치코리아)",
+          "publication_year": "2026",
+          "isbn13": "9788925569475",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38989/36/cover200/8925569477_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.1",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "야812ㅊ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(진짜 하루만에 이해하는) 해운·조선 산업 :원데이클래스",
+          "authors": "김성훈",
+          "publisher": "T.W.I.G(티더블유아이지)",
+          "publication_year": "2025",
+          "isbn13": "9791191590319",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/36540/92/cover200/k742039945_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "326.36",
+          "class_nm": "사회과학 > 경제학 > 공익사업",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김575ㅎ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "영혼의 왈츠 :베르나르 베르베르 장편소설 .1",
+          "authors": "베르베르, 베르나르",
+          "publisher": "열린책들",
+          "publication_year": "2026",
+          "isbn13": "9788932925783",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6045167/60451679193.20260615125826.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "863",
+          "class_nm": "문학 > 프랑스문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "베198ㅇ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "다크심리학 :연애의 법칙 =Dark psychology",
+          "authors": "다크 마인드",
+          "publisher": "하이스트",
+          "publication_year": "2026",
+          "isbn13": "9791193282601",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38473/46/cover200/k482135013_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "189.2",
+          "class_nm": "철학 > 심리학 > 응용심리학 일반",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "다253ㄷ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "꽥 만약에 :생각을 더하는 가치 수업 .7",
+          "authors": "꽥",
+          "publisher": "서울문화사",
+          "publication_year": "2026",
+          "isbn13": "9791173711848",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6055447/60554474379.20260623084903.jpg",
+          "addition_symbol": "",
+          "vol": "7",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "꽥999ㄲ",
+                "shelf_loc_code": "NO000200",
+                "shelf_loc_name": "어린이실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "굿바이, 재버워크 :이사카 고타로 장편소설",
+          "authors": "이사카 고타로",
+          "publisher": "인플루엔셜",
+          "publication_year": "2026",
+          "isbn13": "9791168343955",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6060054/60600545672.20260626071205.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "833.6",
+          "class_nm": "문학 > 일본문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "이356ㄱ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "나는 생각보다 괜찮은 사람 :홍성남 신부의 자존감 수업",
+          "authors": "홍성남",
+          "publisher": "가톨릭출판사",
+          "publication_year": "2026",
+          "isbn13": "9788932119953",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39738/31/cover200/8932119953_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "238.204",
+          "class_nm": "종교 > 기독교 > 교파",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "홍477ㄴ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "시장의 마법사들 :세계 최고 트레이더들과 나눈 대화",
+          "authors": "슈웨거, 잭",
+          "publisher": "이레미디어",
+          "publication_year": "2026",
+          "isbn13": "9791193394984",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39363/79/cover200/k172139562_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "327.83",
+          "class_nm": "사회과학 > 경제학 > 금융",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "슈993ㅅ",
+                "shelf_loc_code": "NO000100",
+                "shelf_loc_name": "종합자료실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-28"
+        }
+      }
+    ]
+  }
+}

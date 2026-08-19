@@ -2,7 +2,7 @@
  * Data4Library 도서관 검색 API(libSrch)로 실제 libCode를 조회한다.
  *
  * libCode를 추측/하드코딩하지 않기 위한 스크립트다. 반드시 이 스크립트(또는 동등한 실제 API 호출)로
- * 확인된 값만 src/lib/config.ts의 LIBRARY_CODE에 반영한다.
+ * 확인된 값만 src/lib/config.ts의 LIBRARIES 배열에 반영한다.
  *
  * 실측 결과: libSrch의 `keyword` 파라미터는 서버 측에서 필터링하지 않고 전체 도서관 목록을
  * 그대로 반환한다(2026-08 기준 numFound=1602). 그래서 이 스크립트는 전체 목록을 pageSize로

@@ -1,0 +1,859 @@
+{
+  "response": {
+    "request": {
+      "libCode": "125010",
+      "startDt": "2026-06-01",
+      "endDt": "2026-08-19",
+      "pageNo": "5",
+      "pageSize": "30",
+      "format": "json"
+    },
+    "libNm": "가수원도서관",
+    "pageNo": 5,
+    "pageSize": 30,
+    "numFound": 1915,
+    "resultNum": 30,
+    "docs": [
+      {
+        "doc": {
+          "bookname": "웃음과 망각의 책",
+          "authors": "쿤데라, 밀란",
+          "publisher": "민음사",
+          "publication_year": "2026",
+          "isbn13": "9788937404658",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38831/87/cover200/8937404656_1.jpg",
+          "addition_symbol": "",
+          "vol": "5",
+          "class_no": "892.96",
+          "class_nm": "문학 > 기타 제문학 > 인도-유럽계문학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "쿤531ㅁ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "한영 육아 번역기 :두 세계 사이에서 아이를 키운다는 것",
+          "authors": "임현주",
+          "publisher": "한겨레엔",
+          "publication_year": "2026",
+          "isbn13": "9791172133948",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38893/63/cover200/k232137504_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "818",
+          "class_nm": "문학 > 한국문학 > 르포르타주 및 기타",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "임989ㅎ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "혜화동 한옥에서 치매 엄마랑 살아요",
+          "authors": "김영연",
+          "publisher": "문학세계사",
+          "publication_year": "2026",
+          "isbn13": "9791193001912",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38602/64/cover200/k252136578_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "818",
+          "class_nm": "문학 > 한국문학 > 르포르타주 및 기타",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김675ㅎ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": "c.2"
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "한번 시작하면 잠들 수 없는 클래식",
+          "authors": "윤진",
+          "publisher": "빅피시",
+          "publication_year": "2026",
+          "isbn13": "9791124137116",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38729/90/cover200/k482136846_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "670.15",
+          "class_nm": "예술 > 음악 > 음악",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "윤847ㅎ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "이토록 위대한 몸",
+          "authors": "엔더스, 줄리아",
+          "publisher": "21세기북스(북이십일 21세기북스)",
+          "publication_year": "2026",
+          "isbn13": "9791173577925",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38705/83/cover200/k022136923_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "517.3",
+          "class_nm": "기술과학 > 의학 > 위생학, 공공의학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "엔239ㅇ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "탐조, 담다",
+          "authors": "권동희",
+          "publisher": "지성사",
+          "publication_year": "2026",
+          "isbn13": "9788978895729",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38900/90/cover200/8978895727_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "498.05",
+          "class_nm": "자연과학 > 동물학 > 조류",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "권556ㅌ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(전자기 시대를 연, 물리학의 두 거장) 패러데이와 맥스웰 :실험과 이론의 협력으로 빚어낸 21세기 과학의 새로운 패러다임",
+          "authors": "포브스, 낸시",
+          "publisher": "반니출판",
+          "publication_year": "2026",
+          "isbn13": "9791124280232",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38726/95/cover200/k352136843_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "427",
+          "class_nm": "자연과학 > 물리학 > 전기학 및 전자학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "포588ㅍ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "과학은 반역이다",
+          "authors": "다이슨, 프리먼",
+          "publisher": "반니(반니출판)",
+          "publication_year": "2026",
+          "isbn13": "9791124280287",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38648/69/cover200/k212136513_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "다228ㄱ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "우리는 광고비 없이 AI로 팝니다 :제로 클릭 시대를 살아가는 마케터를 위한 새로운 필독서",
+          "authors": "김재희",
+          "publisher": "다산북스",
+          "publication_year": "2026",
+          "isbn13": "9791130676258",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39058/32/cover200/k442137644_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.5",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김795ㅇ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "마인드 해킹 :소비심리를 지배하는 아주 작은 행동과학",
+          "authors": "쇼튼, 리처드",
+          "publisher": "RHK(알에이치코리아)",
+          "publication_year": "2026",
+          "isbn13": "9788925569420",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39117/39/cover200/8925569426_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "321.89",
+          "class_nm": "사회과학 > 경제학 > 경제각론",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "쇼766ㅁ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "최강의 일하는 방식 키엔스 :신입부터 베테랑까지, 최단 시간에 최대의 성과를 내는 간단한 규칙",
+          "authors": "사이타 신지",
+          "publisher": "청홍",
+          "publication_year": "2026",
+          "isbn13": "9788965023623",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39152/34/cover200/8965023629_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.5",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "사296ㅊ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "스타트업 아이템 발굴부터 투자 유치까지",
+          "authors": "임성준",
+          "publisher": "유노콘텐츠그룹",
+          "publication_year": "2026",
+          "isbn13": "9791171831654",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39023/72/cover200/k102137637_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.21",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "임939ㅅ",
+                "shelf_loc_code": "GSW00100",
+                "shelf_loc_name": "도서전자실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(Go Go) 카카오프렌즈 자연탐사 .15 ,유라시아 대초원",
+          "authors": "조주희",
+          "publisher": "아울북(북이십일 아울북)",
+          "publication_year": "2022",
+          "isbn13": "9791173575648",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39065/96/cover200/k112137754_1.jpg",
+          "addition_symbol": "",
+          "vol": "15",
+          "class_no": "408",
+          "class_nm": "자연과학 > 자연과학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "조866ㅋ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "에플샘의 아삭 수학 3학년 :초등학교 선생님 4인과 미리 맛보는 수학",
+          "authors": "김유미",
+          "publisher": "시대인",
+          "publication_year": "2025",
+          "isbn13": "9791138384902",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/35517/42/cover200/k832036766_1.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "375.2",
+          "class_nm": "사회과학 > 교육학 > 유아 및 초등교육",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "사141ㅅ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "라면 사면 과학 드립니다",
+          "authors": "정윤선",
+          "publisher": "풀빛",
+          "publication_year": "2026",
+          "isbn13": "9791194636816",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_5936498/59364988483.20260323184335.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "정389ㄹ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "국제 우주 정거장 서바이벌 24시",
+          "authors": "프레보, 파스칼",
+          "publisher": "라임",
+          "publication_year": "2026",
+          "isbn13": "9791194028697",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38727/36/cover200/k082136844_1.jpg",
+          "addition_symbol": "",
+          "vol": "25",
+          "class_no": "082",
+          "class_nm": "총류 > 일반 전집, 총서 > 2인 이상의 일반 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "라238ㄹ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "데미안 :에밀 싱클레어의 젊은 시절 이야기",
+          "authors": "헤세, 헤르만",
+          "publisher": "비룡소",
+          "publication_year": "2026",
+          "isbn13": "9788949141862",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39030/22/cover200/8949141868_1.jpg",
+          "addition_symbol": "",
+          "vol": "62",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "비925바",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "아르헨티나에서 보물찾기",
+          "authors": "팝콘스토리",
+          "publisher": "미래엔",
+          "publication_year": "2026",
+          "isbn13": "9791175487611",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39019/15/cover200/k912137639_1.jpg",
+          "addition_symbol": "",
+          "vol": "36",
+          "class_no": "909",
+          "class_nm": "역사 > 역사 > 세계사, 세계문화사",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "세256ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "비교의 여왕",
+          "authors": "최형미",
+          "publisher": "잇츠북어린이",
+          "publication_year": "2026",
+          "isbn13": "9791194082422",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38697/51/cover200/k162136828_1.jpg",
+          "addition_symbol": "",
+          "vol": "55",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "저666ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "국경을 넘은 소년 :문부일 창작동화",
+          "authors": "문부일",
+          "publisher": "사계절(사계절출판사)",
+          "publication_year": "2025",
+          "isbn13": "9791169814119",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38082/64/cover200/k932034086_1.jpg",
+          "addition_symbol": "",
+          "vol": "118",
+          "class_no": "808.8",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "사141ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "이야기하는 교과서 과학 .2 ,지구과학·생명과학",
+          "authors": "이성희",
+          "publisher": "한권의책",
+          "publication_year": "2026",
+          "isbn13": "9791185237688",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38954/12/cover200/k272137214_1.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "404",
+          "class_nm": "자연과학 > 자연과학 > 강연집, 수필집, 연설문집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "이384ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "오더 :아기 해달 이야기",
+          "authors": "애플게이트, 캐서린",
+          "publisher": "미운오리새끼",
+          "publication_year": "2025",
+          "isbn13": "9791165184049",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/36665/29/cover200/k202030289_1.jpg",
+          "addition_symbol": "",
+          "vol": "21",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "미829ㅁ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "슬프지 않아",
+          "authors": "이현정",
+          "publisher": "해솔",
+          "publication_year": "2025",
+          "isbn13": "9791193147665",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37110/28/cover200/k112030256_1.jpg",
+          "addition_symbol": "",
+          "vol": "59",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "감626ㄱ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "내 친구 김삼연",
+          "authors": "홍정아",
+          "publisher": "천개의바람",
+          "publication_year": "2026",
+          "isbn13": "9791165737191",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38714/63/cover200/k762136632_1.jpg",
+          "addition_symbol": "",
+          "vol": "175",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "바119ㅊ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "빼미야, 일어나",
+          "authors": "지영우",
+          "publisher": "달리",
+          "publication_year": "2025",
+          "isbn13": "9788959985098",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_5379284/53792840245.20250327020321.jpg",
+          "addition_symbol": "",
+          "vol": "19",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "달315ㄷ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "분홍색을 좋아하는 아저씨",
+          "authors": "다케무라 다케시",
+          "publisher": "아울북(북이십일 아울북)",
+          "publication_year": "2026",
+          "isbn13": "9791173579493",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39127/99/cover200/k962137453_1.jpg",
+          "addition_symbol": "",
+          "vol": "4",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "처382ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "일눈이와 백눈이",
+          "authors": "이만경",
+          "publisher": "다정다감",
+          "publication_year": "2025",
+          "isbn13": "9791193140246",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/36257/41/cover200/k132038623_1.jpg",
+          "addition_symbol": "",
+          "vol": "25",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "다237ㄷ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "내 이름은 마리모",
+          "authors": "연두",
+          "publisher": "어위키",
+          "publication_year": "2026",
+          "isbn13": "9791193992821",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38648/62/cover200/k932136513_2.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "퐁666ㅇ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "동물원을 삼킨 사자",
+          "authors": "알보, 파블로",
+          "publisher": "데이원",
+          "publication_year": "2026",
+          "isbn13": "9791173352256",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39137/5/cover200/k842137654_1.jpg",
+          "addition_symbol": "",
+          "vol": "3",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "도724ㄷ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "헨리는 예술가",
+          "authors": "워슬리 , 저스틴",
+          "publisher": "바람의아이들",
+          "publication_year": "2025",
+          "isbn13": "9791162102473",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/36471/83/cover200/k812039912_1.jpg",
+          "addition_symbol": "",
+          "vol": "78",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "알694ㅂ",
+                "shelf_loc_code": "GSW00200",
+                "shelf_loc_name": "어린이도서실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-08-11"
+        }
+      }
+    ]
+  }
+}

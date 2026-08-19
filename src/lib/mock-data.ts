@@ -32,6 +32,7 @@ export const DEMO_QUESTS: QuestSummary[] = [
     theme: "한국소설",
     estimatedMinutes: 15,
     difficulty: "easy",
+    libraryName: "데모 도서관",
     steps: [
       {
         id: "step-1",

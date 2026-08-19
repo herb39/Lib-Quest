@@ -1,27 +1,56 @@
 import Link from "next/link";
-import { LIBRARY_CODE, LIBRARY_NAME } from "@/lib/config";
+import { getLibraryList } from "@/lib/data";
 
-export default function Home() {
+// 도서관 목록은 DB 상태를 반영해야 하므로 매 요청마다 조회한다.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const { libraries } = await getLibraryList();
+
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between px-5 py-8">
-      <div>
-        <h1 className="mt-2 text-2xl font-bold leading-snug">
-          서가를 걸으며
-          <br />책을 발견하는 여정
-        </h1>
-      </div>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
+      <h1 className="text-2xl font-bold leading-snug">
+        대전의 도서관에서
+        <br />새로운 책을 발견해보세요.
+      </h1>
 
-      <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-medium text-slate-400">대표 도서관</p>
-        <h2 className="mt-1 text-lg font-semibold">{LIBRARY_NAME}</h2>
-        <p className="mt-1 text-xs text-slate-400">libCode {LIBRARY_CODE}</p>
+      <p className="mt-4 text-sm text-slate-500">이용할 도서관을 선택하세요.</p>
 
-        <Link
-          href="/quests"
-          className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-slate-900 text-sm font-semibold text-white active:bg-slate-800"
-        >
-          퀘스트 보러가기
-        </Link>
+      <div className="mt-4 flex flex-col gap-3">
+        {libraries.map((lib) => {
+          const playable = lib.questCount > 0;
+          return (
+            <div
+              key={lib.code}
+              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="font-semibold">{lib.name}</h2>
+                {lib.isFeatured && (
+                  <span className="shrink-0 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-medium text-white">
+                    대표 시연
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-slate-400">{lib.region}</p>
+              <p className="mt-1 text-xs text-slate-400">
+                {playable ? `퀘스트 ${lib.questCount}개 이용 가능` : "퀘스트 준비 중"}
+              </p>
+
+              <Link
+                href={playable ? `/quests?library=${lib.code}` : "#"}
+                aria-disabled={!playable}
+                className={`mt-3 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold ${
+                  playable
+                    ? "bg-slate-900 text-white active:bg-slate-800"
+                    : "pointer-events-none bg-slate-100 text-slate-400"
+                }`}
+              >
+                퀘스트 보기
+              </Link>
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-6 flex gap-2">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DEFAULT_LIBRARY_CODE } from "@/lib/config";
 import { getAdminReviewData } from "@/lib/admin-data";
 import { CopyIsbnButton } from "@/components/CopyIsbnButton";
 
@@ -12,8 +13,14 @@ const DIFFICULTY_LABEL: Record<string, string> = {
   hard: "어려움",
 };
 
-export default async function AdminReviewPage() {
-  const data = await getAdminReviewData();
+export default async function AdminReviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ library?: string }>;
+}) {
+  const { library } = await searchParams;
+  const libraryCode = library ?? DEFAULT_LIBRARY_CODE;
+  const data = await getAdminReviewData(libraryCode);
 
   if (!data.available) {
     return (
@@ -33,8 +40,24 @@ export default async function AdminReviewPage() {
         실제 후보 도서와 위치 정보를 확인하는 읽기 전용 화면입니다.
       </p>
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        {data.libraryOptions.map((opt) => (
+          <Link
+            key={opt.code}
+            href={`/admin/review?library=${opt.code}`}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+              opt.code === data.library.code
+                ? "bg-slate-900 text-white"
+                : "border border-slate-300 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            {opt.name}
+          </Link>
+        ))}
+      </div>
+
       <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold text-slate-400">대표 도서관</p>
+        <p className="text-xs font-semibold text-slate-400">선택한 도서관</p>
         <p className="mt-1 font-semibold">
           {data.library.name} <span className="font-normal text-slate-400">libCode {data.library.code}</span>
         </p>

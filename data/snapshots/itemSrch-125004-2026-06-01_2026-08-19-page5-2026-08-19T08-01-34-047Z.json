@@ -1,0 +1,859 @@
+{
+  "response": {
+    "request": {
+      "libCode": "125004",
+      "startDt": "2026-06-01",
+      "endDt": "2026-08-19",
+      "pageNo": "5",
+      "pageSize": "30",
+      "format": "json"
+    },
+    "libNm": "갈마도서관",
+    "pageNo": 5,
+    "pageSize": 30,
+    "numFound": 898,
+    "resultNum": 30,
+    "docs": [
+      {
+        "doc": {
+          "bookname": "내 인생의 배경지식 한 권 교양 - 모든 경험이 지식이 되는 질문 수업",
+          "authors": "유선경",
+          "publisher": "앤의서재",
+          "publication_year": "2026",
+          "isbn13": "9791194877202",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39134/68/cover200/k122137659_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "001.3",
+          "class_nm": "총류 > 총류 > 지식, 학문 일반",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "유486ㄴ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "다시 시작하는 마더링 - 엄마의 역할이 바뀌면, 아이의 미래가 달라진다",
+          "authors": "서혜진",
+          "publisher": "북하우스 퍼블리셔스",
+          "publication_year": "2026",
+          "isbn13": "9791164053537",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38646/13/cover200/k032136416_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "378.9",
+          "class_nm": "사회과학 > 교육학 > 사회교육",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "서887ㅁ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "달리기의 뇌과학",
+          "authors": "김대영",
+          "publisher": "다산북스",
+          "publication_year": "2026",
+          "isbn13": "9791130677491",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39355/30/cover200/k832138630_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "511.1813",
+          "class_nm": "기술과학 > 의학 > 기초의학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김379ㄷ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "도시 감각 - 디자인은 어떻게 도시를 움직이는가",
+          "authors": "김지원",
+          "publisher": "위즈덤하우스",
+          "publication_year": "2026",
+          "isbn13": "9791175910843",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39354/88/cover200/k932138630_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "539.7",
+          "class_nm": "기술과학 > 공학, 공업일반 > 위생, 도시, 환경공학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김845ㄷ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "공룡 도시",
+          "authors": "이은지",
+          "publisher": "Who's Got My Tail(후즈갓마이테일)",
+          "publication_year": "2025",
+          "isbn13": "9791190007733",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37399/22/cover200/k672032890_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "이556ㄱ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "그네 타는 법",
+          "authors": "박현민",
+          "publisher": "달그림",
+          "publication_year": "2026",
+          "isbn13": "9791191592887",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39223/84/cover200/k602138987_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "유",
+                "separate_shelf_name": "성남유아자료",
+                "book_code": "박743ㄱ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "[큰글자도서] 혼모노",
+          "authors": "성해나",
+          "publisher": "창비",
+          "publication_year": "2025",
+          "isbn13": "9788936400002",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37045/40/cover200/8936400002_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "큰글",
+                "separate_shelf_name": "큰글(대활자본도서)",
+                "book_code": "성218ㅎ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": "c.3"
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "글자 먹는 고양이 .2 ,용기의 맛",
+          "authors": "박서진",
+          "publisher": "보랏빛소어린이",
+          "publication_year": "2026",
+          "isbn13": "9791124156018",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38932/8/cover200/k892137816_1.jpg",
+          "addition_symbol": "",
+          "vol": "33",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "책356ㅂ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "웰컴 투 놀이 학교 .2 ,깍두기랑 줄넘기",
+          "authors": "신현경",
+          "publisher": "브릭하우스",
+          "publication_year": "2026",
+          "isbn13": "9791199854604",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_5976469/59764695506.20260422202107.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "신779ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "나민애의 문해력 게임 .5",
+          "authors": "나민애",
+          "publisher": "겜툰",
+          "publication_year": "2026",
+          "isbn13": "9791168442993",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39381/11/cover200/k082139872_1.jpg",
+          "addition_symbol": "",
+          "vol": "5",
+          "class_no": "710",
+          "class_nm": "언어 > 한국어 > 한국어",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "김964ㄴ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "다판다 편의점 .4 ,우정 두 배 두둥 쫀득 쿠키",
+          "authors": "강효미",
+          "publisher": "다산어린이",
+          "publication_year": "2026",
+          "isbn13": "9791130677415",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39448/53/cover200/k752139497_1.jpg",
+          "addition_symbol": "",
+          "vol": "4",
+          "class_no": "813.8",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "강884ㄷ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "동음이의어 말싸움",
+          "authors": "곽미영",
+          "publisher": "만만한책방",
+          "publication_year": "2026",
+          "isbn13": "9791189499921",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39152/17/cover200/k972138865_1.jpg",
+          "addition_symbol": "",
+          "vol": "5",
+          "class_no": "710",
+          "class_nm": "언어 > 한국어 > 한국어",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "만264ㅁ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "박뽕남 할머니의 수상한 외출",
+          "authors": "윤정",
+          "publisher": "내일도맑음",
+          "publication_year": "2026",
+          "isbn13": "9791193461402",
+          "set_isbn13": "",
+          "bookImageURL": "https://shopping-phinf.pstatic.net/main_6041921/60419213683.20260612154806.jpg",
+          "addition_symbol": "",
+          "vol": "14",
+          "class_no": "808.91",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "맑285ㄴ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(배경 지식을 알면 공부가 쉬워지는) 초등 사회 문해력 :3~4학년",
+          "authors": "박하연",
+          "publisher": "팜파스",
+          "publication_year": "2024",
+          "isbn13": "9791170266235",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/33147/47/cover/k282937035_1.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "300",
+          "class_nm": "사회과학 > 사회과학 > 사회과학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "박731ㅊ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "백 년 떡 방앗간의 비밀",
+          "authors": "최봄",
+          "publisher": "해솔",
+          "publication_year": "2025",
+          "isbn13": "9791193147528",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/35993/42/cover200/k922037613_1.jpg",
+          "addition_symbol": "",
+          "vol": "14",
+          "class_no": "808.9",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "해935ㅎ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(백앤아) GO GO 챌린지 GO! :챌린지로 배우는 초등 교과 .4",
+          "authors": "이태영",
+          "publisher": "샌드박스네트워크",
+          "publication_year": "2025",
+          "isbn13": "9791192504926",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39333/44/cover200/k922138439_1.jpg",
+          "addition_symbol": "",
+          "vol": "4",
+          "class_no": "375.2",
+          "class_nm": "사회과학 > 교육학 > 유아 및 초등교육",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "백975ㅂ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "벼래별 기업 탐구 .1 ,구글",
+          "authors": "한무무",
+          "publisher": "아울북",
+          "publication_year": "2026",
+          "isbn13": "9791173579752",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39354/38/cover200/k552138537_1.jpg",
+          "addition_symbol": "",
+          "vol": "1",
+          "class_no": "320",
+          "class_nm": "사회과학 > 경제학 > 경제학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "김556ㅂ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-07-23"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "슈뻘맨의 숨은 생물 찾기 .3 ,관찰하며 배우는 생물 지식",
+          "authors": "류수형",
+          "publisher": "미래엔아이세움",
+          "publication_year": "2025",
+          "isbn13": "9791175487079",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38717/7/cover200/k212136748_1.jpg",
+          "addition_symbol": "",
+          "vol": "3",
+          "class_no": "472",
+          "class_nm": "자연과학 > 생물과학 > 생물학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "아",
+                "separate_shelf_name": "아",
+                "book_code": "슈993ㅅ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "일러스트레이터를 위한 원근법과 깊이감 마스터 가이드북: ,Perspective & depth",
+          "authors": "쓰리디토털 퍼블리싱",
+          "publisher": "영진.com(영진닷컴)",
+          "publication_year": "2026",
+          "isbn13": "9788931481907",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38932/19/cover200/893148190x_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "651",
+          "class_nm": "예술 > 회화, 도화 > 채색이론 및 실제",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "쓰999아",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "잘 자고 잘 먹는 아기의 시간표 :0~2세 수면교육·수유·이유식에 관한 가장 신뢰할 수 있는 기준",
+          "authors": "정재호",
+          "publisher": "한빛라이프",
+          "publication_year": "2026",
+          "isbn13": "9791194725435",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39148/46/cover200/k972138869_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "598.122",
+          "class_nm": "기술과학 > 가정학 및 가정생활 > 육아",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "정423ㅈ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "저 밖에서 비명 소리가 :뉴 블랙 호러 앤솔러지",
+          "authors": "필, 조던",
+          "publisher": "황금가지",
+          "publication_year": "2026",
+          "isbn13": "9791170527060",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39059/41/cover200/k032137646_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "843.6",
+          "class_nm": "문학 > 영미문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "필988자",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "(정갈하고 건강한 한 끼) 집에서 즐기는 일본 요리 수업 :10년차 일본 가정식 요리 선생님이 알려주는 한국인이 가장 배우고 싶어 하는 일본 집밥 100가지",
+          "authors": "김은재",
+          "publisher": "레시피팩토리",
+          "publication_year": "2026",
+          "isbn13": "9791192366661",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/38881/1/cover200/k732137309_1.jpg",
+          "addition_symbol": "",
+          "vol": "2",
+          "class_no": "594.54",
+          "class_nm": "기술과학 > 가정학 및 가정생활 > 식품과 식료",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "세252ㄹ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "죽은 자의 녹취록 :미쓰다 신조 소설",
+          "authors": "미쓰다 신조",
+          "publisher": "더난콘텐츠그룹",
+          "publication_year": "2024",
+          "isbn13": "9791158792145",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/33730/65/cover/k642939649_1.jpg",
+          "addition_symbol": "",
+          "vol": "112",
+          "class_no": "808.3",
+          "class_nm": "문학 > 문학 > 전집, 총서",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "스224ㅂ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "펜슬 드로잉 :재밌는 그림을 위해 꼭 읽어야 하는",
+          "authors": "김동형",
+          "publisher": "Digital Books(디지털북스)",
+          "publication_year": "2024",
+          "isbn13": "9788960884588",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/34257/43/cover200/8960884588_2.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "656.8",
+          "class_nm": "예술 > 회화, 도화 > 소묘, 도화",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "김434ㅍ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "아는 것으로부터의 자유 :지두 크리슈나무르티의 가장 위대한 통찰",
+          "authors": "크리슈나무르티, 지두",
+          "publisher": "스노우폭스북스",
+          "publication_year": "2026",
+          "isbn13": "9791194966395",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39005/71/cover200/k132137329_2.jpg",
+          "addition_symbol": "",
+          "vol": "13",
+          "class_no": "308",
+          "class_nm": "사회과학 > 사회과학 > 총서, 전집, 선집",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "천399ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "왜 우리는 세계를 있는 그대로 보지 못하는가? :과학적 인식을 가로막는 직관의 한계에 대하여",
+          "authors": "슈툴먼, 앤드루",
+          "publisher": "바다출판사",
+          "publication_year": "2023",
+          "isbn13": "9791166891748",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/32228/77/cover/k632834733_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "400",
+          "class_nm": "자연과학 > 자연과학 > 자연과학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "슈994ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "우리는 같은 통점이 된다",
+          "authors": "김도경",
+          "publisher": "걷는사람",
+          "publication_year": "2025",
+          "isbn13": "9791175010178",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/37426/16/cover200/k892032999_1.jpg",
+          "addition_symbol": "",
+          "vol": "131",
+          "class_no": "811.608",
+          "class_nm": "문학 > 한국문학 > 시",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "걷959ㄱ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "원니스 :자기 자신으로 살게 하는 라이프 코칭 안내서  =Oneness",
+          "authors": "육현주",
+          "publisher": "행성B(행성비)",
+          "publication_year": "2026",
+          "isbn13": "9791164713127",
+          "set_isbn13": "",
+          "bookImageURL": "https://image.aladin.co.kr/product/39147/72/cover200/k452138767_1.jpg",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "325.37",
+          "class_nm": "사회과학 > 경제학 > 경영관리",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "육587ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "인간 지성에 관한 탐구",
+          "authors": "흄 데이비드",
+          "publisher": "아카넷",
+          "publication_year": "2026",
+          "isbn13": "9788989103561",
+          "set_isbn13": "",
+          "bookImageURL": "",
+          "addition_symbol": "",
+          "vol": "",
+          "class_no": "164.3",
+          "class_nm": "철학 > 서양철학 > 영국철학",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "흄892ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      },
+      {
+        "doc": {
+          "bookname": "모델",
+          "authors": "정해연",
+          "publisher": "위즈덤하우스",
+          "publication_year": "2025",
+          "isbn13": "9791168127005",
+          "set_isbn13": "",
+          "bookImageURL": "",
+          "addition_symbol": "",
+          "vol": "19",
+          "class_no": "813.7",
+          "class_nm": "문학 > 한국문학 > 소설",
+          "callNumbers": [
+            {
+              "callNumber": {
+                "separate_shelf_code": "",
+                "separate_shelf_name": "",
+                "book_code": "위371ㅇ",
+                "shelf_loc_code": "GAL00100",
+                "shelf_loc_name": "도서정보실",
+                "copy_code": ""
+              }
+            }
+          ],
+          "reg_date": "2026-06-17"
+        }
+      }
+    ]
+  }
+}

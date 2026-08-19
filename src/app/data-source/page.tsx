@@ -2,24 +2,16 @@ import { getDataSourceInfo } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
 
-// 실제 수집 당시(2026-08-19) 기록. Data4Library itemSrch는 등록 기간 기준 조회이며
-// 이 값들은 수집 이력이므로 코드/DB가 아닌 문서로 고정해 둔다 (재수집 시 함께 갱신).
-const COLLECTION = {
-  apiName: "도서관 정보나루(Data4Library) itemSrch",
-  startDt: "2026-06-01",
-  endDt: "2026-08-19",
-  rawCount: 300,
-  curatedCount: 36,
-  fields: [
-    "ISBN13",
-    "제목",
-    "저자",
-    "KDC 분류번호/분류명",
-    "청구기호",
-    "자료실/서가 위치",
-    "등록일",
-  ],
+// 실제 수집 이력(2026-08-19 기준). Data4Library itemSrch는 등록 기간 기준 조회이며
+// 도서관마다 수집 시점의 기간/원본 건수가 다르므로 DB가 아닌 문서로 고정해 둔다 (재수집 시 함께 갱신).
+const COLLECTION_HISTORY: Record<string, { startDt: string; endDt: string; rawCount: number }> = {
+  "130026": { startDt: "2026-06-01", endDt: "2026-08-19", rawCount: 300 },
+  "125004": { startDt: "2026-06-01", endDt: "2026-08-19", rawCount: 300 },
+  "125010": { startDt: "2025-01-01", endDt: "2026-08-19", rawCount: 450 },
+  "130012": { startDt: "2025-01-01", endDt: "2026-08-19", rawCount: 445 },
 };
+
+const FIELDS = ["ISBN13", "제목", "저자", "KDC 분류번호/분류명", "청구기호", "자료실/서가 위치", "등록일"];
 
 export default async function DataSourcePage() {
   const info = await getDataSourceInfo();
@@ -33,44 +25,55 @@ export default async function DataSourcePage() {
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <p className="text-xs font-semibold text-slate-400">활용 데이터</p>
-        <p className="mt-1 font-semibold">{COLLECTION.apiName}</p>
+        <p className="mt-1 font-semibold">도서관 정보나루(Data4Library) itemSrch</p>
         {info.available ? (
           <p className="mt-1 text-sm text-slate-500">
-            대표 도서관: {info.library.name} (libCode {info.library.code})
+            활용 도서관: {info.libraries.length}곳 · 전체 도서 {info.totalBookCount}권 · 전체 퀘스트{" "}
+            {info.totalQuestCount}개
           </p>
         ) : (
           <p className="mt-1 text-sm text-amber-600">DB 연결이 없어 현재 도서관 정보를 표시할 수 없습니다.</p>
         )}
       </section>
 
-      <section className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold text-slate-400">수집 정보</p>
-        <dl className="mt-2 grid grid-cols-2 gap-y-2 text-sm">
-          <dt className="text-slate-400">수집 API</dt>
-          <dd>itemSrch</dd>
-          <dt className="text-slate-400">수집 기간</dt>
-          <dd>
-            {COLLECTION.startDt} ~ {COLLECTION.endDt}
-          </dd>
-          <dt className="text-slate-400">원본 조회 건수</dt>
-          <dd>{COLLECTION.rawCount}건</dd>
-          <dt className="text-slate-400">발표용 큐레이션 도서</dt>
-          <dd>{COLLECTION.curatedCount}권</dd>
-          {info.available && (
-            <>
-              <dt className="text-slate-400">현재 DB 도서 수</dt>
-              <dd>{info.bookCount}권</dd>
-              <dt className="text-slate-400">현재 DB 퀘스트 수</dt>
-              <dd>{info.questCount}개</dd>
-            </>
-          )}
-        </dl>
-      </section>
+      {info.available && (
+        <section className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-semibold text-slate-400">도서관별 수집 정보</p>
+          <div className="mt-2 flex flex-col divide-y divide-slate-100">
+            {info.libraries.map((lib) => {
+              const history = COLLECTION_HISTORY[lib.code];
+              return (
+                <div key={lib.code} className="py-3 first:pt-0 last:pb-0">
+                  <p className="font-medium">
+                    {lib.name} <span className="font-normal text-slate-400">libCode {lib.code}</span>
+                  </p>
+                  <dl className="mt-1 grid grid-cols-2 gap-y-1 text-sm">
+                    {history && (
+                      <>
+                        <dt className="text-slate-400">수집 기간</dt>
+                        <dd>
+                          {history.startDt} ~ {history.endDt}
+                        </dd>
+                        <dt className="text-slate-400">원본 조회 건수</dt>
+                        <dd>{history.rawCount}건</dd>
+                      </>
+                    )}
+                    <dt className="text-slate-400">큐레이션 도서</dt>
+                    <dd>{lib.bookCount}권</dd>
+                    <dt className="text-slate-400">퀘스트</dt>
+                    <dd>{lib.questCount}개</dd>
+                  </dl>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <p className="text-xs font-semibold text-slate-400">수집된 필드</p>
         <ul className="mt-2 flex flex-wrap gap-1.5">
-          {COLLECTION.fields.map((f) => (
+          {FIELDS.map((f) => (
             <li key={f} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
               {f}
             </li>

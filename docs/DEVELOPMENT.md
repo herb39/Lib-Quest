@@ -33,10 +33,10 @@ Data4Library (itemSrch)
 
 ## 주요 데이터 모델
 
-`prisma/schema.prisma` 기준.
+`prisma/schema.prisma` 기준. 다중 도서관 지원을 위해 스키마를 변경한 적은 없다 — `libraryId` 외래키가 애초에 모든 모델에 있어 도서관을 몇 개 붙이든 구조 변경이 필요 없다. 단일→다중 도서관 확장은 전부 애플리케이션 레이어(`src/lib/config.ts`의 `LIBRARIES` 목록, 각 조회 함수의 `libraryCode` 매개변수, 화면의 도서관 선택 UI)에서 처리한다.
 
-- `Library` — 대표 도서관(단일). `code`(libCode), `name`
-- `Book` — 실제 수집 도서. `isbn13`, `title`, `author`, `classNo`/`className`(KDC), `callNumber`, `shelfLocation`, `registeredAt`, `source`
+- `Library` — 도서관. `code`(libCode, unique), `name`. 현재 4곳이 등록되어 있다 (아래 "Data4Library 수집" 참고).
+- `Book` — 실제 수집 도서. `isbn13`, `title`, `author`, `classNo`/`className`(KDC), `callNumber`, `shelfLocation`, `registeredAt`, `source`. `@@unique([libraryId, isbn13])`라 같은 ISBN이 다른 도서관에 각각 존재할 수 있다.
 - `Quest` — 퀘스트. `title`, `description`, `theme`, `estimatedMinutes`, `difficulty`, `published`
 - `QuestStep` — 퀘스트 단계. `order`, `title`, `description`, `hint`
 - `QuestCandidate` — 단계별 후보 도서 (`QuestStep` ↔ `Book`, `isPrimary`)
@@ -60,8 +60,8 @@ src/
     BarcodeScanner.tsx         # ZXing 기반 카메라 바코드 스캐너
     CopyIsbnButton.tsx          # /admin/review 전용 ISBN 클립보드 복사 버튼
   lib/
-    config.ts                 # 대표 도서관 식별자(LIBRARY_CODE/LIBRARY_NAME)
-    data.ts                   # /quests, /quests/[id]용 DB 조회 (DB 없으면 데모 데이터)
+    config.ts                 # 지원 도서관 목록(LIBRARIES) + 기본 도서관(DEFAULT_LIBRARY_CODE)
+    data.ts                   # /(홈), /quests, /quests/[id]용 DB 조회 (DB 없으면 데모 데이터)
     admin-data.ts              # /admin/review, /data-source용 DB 조회 (데모 대체 없음)
     mock-data.ts               # 로컬 개발 전용 데모 데이터 (실데이터 아님)
     prisma.ts                  # Prisma Client 싱글턴 (adapter-pg)
@@ -69,15 +69,15 @@ src/
 prisma/
   schema.prisma
   migrations/                 # 라이브 DB 연결 없이 `migrate diff`로 생성한 초기 마이그레이션 포함
-  seed.ts                     # data/collected-books.json + data/quest-curation.json만 시드
+  seed.ts                     # data/libraries/* 폴더를 전부 순회하며 시드
 scripts/
   lookup-library.ts           # Data4Library libSrch로 실제 libCode 조회
-  fetch-library-books.ts      # Data4Library itemSrch로 실제 도서 수집
+  fetch-library-books.ts      # Data4Library itemSrch로 실제 도서 수집 (data/libraries/<libCode>/에 저장)
 data/
-  README.md                   # 수집 절차 상세
-  snapshots/                  # itemSrch 원본 응답 (authKey 미포함)
-  collected-books.json        # 정규화·큐레이션된 실제 도서 목록
-  quest-curation.json         # 퀘스트/단계/후보 구성 (collected-books의 ISBN만 참조)
+  README.md                   # 수집 절차 상세, 도서관별 수집 이력, 검토 후 제외한 도서관 목록
+  snapshots/                  # itemSrch 원본 응답 (파일명에 libCode 포함, authKey 미포함)
+  libraries/
+    130026/  125004/  125010/  130012/   # 도서관별 collected-books.json + quest-curation.json
 docs/
   DEVELOPMENT.md               # 이 문서 (개발자/시스템 관리자용)
   OPERATOR_GUIDE.md            # 사서/운영자용 검수 가이드
@@ -112,7 +112,7 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm run lookup:library -- --keyword=도서관명` | Data4Library `libSrch`로 실제 libCode 조회 |
 | `npm run fetch:books -- --libCode=... --startDt=... --endDt=...` | Data4Library `itemSrch`로 실제 도서 수집 |
-| `npm run db:seed` | `data/collected-books.json` + `data/quest-curation.json`을 Neon에 시드 |
+| `npm run db:seed` | `data/libraries/` 아래 모든 도서관 폴더를 Neon에 시드 (이미 있는 Quest는 건너뜀) |
 | `npm run db:migrate` | (로컬 전용) `prisma migrate dev` |
 | `npm run db:studio` | Prisma Studio |
 
@@ -120,17 +120,28 @@ npm run dev
 
 ## Data4Library 수집 (현재 반영된 실데이터)
 
-대전 원신흥도서관, libCode `130026` (`scripts/lookup-library.ts`로 확인 — 전국에서 도서관명 "원신흥도서관"은 1건뿐이며 주소가 "대전광역시 유성구 원신흥남로 59"임을 확인).
+대전 지역 공공도서관 4곳을 실제 Data4Library API로 확인·수집해 지원한다 (`scripts/lookup-library.ts`로 libCode 확인, 후보 도서관 중 청구기호/서가위치 필드 완전성이 높은 곳만 채택 — 검토했으나 제외한 도서관 목록은 [data/README.md](../data/README.md) 참고).
 
-현재 `data/`에 반영되어 있는 실제 데이터 (repository 파일 기준):
+| libCode | 도서관 | 지역 | 비고 |
+| --- | --- | --- | --- |
+| 130026 | 대전 원신흥도서관 | 유성구 | 대표 시연 도서관 |
+| 125004 | 대전 갈마도서관 | 서구 | |
+| 125010 | 대전 가수원도서관 | 서구 | Quest1 구성을 실제 재고에 맞게 조정(상세는 data/README.md) |
+| 130012 | 대전 노은도서관 | 유성구 | |
 
-- 원본(raw) 조회: `itemSrch`, libCode 130026, 2026-06-01~2026-08-19, 300건 (`data/snapshots/` 10개 페이지 파일)
-- 큐레이션된 도서(curated): 36권 (`data/collected-books.json`)
-- Quest 3개 / QuestStep 9개(퀘스트당 3단계) / QuestCandidate 36개(단계당 4개) (`data/quest-curation.json`)
-
-재수집하거나 다른 도서관으로 바꾸려면 [data/README.md](../data/README.md)의 절차를 따른다. `itemSrch`는 `pageSize>=100`에서 504 Timeout이 발생해 `pageSize=30`으로 낮춰 두었다.
+도서관마다 `data/libraries/<libCode>/`에 `collected-books.json`(36권) + `quest-curation.json`(Quest 3 · Step 9 · Candidate 36)이 있다. 4곳 합계는 Library 4 / Book 144 / Quest 12 / QuestStep 36 / QuestCandidate 144. 재수집하거나 도서관을 추가하려면 [data/README.md](../data/README.md)의 절차를 따른다. `itemSrch`는 `pageSize>=100`에서 504 Timeout이 발생해 `pageSize=30`으로 낮춰 두었다.
 
 **`itemSrch`는 "등록 기간(startDt~endDt) 기준 조회"이며 실시간 대출 가능 여부가 아니다.** `registeredAt`(등록일)으로만 사용하며, 화면 어디에도 "지금 대출 가능"처럼 표현하지 않는다.
+
+## 다중 도서관 URL 구조
+
+라우터를 새로 만드는 대신 기존 `/quests`, `/admin/review`에 `?library=<libCode>` 쿼리 파라미터를 추가하는 방식을 택했다 (발표 일정상 과도한 라우팅 리팩토링을 피하기 위함).
+
+- `/` — `getLibraryList()`로 전체 도서관을 카드로 보여준다. 각 카드가 `/quests?library=<libCode>`로 연결된다.
+- `/quests?library=<libCode>` — 파라미터가 없으면 `DEFAULT_LIBRARY_CODE`(원신흥도서관)로 대체된다. DB에 없는 코드면 `notFound()`.
+- `/quests/[id]` — 퀘스트 `id`가 이미 전역적으로 유일(cuid)하므로 URL에 library 파라미터가 필요 없다. `QuestSummary.libraryName`으로 상단에 도서관명을 표시한다.
+- `/admin/review?library=<libCode>` — 상단 탭으로 도서관을 전환한다. 파라미터가 없으면 기본 도서관.
+- `/data-source` — 도서관 파라미터 없이 전체 도서관을 한 화면에 나열한다.
 
 ## Prisma / Neon
 
@@ -141,9 +152,10 @@ npx prisma migrate deploy   # 이미 생성된 마이그레이션만 적용 (des
 npm run db:seed             # 실데이터만 시드
 ```
 
-- `prisma/seed.ts`는 `data/collected-books.json`이 없으면 아예 실행되지 않는다 (가짜 데이터 시드 방지).
-- 큐레이션(`quest-curation.json`)이 `collected-books.json`에 없는 ISBN을 참조하거나, 한 단계의 candidate가 3개 미만이거나, 같은 단계에 중복 ISBN이 있으면 seed가 즉시 실패한다.
-- **production DB에 대해 `migrate reset`을 실행하거나 mock/생성 데이터를 시드하는 스크립트는 두지 않았다.** 마이그레이션은 항상 `migrate deploy`(기존 마이그레이션 파일 적용)만 사용한다.
+- `prisma/seed.ts`는 `data/libraries/` 폴더가 없거나 비어 있으면 아예 실행되지 않는다 (가짜 데이터 시드 방지). 폴더 하나하나가 도서관 하나에 대응하며, 폴더명(libCode)이 `src/lib/config.ts`의 `LIBRARIES`에 없으면 에러로 중단한다.
+- 큐레이션(`quest-curation.json`)이 같은 폴더의 `collected-books.json`에 없는 ISBN을 참조하거나, 한 단계의 candidate가 3개 미만이거나, 같은 단계에 중복 ISBN이 있으면 seed가 즉시 실패한다.
+- 같은 도서관에 같은 title의 Quest가 이미 있으면 다시 만들지 않고 건너뛴다 — 여러 번 실행하거나 도서관을 하나씩 추가해도 기존 Quest가 중복 생성되지 않는다.
+- **production DB에 대해 `migrate reset`을 실행하거나 mock/생성 데이터를 시드하는 스크립트는 두지 않았다.** 마이그레이션은 항상 `migrate deploy`(기존 마이그레이션 파일 적용)만 사용하며, 기존 데이터를 삭제하는 로직은 없다.
 
 ## Mock 정책
 
@@ -196,10 +208,11 @@ npm run build
 
 DB 연결이 가능한 로컬 환경이라면 추가로 확인한다.
 
-- `/quests` — DB의 퀘스트 3개가 데모 배너 없이 노출되는지
-- `/quests/[id]` — 실제 후보 도서(청구기호 등)로 QuestRunner가 렌더링되는지
+- `/` — 도서관 4곳이 모두 카드로 노출되는지
+- `/quests?library=<libCode>` — 선택한 도서관의 퀘스트 3개가 데모 배너 없이 노출되는지 (도서관별로 다른 책이 나와야 함)
+- `/quests/[id]` — 실제 후보 도서(청구기호 등)와 소속 도서관명으로 QuestRunner가 렌더링되는지
 - `POST /api/quests/[questId]/steps/[stepId]/verify` — 정답/오답/다른 단계 candidate ISBN 3가지 케이스
-- `/admin/review`, `/data-source` — DB 실데이터가 그대로 표시되는지
+- `/admin/review?library=<libCode>`, `/data-source` — DB 실데이터가 도서관별로 정확히 표시되는지, cross-library candidate 오류가 없는지
 
 ## 보안 및 운영 주의사항
 

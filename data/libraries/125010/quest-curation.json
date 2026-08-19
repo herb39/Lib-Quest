@@ -1,0 +1,142 @@
+{
+  "quests": [
+    {
+      "title": "익숙한 문학, 낯선 이야기",
+      "description": "도서전자실 문학 서가를 오가며 한국 소설, 영미 소설, 그리고 소설이 아닌 낯선 글까지 만나보는 퀘스트입니다.",
+      "theme": "문학",
+      "estimatedMinutes": 15,
+      "difficulty": "easy",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "우리말로 쓰인 새 이야기",
+          "description": "도서전자실 문학 서가, 청구기호 813번대에서 한국 소설을 찾아보세요.",
+          "hint": "영화로도 잘 알려진 작가의 소설집이 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9788954681155", "isPrimary": true },
+            { "isbn13": "9788936439910", "isPrimary": false },
+            { "isbn13": "9791163166795", "isPrimary": false },
+            { "isbn13": "9791193939499", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "바다 건너 온 이야기",
+          "description": "청구기호 843번대, 영미 소설 서가에서 한 권을 골라보세요.",
+          "hint": "SF와 스릴러가 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791166688348", "isPrimary": true },
+            { "isbn13": "9791130687001", "isPrimary": false },
+            { "isbn13": "9791192959726", "isPrimary": false },
+            { "isbn13": "9791173325731", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "소설이 아닌 낯선 문장",
+          "description": "같은 서가에서 소설이 아닌 산문·에세이(청구기호 818번대)를 찾아 퀘스트를 완료하세요.",
+          "hint": "육아, 투병, 가족을 담담하게 적은 글들이에요.",
+          "candidates": [
+            { "isbn13": "9791171259175", "isPrimary": true },
+            { "isbn13": "9791140718160", "isPrimary": false },
+            { "isbn13": "9791197857584", "isPrimary": false },
+            { "isbn13": "9791193001912", "isPrimary": false }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "서로 다른 서가로 떠나는 지식 여행",
+      "description": "사회과학, 자연과학, 예술 서가를 차례로 옮겨 다니며 전혀 다른 세 권을 찾는 퀘스트입니다.",
+      "theme": "분야탐색",
+      "estimatedMinutes": 20,
+      "difficulty": "normal",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "돈과 일의 미래",
+          "description": "도서전자실 사회과학 서가(청구기호 320번대)에서 경제·경영을 다룬 책을 찾아보세요.",
+          "hint": "행동경제학의 고전이 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9788925569406", "isPrimary": true },
+            { "isbn13": "9791192745657", "isPrimary": false },
+            { "isbn13": "9788965968221", "isPrimary": false },
+            { "isbn13": "9788901299440", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "우주와 과학이 말해주는 것들",
+          "description": "자연과학 서가(청구기호 400번대)로 이동해 과학 교양서를 찾아보세요.",
+          "hint": "칼 세이건의 뒤를 잇는 우주 이야기가 있어요.",
+          "candidates": [
+            { "isbn13": "9788965968108", "isPrimary": true },
+            { "isbn13": "9791124280386", "isPrimary": false },
+            { "isbn13": "9791124280270", "isPrimary": false },
+            { "isbn13": "9791197663680", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "음악과 미술 사이",
+          "description": "예술 서가(청구기호 600번대)에서 음악이나 미술 이야기를 담은 책을 찾아 완료하세요.",
+          "hint": "페미니즘 미술 전시를 다룬 책도 있어요.",
+          "candidates": [
+            { "isbn13": "9791194324706", "isPrimary": true },
+            { "isbn13": "9788965643173", "isPrimary": false },
+            { "isbn13": "9791168231245", "isPrimary": false },
+            { "isbn13": "9791124137116", "isPrimary": false }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "짧은 시간, 세 권의 발견",
+      "description": "철학, 역사, 실용과학 서가를 빠르게 오가며 짧은 시간 안에 세 권을 발견하는 퀘스트입니다.",
+      "theme": "속전속결",
+      "estimatedMinutes": 10,
+      "difficulty": "hard",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "마음을 들여다보는 책",
+          "description": "철학·심리 서가(청구기호 100번대)에서 마음과 생각에 관한 책 한 권을 찾아보세요.",
+          "hint": "악의 평범성을 이야기한 유명한 정치철학서도 있어요.",
+          "candidates": [
+            { "isbn13": "9788935679164", "isPrimary": true },
+            { "isbn13": "9788964947951", "isPrimary": false },
+            { "isbn13": "9791199081505", "isPrimary": false },
+            { "isbn13": "9791165191139", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "세계사를 다시 보는 법",
+          "description": "역사 서가(청구기호 900번대)에서 고대·중세 세계사를 다룬 책을 찾아보세요.",
+          "hint": "몽골 제국과 고대 그리스 전쟁사가 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791194263951", "isPrimary": true },
+            { "isbn13": "9791194273387", "isPrimary": false },
+            { "isbn13": "9791139729399", "isPrimary": false },
+            { "isbn13": "9791173325847", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "도시와 몸, 마지막 발견",
+          "description": "기술과학 서가(청구기호 500번대)에서 도시나 몸에 관한 책을 찾아 퀘스트를 완료하세요.",
+          "hint": "반려식물 이야기와 인체 탐구서가 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791191131307", "isPrimary": true },
+            { "isbn13": "9791173577925", "isPrimary": false },
+            { "isbn13": "9791188602940", "isPrimary": false },
+            { "isbn13": "9788976047748", "isPrimary": false }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -14,7 +14,9 @@
  *
  * 결과:
  *   - data/snapshots/itemSrch-<libCode>-<startDt>_<endDt>-page<N>-<실행시각>.json (원본 API 응답, 출처 추적용. authKey 미포함)
- *   - data/collected-books.json                                                  (정규화된 도서 목록, seed에서 사용)
+ *   - data/libraries/<libCode>/collected-books.json                              (정규화된 도서 목록, seed에서 사용)
+ *
+ * 여러 도서관을 다룰 때는 libCode별 폴더(data/libraries/<libCode>/)로 데이터가 분리된다.
  *
  * itemSrch는 "등록 기간" 기준 조회이며 실시간 대출 가능 여부가 아니다. registeredAt으로만 사용한다.
  *
@@ -214,7 +216,7 @@ async function main() {
   }
   const deduped = [...dedupedMap.values()];
 
-  const outPath = path.join(process.cwd(), "data", "collected-books.json");
+  const outPath = path.join(process.cwd(), "data", "libraries", libCode, "collected-books.json");
   mkdirSync(path.dirname(outPath), { recursive: true });
   writeFileSync(
     outPath,

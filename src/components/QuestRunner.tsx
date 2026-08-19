@@ -81,7 +81,8 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
           <p className="text-xs font-semibold text-emerald-600">퀘스트 완료</p>
-          <h1 className="mt-2 text-xl font-bold">{quest.title}</h1>
+          <p className="mt-1 text-xs text-slate-500">{quest.libraryName}</p>
+          <h1 className="mt-1 text-xl font-bold">{quest.title}</h1>
           <p className="mt-1 text-sm text-slate-600">
             총 {totalSteps}단계에서 {foundBooks.length}권의 책을 발견했어요.
           </p>
@@ -176,7 +177,8 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         />
       </div>
 
-      <h1 className="mt-5 text-lg font-bold">{quest.title}</h1>
+      <p className="mt-5 text-xs font-medium text-slate-400">{quest.libraryName}</p>
+      <h1 className="mt-0.5 text-lg font-bold">{quest.title}</h1>
 
       <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <p className="text-xs font-semibold text-slate-400">{currentStep.order}단계 미션</p>

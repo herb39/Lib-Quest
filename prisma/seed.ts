@@ -1,18 +1,20 @@
 /**
  * 실제 Data4Library 수집 데이터만 시드한다. 가짜/임시 도서 데이터는 절대 만들지 않는다.
  *
- * 사전 조건:
- *   1) npx tsx scripts/fetch-library-books.ts 로 data/collected-books.json 생성
- *   2) (선택) data/quest-curation.json 에 실제 수집된 ISBN13을 참조하는 퀘스트 구성 작성
+ * data/libraries/<libCode>/ 폴더 하나가 도서관 하나에 대응한다. 각 폴더는 다음을 포함해야 한다.
+ *   - collected-books.json : scripts/fetch-library-books.ts 로 수집한 실제 도서 목록
+ *   - quest-curation.json  : (선택) collected-books.json의 ISBN만 참조하는 퀘스트 구성
  *
- * data/collected-books.json이 없으면 절대 진행하지 않고 에러로 중단한다.
+ * data/libraries/ 아래 폴더가 하나도 없으면 절대 진행하지 않고 에러로 중단한다.
+ * 이미 존재하는 Quest(같은 도서관에 같은 title)는 다시 만들지 않는다(재실행 안전, 중복 생성 방지).
+ * 기존 데이터를 삭제하는 로직은 없다 — 실행할 때마다 새 데이터만 추가/갱신된다.
  */
 import "dotenv/config";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { LIBRARY_CODE, LIBRARY_NAME } from "../src/lib/config";
+import { getLibraryMeta } from "../src/lib/config";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -30,6 +32,7 @@ type CollectedBook = {
 };
 
 type CollectedBooksFile = {
+  libCode?: string;
   count: number;
   books: CollectedBook[];
 };
@@ -53,11 +56,14 @@ type CurationQuest = {
 };
 type CurationFile = { quests: CurationQuest[] };
 
-const COLLECTED_BOOKS_PATH = path.join(process.cwd(), "data", "collected-books.json");
-const QUEST_CURATION_PATH = path.join(process.cwd(), "data", "quest-curation.json");
+const LIBRARIES_DIR = path.join(process.cwd(), "data", "libraries");
 
 /** 큐레이션이 존재하지 않는 ISBN을 참조하거나 중복 candidate를 포함하면 seed를 즉시 실패시킨다. */
-function validateCuration(curation: CurationFile, bookByIsbn: Map<string, { id: string }>): void {
+function validateCuration(
+  curationPath: string,
+  curation: CurationFile,
+  bookByIsbn: Map<string, { id: string }>
+): void {
   const errors: string[] = [];
 
   for (const q of curation.quests) {
@@ -88,29 +94,40 @@ function validateCuration(curation: CurationFile, bookByIsbn: Map<string, { id: 
   }
 
   if (errors.length > 0) {
-    throw new Error(
-      `${QUEST_CURATION_PATH} 검증 실패:\n` + errors.map((e) => `  - ${e}`).join("\n")
-    );
+    throw new Error(`${curationPath} 검증 실패:\n` + errors.map((e) => `  - ${e}`).join("\n"));
   }
 }
 
-async function main() {
-  if (!existsSync(COLLECTED_BOOKS_PATH)) {
+async function seedLibrary(libCode: string) {
+  const dir = path.join(LIBRARIES_DIR, libCode);
+  const collectedPath = path.join(dir, "collected-books.json");
+  const curationPath = path.join(dir, "quest-curation.json");
+
+  if (!existsSync(collectedPath)) {
+    throw new Error(`${collectedPath} 가 없습니다. 가짜 데이터로 시드하지 않습니다.`);
+  }
+
+  const meta = getLibraryMeta(libCode);
+  if (!meta) {
     throw new Error(
-      `${COLLECTED_BOOKS_PATH} 가 없습니다. 먼저 "npx tsx scripts/fetch-library-books.ts"로 실제 도서 데이터를 수집하세요. ` +
-        "가짜 데이터로 시드하지 않습니다."
+      `libCode=${libCode} 가 src/lib/config.ts의 LIBRARIES에 없습니다. 먼저 등록하세요.`
     );
   }
 
-  const collected: CollectedBooksFile = JSON.parse(readFileSync(COLLECTED_BOOKS_PATH, "utf-8"));
+  const collected: CollectedBooksFile = JSON.parse(readFileSync(collectedPath, "utf-8"));
   if (!collected.books || collected.books.length === 0) {
-    throw new Error(`${COLLECTED_BOOKS_PATH} 에 도서가 없습니다. 수집 스크립트를 다시 실행하세요.`);
+    throw new Error(`${collectedPath} 에 도서가 없습니다. 수집 스크립트를 다시 실행하세요.`);
+  }
+  if (collected.libCode && collected.libCode !== libCode) {
+    throw new Error(
+      `${collectedPath}의 libCode(${collected.libCode})가 폴더명(${libCode})과 다릅니다.`
+    );
   }
 
   const library = await prisma.library.upsert({
-    where: { code: LIBRARY_CODE },
-    update: { name: LIBRARY_NAME },
-    create: { code: LIBRARY_CODE, name: LIBRARY_NAME },
+    where: { code: libCode },
+    update: { name: meta.name },
+    create: { code: libCode, name: meta.name },
   });
 
   const bookByIsbn = new Map<string, { id: string; isbn13: string; title: string }>();
@@ -143,21 +160,29 @@ async function main() {
     bookByIsbn.set(book.isbn13, book);
   }
 
-  console.log(`[seed] library=${library.name} books=${bookByIsbn.size} (source: 실데이터, ${COLLECTED_BOOKS_PATH})`);
+  console.log(`[seed] library=${library.name}(${libCode}) books=${bookByIsbn.size} (source: 실데이터, ${collectedPath})`);
 
-  if (!existsSync(QUEST_CURATION_PATH)) {
+  if (!existsSync(curationPath)) {
     console.warn(
-      `[seed] ${QUEST_CURATION_PATH} 가 없어 퀘스트는 생성하지 않았습니다. ` +
-        "수집된 실제 도서 목록을 검토한 뒤 큐레이션 파일을 작성하세요."
+      `[seed] ${curationPath} 가 없어 퀘스트는 생성하지 않았습니다. 수집된 실제 도서 목록을 검토한 뒤 큐레이션 파일을 작성하세요.`
     );
     return;
   }
 
-  const curation: CurationFile = JSON.parse(readFileSync(QUEST_CURATION_PATH, "utf-8"));
-  validateCuration(curation, bookByIsbn);
+  const curation: CurationFile = JSON.parse(readFileSync(curationPath, "utf-8"));
+  validateCuration(curationPath, curation, bookByIsbn);
 
   let createdQuests = 0;
+  let skippedQuests = 0;
   for (const q of curation.quests) {
+    const existing = await prisma.quest.findFirst({
+      where: { libraryId: library.id, title: q.title },
+    });
+    if (existing) {
+      skippedQuests++;
+      continue;
+    }
+
     await prisma.quest.create({
       data: {
         libraryId: library.id,
@@ -186,7 +211,27 @@ async function main() {
     createdQuests++;
   }
 
-  console.log(`[seed] 완료: quests=${createdQuests}`);
+  console.log(`[seed] library=${libCode} 완료: quests 생성=${createdQuests}, 이미 존재해 건너뜀=${skippedQuests}`);
+}
+
+async function main() {
+  if (!existsSync(LIBRARIES_DIR)) {
+    throw new Error(`${LIBRARIES_DIR} 가 없습니다. 가짜 데이터로 시드하지 않습니다.`);
+  }
+
+  const libCodes = readdirSync(LIBRARIES_DIR, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+
+  if (libCodes.length === 0) {
+    throw new Error(`${LIBRARIES_DIR} 아래에 도서관 폴더가 없습니다.`);
+  }
+
+  for (const libCode of libCodes) {
+    await seedLibrary(libCode);
+  }
+
+  console.log(`[seed] 전체 완료: ${libCodes.length}개 도서관 처리`);
 }
 
 main()

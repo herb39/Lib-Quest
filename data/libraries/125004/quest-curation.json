@@ -1,0 +1,142 @@
+{
+  "quests": [
+    {
+      "title": "익숙한 문학, 낯선 이야기",
+      "description": "도서정보실 문학 서가를 오가며 한국·일본·영미 소설을 하나씩 만나보는 퀘스트입니다.",
+      "theme": "문학",
+      "estimatedMinutes": 15,
+      "difficulty": "easy",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "우리말로 쓰인 새 이야기",
+          "description": "도서정보실 문학 서가, 청구기호 813.7에서 최근 등록된 한국 소설을 찾아보세요.",
+          "hint": "배우 출신 작가가 쓴 장편소설이에요.",
+          "candidates": [
+            { "isbn13": "9791194531395", "isPrimary": true },
+            { "isbn13": "9791191029963", "isPrimary": false },
+            { "isbn13": "9788936400002", "isPrimary": false },
+            { "isbn13": "9791168127005", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "바다 건너 온 이야기",
+          "description": "같은 문학 서가에서 일본 소설(청구기호 833.6) 쪽으로 자리를 옮겨보세요.",
+          "hint": "세계적으로 유명한 일본 소설가의 단편집이 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791191803617", "isPrimary": true },
+            { "isbn13": "9791141616144", "isPrimary": false },
+            { "isbn13": "9791193034224", "isPrimary": false },
+            { "isbn13": "9791141602505", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "지구 반대편 이야기",
+          "description": "청구기호 843 번대, 영미 소설 서가에서 한 권을 골라 퀘스트를 완료하세요.",
+          "hint": "고전 스릴러의 리커버판이 있어요.",
+          "candidates": [
+            { "isbn13": "9791158512590", "isPrimary": true },
+            { "isbn13": "9791193235638", "isPrimary": false },
+            { "isbn13": "9791191247725", "isPrimary": false },
+            { "isbn13": "9791168343849", "isPrimary": false }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "서로 다른 서가로 떠나는 지식 여행",
+      "description": "사회과학, 자연과학, 예술 서가를 차례로 옮겨 다니며 전혀 다른 세 권을 찾는 퀘스트입니다.",
+      "theme": "분야탐색",
+      "estimatedMinutes": 20,
+      "difficulty": "normal",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "일과 성장에 대한 책",
+          "description": "도서정보실 사회과학 서가(청구기호 320번대)에서 일·경제·투자를 다룬 책을 찾아보세요.",
+          "hint": "세계 최고 트레이더들의 인터뷰를 엮은 책도 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791175158795", "isPrimary": true },
+            { "isbn13": "9791192167282", "isPrimary": false },
+            { "isbn13": "9791124126257", "isPrimary": false },
+            { "isbn13": "9791193394984", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "과학이 말해주는 것들",
+          "description": "자연과학 서가(청구기호 400번대)로 이동해 과학 교양서를 찾아보세요.",
+          "hint": "화학, 인지과학, 수학사를 다루는 책들이에요.",
+          "candidates": [
+            { "isbn13": "9791190266093", "isPrimary": true },
+            { "isbn13": "9791164053605", "isPrimary": false },
+            { "isbn13": "9791166891748", "isPrimary": false },
+            { "isbn13": "9791139730395", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "그림과 음악 사이",
+          "description": "예술 서가(청구기호 600번대)에서 그림이나 음악 이야기를 담은 책을 찾아 완료하세요.",
+          "hint": "세계적인 영화감독이 쓴 에세이도 있어요.",
+          "candidates": [
+            { "isbn13": "9791190812443", "isPrimary": true },
+            { "isbn13": "9791173324055", "isPrimary": false },
+            { "isbn13": "9788932476148", "isPrimary": false },
+            { "isbn13": "9788960884588", "isPrimary": false }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "짧은 시간, 세 권의 발견",
+      "description": "철학, 역사, 실용과학 서가를 빠르게 오가며 짧은 시간 안에 세 권을 발견하는 퀘스트입니다.",
+      "theme": "속전속결",
+      "estimatedMinutes": 10,
+      "difficulty": "hard",
+      "published": true,
+      "steps": [
+        {
+          "order": 1,
+          "title": "마음을 들여다보는 책",
+          "description": "철학·심리 서가(청구기호 100번대)에서 마음과 생각에 관한 책 한 권을 찾아보세요.",
+          "hint": "18세기 철학자의 고전도 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791194534808", "isPrimary": true },
+            { "isbn13": "9791173579721", "isPrimary": false },
+            { "isbn13": "9791193388365", "isPrimary": false },
+            { "isbn13": "9788989103561", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 2,
+          "title": "세계와 역사를 만나는 법",
+          "description": "역사 서가(청구기호 900번대)에서 한국사 또는 세계 여행지를 다룬 책을 찾아보세요.",
+          "hint": "만화로 풀어낸 한국사 책도 있어요.",
+          "candidates": [
+            { "isbn13": "9791198390332", "isPrimary": true },
+            { "isbn13": "9791124137437", "isPrimary": false },
+            { "isbn13": "9788927813668", "isPrimary": false },
+            { "isbn13": "9791192767413", "isPrimary": false }
+          ]
+        },
+        {
+          "order": 3,
+          "title": "몸과 일상의 마지막 발견",
+          "description": "기술과학 서가(청구기호 500번대)에서 몸이나 생활에 관한 책을 찾아 퀘스트를 완료하세요.",
+          "hint": "정원 가꾸기와 노화 방지를 다룬 책이 섞여 있어요.",
+          "candidates": [
+            { "isbn13": "9791175983298", "isPrimary": true },
+            { "isbn13": "9791189231873", "isPrimary": false },
+            { "isbn13": "9791139730548", "isPrimary": false },
+            { "isbn13": "9791175910584", "isPrimary": false }
+          ]
+        }
+      ]
+    }
+  ]
+}
