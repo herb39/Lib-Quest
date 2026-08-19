@@ -3,7 +3,7 @@
 2026 도서관 데이터 활용 공모전 발표심사용 모바일 웹 프로토타입.
 도서관 실제 소장 도서를 기반으로 서가를 탐색하고 ISBN을 확인하며 퀘스트를 완료하는 서비스.
 
-대표 도서관: 대전 원신흥도서관 (libCode ⚠️ 미확인 — 아래 "실제 데이터 수집" 1단계 참고)
+대표 도서관: 대전 원신흥도서관 (libCode `130026`, Data4Library `libSrch`로 확인)
 
 - GitHub: https://github.com/herb39/Lib-Quest
 - 배포 도메인: https://lib-quest.lib.lc (Vercel Hobby)
@@ -22,7 +22,9 @@
 
 ## ⚠️ 데이터 출처 관련 중요 사항
 
-**현재 `prisma/seed.ts`는 `data/collected-books.json`이 없으면 실행되지 않는다.** 즉 실제 API로 수집한 데이터가 없는 상태에서는 DB에 어떤 도서도 들어가지 않는다 (가짜 데이터를 절대 만들지 않기 위함).
+**실제 Data4Library 데이터 수집이 완료되었다.** [data/collected-books.json](data/collected-books.json)에 대전 원신흥도서관(libCode `130026`)에서 실제 `itemSrch` API로 수집한 36권이 들어 있고, [data/quest-curation.json](data/quest-curation.json)에 그 중 ISBN만 참조하는 퀘스트 3개(각 3단계, 단계별 후보 4권)가 정의되어 있다. 자세한 수집 과정은 [data/README.md](data/README.md) 참고.
+
+`prisma/seed.ts`는 `data/collected-books.json`이 없으면 실행되지 않는다. 즉 실제 API로 수집한 데이터가 없는 상태에서는 DB에 어떤 도서도 들어가지 않는다 (가짜 데이터를 절대 만들지 않기 위함). 큐레이션이 존재하지 않는 ISBN을 참조하거나 candidate가 3개 미만/중복이면 seed가 즉시 실패한다.
 
 로컬에서 DB 없이 화면 흐름만 보고 싶을 때는 `DATABASE_URL`을 비워두면 [src/lib/mock-data.ts](src/lib/mock-data.ts)의 데모 데이터(실제 API 데이터 아님, 화면 표시에 "데모 데이터" 배너 표시됨)로 자동 대체된다.
 
@@ -36,6 +38,8 @@ npm run dev
 `http://localhost:3000` 접속. `DATABASE_URL`을 비워두면 데모 데이터로 전체 흐름(퀘스트 선택 → 3단계 → 결과 카드)을 확인할 수 있다.
 
 ## 실제 데이터 수집 → Neon 반영 절차
+
+아래 1~3단계(libCode 확인, 도서 수집, 큐레이션)는 이미 완료되어 `data/`에 결과물이 있다. 재수집하거나 다른 도서관으로 바꿀 때만 다시 실행하면 된다. 지금 당장 필요한 건 4단계(Neon 반영)뿐이다.
 
 ### 1) Data4Library API 키 발급 + libCode 확인
 
@@ -133,19 +137,17 @@ Vercel에 `DATABASE_URL`을 등록하는 순간부터 이 정책이 적용되므
 
 ## 아직 미구현인 항목
 
-- **`src/lib/config.ts`의 `LIBRARY_CODE` 확인** — `DATA4LIBRARY_API_KEY`가 없어 `scripts/lookup-library.ts`로 대전 원신흥도서관의 실제 libCode를 아직 조회하지 못함. 현재 빈 문자열(`""`)로 두어 잘못된 코드가 섞이지 않도록 했다.
 - 최소 운영자 검수 화면
 - 데이터 출처 확인 화면
-- 실제 Data4Library 수집 실행 및 `data/quest-curation.json` 작성 (API 키 필요, 아직 미보유)
-- Neon 프로젝트 생성 및 마이그레이션 실제 적용 (DB 자격증명 필요)
+- Neon 프로젝트 생성 및 마이그레이션 실제 적용 (DB 자격증명 필요 — `data/collected-books.json`/`quest-curation.json`은 준비되었으므로 `migrate deploy` + `db:seed`만 실행하면 됨)
 - Vercel 프로젝트 연결 및 배포 (Vercel 계정 접근 필요)
 - Cloudflare CNAME 레코드 등록 (Cloudflare 계정 접근 필요)
 
 ## 다음 작업
 
-1. `DATA4LIBRARY_API_KEY` 발급 → `npm run lookup:library -- --keyword=원신흥도서관` 실행 → 정확한 libCode 확인 후 `src/lib/config.ts`에 반영
-2. `npm run fetch:books -- --libCode=확인된코드 ...` 로 실제 도서 수집(30~50권 목표, 분류 분산 확인) → `data/quest-curation.json` 작성
-3. Neon 프로젝트 생성 → `migrate deploy` + `db:seed` 실행 → Vercel 배포 → Cloudflare CNAME 연결
+1. Neon 프로젝트 생성 → 로컬 `.env`에 실제 `DATABASE_URL` 설정 → `npx prisma migrate deploy` → `npm run db:seed` (실제 36권 + 퀘스트 3개 반영)
+2. Vercel 프로젝트 Import → `DATABASE_URL` 환경변수 등록 → 배포
+3. Cloudflare에서 `lib-quest` CNAME(DNS only) 등록 → `lib-quest.lib.lc` 접속 확인
 
 ## 기술 스택
 

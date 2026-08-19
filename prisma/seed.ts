@@ -56,6 +56,44 @@ type CurationFile = { quests: CurationQuest[] };
 const COLLECTED_BOOKS_PATH = path.join(process.cwd(), "data", "collected-books.json");
 const QUEST_CURATION_PATH = path.join(process.cwd(), "data", "quest-curation.json");
 
+/** 큐레이션이 존재하지 않는 ISBN을 참조하거나 중복 candidate를 포함하면 seed를 즉시 실패시킨다. */
+function validateCuration(curation: CurationFile, bookByIsbn: Map<string, { id: string }>): void {
+  const errors: string[] = [];
+
+  for (const q of curation.quests) {
+    const orders = q.steps.map((s) => s.order);
+    const dupOrders = orders.filter((o, i) => orders.indexOf(o) !== i);
+    if (dupOrders.length > 0) {
+      errors.push(`퀘스트 "${q.title}": 중복된 step order (${[...new Set(dupOrders)].join(", ")})`);
+    }
+
+    for (const s of q.steps) {
+      if (s.candidates.length < 3) {
+        errors.push(`퀘스트 "${q.title}" ${s.order}단계: candidate가 ${s.candidates.length}개 (최소 3개 필요)`);
+      }
+
+      const isbns = s.candidates.map((c) => c.isbn13);
+      const dupIsbns = isbns.filter((isbn, i) => isbns.indexOf(isbn) !== i);
+      if (dupIsbns.length > 0) {
+        errors.push(`퀘스트 "${q.title}" ${s.order}단계: 중복 candidate ISBN (${[...new Set(dupIsbns)].join(", ")})`);
+      }
+
+      const missingIsbns = isbns.filter((isbn) => !bookByIsbn.has(isbn));
+      if (missingIsbns.length > 0) {
+        errors.push(
+          `퀘스트 "${q.title}" ${s.order}단계: 수집된 도서에 없는 ISBN 참조 (${missingIsbns.join(", ")})`
+        );
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(
+      `${QUEST_CURATION_PATH} 검증 실패:\n` + errors.map((e) => `  - ${e}`).join("\n")
+    );
+  }
+}
+
 async function main() {
   if (!existsSync(COLLECTED_BOOKS_PATH)) {
     throw new Error(
@@ -116,20 +154,10 @@ async function main() {
   }
 
   const curation: CurationFile = JSON.parse(readFileSync(QUEST_CURATION_PATH, "utf-8"));
+  validateCuration(curation, bookByIsbn);
+
   let createdQuests = 0;
-
   for (const q of curation.quests) {
-    const missingIsbns = q.steps
-      .flatMap((s) => s.candidates.map((c) => c.isbn13))
-      .filter((isbn) => !bookByIsbn.has(isbn));
-
-    if (missingIsbns.length > 0) {
-      console.warn(
-        `[seed] 퀘스트 "${q.title}" 건너뜀: 수집된 도서에 없는 ISBN 참조 (${missingIsbns.join(", ")})`
-      );
-      continue;
-    }
-
     await prisma.quest.create({
       data: {
         libraryId: library.id,

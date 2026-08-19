@@ -1,9 +1,8 @@
 // 대표 도서관 식별자. 이번 MVP는 단일 도서관만 지원한다.
 //
-// ⚠️ LIBRARY_CODE는 아직 확인되지 않았다 (TODO).
-// 대전 원신흥도서관으로 대표 도서관을 변경했지만, DATA4LIBRARY_API_KEY가 없어
-// scripts/lookup-library.ts로 실제 libCode를 조회하지 못했다.
-// 절대 libCode를 추측해서 채우지 말고, 아래 명령으로 확인된 값만 반영할 것:
-//   DATA4LIBRARY_API_KEY=발급받은키 npx tsx scripts/lookup-library.ts --keyword=원신흥도서관
-export const LIBRARY_CODE = "";
+// libCode 130026은 scripts/lookup-library.ts (Data4Library libSrch API)로 확인했다.
+// 검색 결과 전국에서 도서관명이 "원신흥도서관"인 항목은 1건뿐이며, 주소가
+// "대전광역시 유성구 원신흥남로 59", 홈페이지가 대전 유성구 도서관 사이트(lib.yuseong.go.kr)로
+// 대전광역시 유성구 원신흥도서관임을 확인했다.
+export const LIBRARY_CODE = "130026";
 export const LIBRARY_NAME = "대전 원신흥도서관";
