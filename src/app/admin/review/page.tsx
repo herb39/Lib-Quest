@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { DEFAULT_LIBRARY_CODE } from "@/lib/config";
 import { getAdminReviewData } from "@/lib/admin-data";
@@ -39,6 +40,15 @@ export default async function AdminReviewPage({
       <p className="mt-1 text-sm text-slate-500">
         실제 후보 도서와 위치 정보를 확인하는 읽기 전용 화면입니다.
       </p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-slate-400">
+        {["Data4Library 후보", "콘텐츠 작성", "운영자 검수", "이용자 공개"].map((step, i, arr) => (
+          <span key={step} className="flex items-center gap-1.5">
+            <span className="whitespace-nowrap rounded-full bg-slate-100 px-2 py-1 text-slate-600">{step}</span>
+            {i < arr.length - 1 && <span aria-hidden="true">→</span>}
+          </span>
+        ))}
+      </div>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {data.libraryOptions.map((opt) => (
@@ -131,28 +141,69 @@ export default async function AdminReviewPage({
                       </thead>
                       <tbody>
                         {step.candidates.map((c) => (
-                          <tr key={c.book.isbn13} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/70">
-                            <td className="whitespace-nowrap py-2.5 pl-3 pr-2 align-top">
-                              {c.isPrimary && (
-                                <span className="inline-block whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
-                                  대표
+                          <Fragment key={c.book.isbn13}>
+                            <tr className="border-b border-slate-100 hover:bg-slate-50/70">
+                              <td className="whitespace-nowrap py-2.5 pl-3 pr-2 align-top">
+                                {c.isPrimary && (
+                                  <span className="inline-block whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                                    대표
+                                  </span>
+                                )}
+                              </td>
+                              <td className="break-keep py-2.5 pr-2 align-top font-medium">{c.book.title}</td>
+                              <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.author ?? "-"}</td>
+                              <td className="py-2.5 pr-2 align-top">
+                                <span className="inline-flex flex-wrap items-center gap-1.5 whitespace-nowrap font-mono text-slate-600">
+                                  {c.book.isbn13}
+                                  <CopyIsbnButton isbn13={c.book.isbn13} />
                                 </span>
-                              )}
-                            </td>
-                            <td className="break-keep py-2.5 pr-2 align-top font-medium">{c.book.title}</td>
-                            <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.author ?? "-"}</td>
-                            <td className="py-2.5 pr-2 align-top">
-                              <span className="inline-flex flex-wrap items-center gap-1.5 whitespace-nowrap font-mono text-slate-600">
-                                {c.book.isbn13}
-                                <CopyIsbnButton isbn13={c.book.isbn13} />
-                              </span>
-                            </td>
-                            <td className="whitespace-nowrap py-2.5 pr-2 align-top text-slate-500">{c.book.classNo ?? "-"}</td>
-                            <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.className ?? "-"}</td>
-                            <td className="whitespace-nowrap py-2.5 pr-2 align-top text-slate-500">{c.book.callNumber ?? "-"}</td>
-                            <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.shelfLocation ?? "-"}</td>
-                            <td className="whitespace-nowrap py-2.5 pr-3 align-top text-slate-500">{c.book.source}</td>
-                          </tr>
+                              </td>
+                              <td className="whitespace-nowrap py-2.5 pr-2 align-top text-slate-500">{c.book.classNo ?? "-"}</td>
+                              <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.className ?? "-"}</td>
+                              <td className="whitespace-nowrap py-2.5 pr-2 align-top text-slate-500">{c.book.callNumber ?? "-"}</td>
+                              <td className="break-keep py-2.5 pr-2 align-top text-slate-500">{c.book.shelfLocation ?? "-"}</td>
+                              <td className="whitespace-nowrap py-2.5 pr-3 align-top text-slate-500">{c.book.source}</td>
+                            </tr>
+                            <tr className="border-b border-slate-100 last:border-0">
+                              <td colSpan={9} className="bg-slate-50/60 px-3 py-1.5">
+                                <details>
+                                  <summary className="cursor-pointer whitespace-nowrap text-xs font-medium text-slate-500 marker:text-slate-400">
+                                    콘텐츠 보기{" "}
+                                    <span
+                                      className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                        c.book.editorial
+                                          ? "bg-emerald-100 text-emerald-700"
+                                          : "bg-amber-100 text-amber-700"
+                                      }`}
+                                    >
+                                      {c.book.editorial ? "검수된 콘텐츠" : "콘텐츠 없음"}
+                                    </span>
+                                  </summary>
+                                  {c.book.editorial ? (
+                                    <dl className="mt-2 grid grid-cols-1 gap-2 pb-1 sm:grid-cols-3">
+                                      <div>
+                                        <dt className="text-[10px] font-semibold text-slate-400">한 줄 훅</dt>
+                                        <dd className="mt-0.5 break-keep text-xs text-slate-700">{c.book.editorial.hook}</dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-[10px] font-semibold text-slate-400">teaser</dt>
+                                        <dd className="mt-0.5 break-keep text-xs text-slate-700">{c.book.editorial.teaser}</dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-[10px] font-semibold text-slate-400">읽기 전 질문</dt>
+                                        <dd className="mt-0.5 break-keep text-xs text-slate-700">{c.book.editorial.question}</dd>
+                                      </div>
+                                    </dl>
+                                  ) : (
+                                    <p className="mt-2 pb-1 text-xs text-slate-400">
+                                      이 책은 아직 teaser/hook/question이 작성되지 않았습니다. 이용자 화면에서는
+                                      표지·제목·저자·+10 XP까지만 표시되고, 아래 콘텐츠 영역은 노출되지 않습니다.
+                                    </p>
+                                  )}
+                                </details>
+                              </td>
+                            </tr>
+                          </Fragment>
                         ))}
                       </tbody>
                     </table>

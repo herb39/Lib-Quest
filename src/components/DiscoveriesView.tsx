@@ -12,6 +12,7 @@ import {
   getLibraryDiscoveryCount,
   type DiscoveryStore,
 } from "@/lib/discovery-storage";
+import { loadInterestStore, isInterested, type InterestStore } from "@/lib/interest-storage";
 
 type LibraryInfo = { code: string; name: string; bookCount: number };
 
@@ -26,11 +27,15 @@ function formatDate(iso: string) {
 export function DiscoveriesView({ libraries }: { libraries: LibraryInfo[] }) {
   const [mounted, setMounted] = useState(false);
   const [store, setStore] = useState<DiscoveryStore>({ version: 1, discoveries: [] });
+  const [interestStore, setInterestStore] = useState<InterestStore>({ version: 1, bookIds: [] });
   const [filter, setFilter] = useState<string>("all");
+  const [interestOnly, setInterestOnly] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStore(loadDiscoveryStore());
+     
+    setInterestStore(loadInterestStore());
     setMounted(true);
   }, []);
 
@@ -39,8 +44,11 @@ export function DiscoveriesView({ libraries }: { libraries: LibraryInfo[] }) {
   const xp = getXp(store);
   const title = getExplorerTitle(xp);
 
-  const visible =
-    filter === "all" ? store.discoveries : store.discoveries.filter((d) => d.libraryCode === filter);
+  const interestedCount = store.discoveries.filter((d) => isInterested(interestStore, d.bookId)).length;
+
+  const visible = store.discoveries
+    .filter((d) => filter === "all" || d.libraryCode === filter)
+    .filter((d) => !interestOnly || isInterested(interestStore, d.bookId));
 
   function libraryName(code: string) {
     return libraries.find((l) => l.code === code)?.name ?? code;
@@ -103,7 +111,16 @@ export function DiscoveriesView({ libraries }: { libraries: LibraryInfo[] }) {
             filter === "all" ? "bg-emerald-600 text-white" : "border border-stone-300 text-stone-600"
           }`}
         >
-          전체
+          전체 {uniqueCount}권
+        </button>
+        <button
+          type="button"
+          onClick={() => setInterestOnly((v) => !v)}
+          className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
+            interestOnly ? "bg-rose-500 text-white" : "border border-stone-300 text-stone-600"
+          }`}
+        >
+          <span aria-hidden="true">♥</span> 읽어보고 싶어요 {interestedCount}권
         </button>
         {libraries.map((lib) => (
           <button
@@ -126,7 +143,15 @@ export function DiscoveriesView({ libraries }: { libraries: LibraryInfo[] }) {
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-3">
           {visible.map((d) => (
-            <div key={d.bookId} className="rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
+            <div key={d.bookId} className="relative rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
+              {isInterested(interestStore, d.bookId) && (
+                <span
+                  aria-hidden="true"
+                  className="absolute right-3 top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-xs text-white shadow-sm"
+                >
+                  ♥
+                </span>
+              )}
               <div className="h-36 w-full">
                 <DiscoveryCard3D revealed coverUrl={d.coverUrl} title={d.title} size="grid" />
               </div>

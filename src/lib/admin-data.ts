@@ -2,6 +2,7 @@
 // 두 화면 모두 발표 중 검수·출처 확인이 목적이므로 데모 데이터로 대체하지 않는다.
 // DATABASE_URL이 없으면 명시적으로 "DB 연결 필요" 상태를 반환한다.
 import { DEFAULT_LIBRARY_CODE } from "@/lib/config";
+import { getEditorial, type BookEditorial } from "@/lib/editorial";
 
 export type AdminBook = {
   isbn13: string;
@@ -12,6 +13,7 @@ export type AdminBook = {
   callNumber: string | null;
   shelfLocation: string | null;
   source: string;
+  editorial: BookEditorial | null;
 };
 
 export type AdminCandidate = {
@@ -111,6 +113,7 @@ export async function getAdminReviewData(
             callNumber: c.book.callNumber,
             shelfLocation: c.book.shelfLocation,
             source: c.book.source,
+            editorial: getEditorial(library.code, c.book.isbn13),
           },
         })),
       })),

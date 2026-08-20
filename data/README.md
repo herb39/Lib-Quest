@@ -11,6 +11,7 @@ data/
     130026/                     대전 원신흥도서관 (대표 시연)
       collected-books.json
       quest-curation.json
+      book-editorial.json        teaser/hook/question (36권 전체 작성)
     125004/                     대전 갈마도서관
       collected-books.json
       quest-curation.json
@@ -27,6 +28,22 @@ data/
 - `collected-books.json` — 해당 도서관에서 `itemSrch`로 수집한 원본 중, 청구기호·서가위치 등 전 항목이 채워진 책만 골라 분류 다양성을 고려해 선별한 서브셋(도서관마다 36권). ISBN13 중복 0건, 필수 필드 누락 0건.
 - `quest-curation.json` — 그 36권을 전부 사용해 구성한 퀘스트 3개(각 3단계, 단계별 후보 4권, 실제 ISBN13만 참조). `prisma/seed.ts`는 여기서 참조하는 ISBN이 같은 폴더의 `collected-books.json`에 없거나, 단계별 후보가 3개 미만이거나, 중복 후보가 있으면 즉시 에러를 던진다.
 - `snapshots/` — 각 도서관의 `itemSrch` 원본 응답(파일명에 `itemSrch-<libCode>-...`로 도서관이 구분됨). authKey는 응답 본문에 포함되지 않으므로 그대로 보존해도 안전함을 확인했다.
+- `book-editorial.json`(원신흥만 존재) — 발견 성공 화면에서 보여주는 teaser/hook/question. **Data4Library 데이터가 아니라 Lib Quest가 직접 작성한 편집 콘텐츠**다. `src/lib/editorial.ts`가 ISBN 기준으로 조회한다. 아래 "book-editorial.json 작성 방식" 참고.
+
+### 표지 이미지 (src/lib/cover-urls.json)
+
+`data/` 폴더 밖에 있지만 이 데이터를 그대로 가공한 파일이라 여기에 함께 기록한다. `data/snapshots/*.json`의 `bookImageURL` 필드를 ISBN 기준으로 추출해 `src/lib/cover-urls.json`(144권 중 142권 매칭)에 저장했다. `src/lib/covers.ts`의 `getCoverUrl(isbn13)`이 조회한다. ISBN 패턴으로 URL을 추측하거나 임의 생성한 값은 없다.
+
+### book-editorial.json 작성 방식
+
+| 구분 | 내용 |
+| --- | --- |
+| 출처 | Lib Quest 자체 제작(편집 초안). Data4Library `itemSrch`는 줄거리/키워드 필드를 제공하지 않는다(`bookname`/`authors`/`class_no`/`class_nm`/`bookImageURL` 등 서지 메타데이터만 존재, 실제로 raw snapshot 필드를 전수 확인함). |
+| 생성 방식 | 실제 제목·부제·저자·KDC 분류만 근거로 작성. 소설(KDC 813.7/833.6/843.6)은 부제에 줄거리 정보가 없어 장르·작가 계열 소개 수준으로 제한했고, 그 외 분야(사회과학/자연과학/예술/철학/역사/기술과학)는 실제 부제 문구가 사실상 요약이라 이를 참고해 문장을 다듬었다. 존재하지 않는 사건·인물·추천사·실제 인물 인용은 만들지 않았다. |
+| 검수 방식 | 작성 직후 실제 UI(발견 성공 화면·`/admin/review` 콘텐츠 패널)에서 문구가 책 제목/분류와 명백히 어긋나지 않는지 직접 확인. |
+| ISBN 연결 방식 | `isbn13` 키로 연결(제목 문자열 매칭 금지 — 동명이서 오매칭 방지). `src/lib/editorial.ts`의 `getEditorial(libraryCode, isbn13)`이 조회한다. |
+| Data4Library 데이터 vs Lib Quest 콘텐츠 | `collected-books.json`/`quest-curation.json`(청구기호·서가위치·ISBN 등)은 Data4Library 원본 그대로이고, `book-editorial.json`(teaser/hook/question)은 Lib Quest가 만든 콘텐츠라는 점을 명확히 구분한다. `/admin/review`에서도 두 출처가 다른 영역(표 vs "콘텐츠 보기" 패널)에 분리 표시된다. |
+| 현재 적용 범위 | 대전 원신흥도서관 36권 전체. 나머지 3개 도서관(갈마·가수원·노은) 108권은 아직 작성하지 않았다 — 근거 없는 문구를 시간에 쫓겨 만드는 대신 품질을 우선했다. `/admin/review`에서 `콘텐츠 없음`으로 표시되며, 이용자 화면에서는 해당 콘텐츠 영역 자체가 노출되지 않는다(표지·제목·저자·XP는 정상 노출). |
 
 ## 도서관별 실제 수집 이력 (2026-08-19)
 

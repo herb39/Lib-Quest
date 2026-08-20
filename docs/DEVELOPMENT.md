@@ -5,6 +5,7 @@
 발표용 MVP의 기술 구조와 로컬 개발/데이터 수집/배포 절차를 정리한 개발자 문서. 이 문서에는 기술적인 정보만 둔다.
 
 - 서비스 소개, 이용 방법: [README.md](../README.md)
+- 제품 방향/B2B2C 구조: [SERVICE_DESIGN.md](SERVICE_DESIGN.md)
 - 사서/운영자를 위한 검수 안내: [OPERATOR_GUIDE.md](OPERATOR_GUIDE.md)
 - 심사자/발표자를 위한 시연 시나리오: [DEMO_GUIDE.md](DEMO_GUIDE.md)
 
@@ -56,7 +57,11 @@ src/
     api/quests/[questId]/steps/[stepId]/verify/route.ts  # ISBN 서버 판정 API
   components/
     Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: 홈이 아닐 때만 "홈" 버튼)
-    QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션)
+    QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션 + 도감/관심/오늘의 한 권)
+    DiscoveryCard3D.tsx        # 순수 CSS 3D flip 카드 (hidden ↔ revealed)
+    DiscoveriesView.tsx        # /discoveries 클라이언트 화면 (도감/XP/칭호/필터)
+    MyExploration.tsx          # 홈 "나의 탐험" 요약 (client)
+    LibraryProgress.tsx        # 홈 도서관 카드의 "N/전체 발견" 진행도 (client)
     BarcodeScanner.tsx         # ZXing 기반 카메라 바코드 스캐너
     CopyIsbnButton.tsx          # /admin/review 전용 ISBN 클립보드 복사 버튼
   lib/
@@ -66,6 +71,11 @@ src/
     mock-data.ts               # 로컬 개발 전용 데모 데이터 (실데이터 아님)
     prisma.ts                  # Prisma Client 싱글턴 (adapter-pg)
     types.ts                   # 화면용 공용 타입
+    covers.ts / cover-urls.json     # ISBN → 표지 이미지 URL 정적 조회 (raw snapshot 기반)
+    editorial.ts               # ISBN → teaser/hook/question 정적 조회 (book-editorial.json 기반)
+    discovery-storage.ts        # 발견 도감 localStorage (QuestSession과 분리)
+    interest-storage.ts         # "읽어보고 싶어요" 관심 표시 localStorage (도감과 별도 개념)
+    final-selection-storage.ts   # Quest별 "오늘의 한 권" 선택 localStorage
 prisma/
   schema.prisma
   migrations/                 # 라이브 DB 연결 없이 `migrate diff`로 생성한 초기 마이그레이션 포함
@@ -143,6 +153,42 @@ npm run dev
 - `/admin/review?library=<libCode>` — 상단 탭으로 도서관을 전환한다. 파라미터가 없으면 기본 도서관.
 - `/data-source` — 도서관 파라미터 없이 전체 도서관을 한 화면에 나열한다.
 
+## 콘텐츠·게임화 데이터 구조
+
+서비스 방향(발견 → 관심 → 선택)에 대한 배경은 [SERVICE_DESIGN.md](SERVICE_DESIGN.md) 참고. 여기서는 구현 세부만 다룬다.
+
+### 표지 이미지 (`src/lib/covers.ts`, `src/lib/cover-urls.json`)
+
+Data4Library `itemSrch` 원본 응답에는 `bookImageURL` 필드로 실제 표지 URL(호스트: `image.aladin.co.kr`, `shopping-phinf.pstatic.net`, `bookthumb-phinf.pstatic.net`)이 들어있다. 이 필드는 curated `collected-books.json`/DB `Book` 테이블에는 없으므로(스키마 변경을 피하기 위해), `data/snapshots/*.json`에서 ISBN 기준으로 값을 그대로 추출해 `src/lib/cover-urls.json`(정적 JSON, git import)에 저장해 두고 `getCoverUrl(isbn13)`으로 조회한다. 큐레이션된 144권 중 142권이 매칭되며(2권은 원본에도 이미지가 없음), 임의로 만든 URL은 없다. `next/image`는 호스트가 3곳으로 다양해 `remotePatterns`가 불필요하게 복잡해지므로 사용하지 않고 일반 `<img>`(로딩/에러 상태는 컴포넌트에서 직접 처리)를 쓴다.
+
+### 편집 콘텐츠 (`src/lib/editorial.ts`, `data/libraries/<libCode>/book-editorial.json`)
+
+책 발견 직후 보여주는 teaser(짧은 소개)/hook(끌리는 이유 한 줄)/question(읽기 전 질문)은 Lib Quest가 실제 제목·부제·저자·KDC 분류만 근거로 직접 작성한 정적 콘텐츠다. Data4Library API는 줄거리/키워드 필드를 제공하지 않으므로(`class_no`/`class_nm`/`bookname`/`authors` 등만 존재), 소설류는 구체적 줄거리를 상상하지 않고 장르·작가 소개 수준으로 제한했다. `getEditorial(libraryCode, isbn13)`이 해당 도서관 JSON을 찾아 반환하며, 없으면 `null`(빈 콘텐츠를 억지로 채우지 않음). 현재 대전 원신흥도서관 36권만 작성되어 있다(`data/README.md` 참고).
+
+### 발견 도감 / 관심 / 오늘의 한 권 (localStorage, 서로 분리된 3개 저장소)
+
+| 저장소 | 키 | 의미 | QuestSession과의 관계 |
+| --- | --- | --- | --- |
+| `discovery-storage.ts` | `libquest_discoveries` | 실제로 발견한 책 누적 기록(도감). `bookId`당 1건, 중복 발견 시 새로 추가하지 않음 | 완전히 분리 — 도감 초기화가 진행 중인 Quest에 영향을 주지 않음 |
+| `interest-storage.ts` | `libquest_interests` | "읽어보고 싶어요" 표시한 `bookId` 목록 | 도감과도 분리 — 발견 여부와 관심 여부는 다른 개념이라 한 레코드에 묶지 않았다 |
+| `final-selection-storage.ts` | `libquest_final_selections` | Quest별 "오늘의 한 권" 선택(`questId`→`bookId`+`selectedAt`) | Quest 하나당 최신 선택 1건. 실제 대출 여부와는 무관 |
+
+XP는 `getXp = 발견 도감 unique 권수 × 10`으로 **항상 재계산**하며 별도 mutable 숫자를 저장하지 않는다. 탐험 칭호(`getExplorerTitle`)도 XP 임계값 기반 순수 함수다. 세 저장소 모두 SSR-safe(`typeof window` 가드), JSON 파싱 실패/버전 불일치 시 빈 상태로 안전하게 대체한다.
+
+### DiscoveryCard3D (`src/components/DiscoveryCard3D.tsx`)
+
+순수 CSS 3D 카드(`perspective`/`transform-style: preserve-3d`/`backface-visibility`/`rotateY`) — 외부 애니메이션 라이브러리나 WebGL/Three.js는 쓰지 않는다.
+
+- **hidden ↔ revealed**: `revealed` prop으로 앞/뒷면 전환. `justRevealed`가 true면 마운트 후 짧은 지연을 두고 flip을 재생해(발견 성공 연출) 이미 발견된 슬롯/도감 카드는 애니메이션 없이 바로 최종 상태로 그린다.
+- **PC pointer tilt**: `pointermove`(mouse만) 기준 카드 중심 대비 오프셋을 계산해 `requestAnimationFrame`으로 스로틀링한 뒤 ref의 `style.transform`을 직접 갱신한다(React state로 매 프레임 리렌더하지 않음).
+- **모바일 touch tilt**: `pointermove`를 추적하지 않고 `pointerdown` 시점 위치로 한 번만 기울인 뒤 `pointerup/cancel`에서 원위치한다. `touch-action: pan-y`를 명시해 세로 스크롤을 절대 막지 않는다.
+- **idle motion**: 현재 탐색 중인 hidden 카드(`active && !revealed`)에만 은은한 CSS keyframe 적용, 상호작용 중에는 일시정지.
+- **reduced motion**: `prefers-reduced-motion` 감지 시 tilt 비활성화, flip은 rotateY 대신 opacity crossfade로 대체.
+
+## 인증 전 데이터 redaction (보안 경계)
+
+`/quests/[id]/page.tsx`의 `redactCandidatesForPlay()`가 서버 컴포넌트 단계에서 각 Step의 후보(`title`/`author`/`isbn13`)를 빈 값으로 치환한 뒤에만 클라이언트 컴포넌트(`QuestRunner`)에 전달한다. 서가 위치/청구기호는 책을 찾는 데 필요한 정보라 그대로 전달한다. **표지 URL과 teaser/hook/question도 같은 이유로 redaction 대상이다** — verify API가 `success: true`를 반환한 이후에만(`bookImageUrl`, `teaser`, `hook`, `question` 필드) 클라이언트가 받는다. 실패 응답에는 이 필드들이 전혀 포함되지 않는다. `/admin/review`는 이 redaction을 거치지 않는 별도 조회(`getAdminReviewData`)라 후보 전체와 콘텐츠가 그대로 노출된다(운영자 검수 목적이므로 의도된 동작).
+
 ## Prisma / Neon
 
 ```bash
@@ -213,6 +259,13 @@ DB 연결이 가능한 로컬 환경이라면 추가로 확인한다.
 - `/quests/[id]` — 실제 후보 도서(청구기호 등)와 소속 도서관명으로 QuestRunner가 렌더링되는지
 - `POST /api/quests/[questId]/steps/[stepId]/verify` — 정답/오답/다른 단계 candidate ISBN 3가지 케이스
 - `/admin/review?library=<libCode>`, `/data-source` — DB 실데이터가 도서관별로 정확히 표시되는지, cross-library candidate 오류가 없는지
+- 발견 성공 시 `bookImageUrl`/`teaser`/`hook`/`question`이 verify 성공 응답에만 있고, 인증 전 페이지 payload(뷰소스 포함)에는 없는지
+- `/discoveries` — 발견 도감/XP/칭호/도서관별 진행도/관심 필터가 실제 localStorage 값과 일치하는지
+- Quest 완료 시 "오늘의 한 권" 선택 화면이 뜨고, 선택 후 새로고침해도 결과 화면에 그대로 반영되는지
+
+## AI 사용 원칙과 analytics 설계
+
+실시간 LLM을 사용자 요청마다 호출하지 않는 이유, teaser/hook/question 생성·검수 기준, 향후 analytics 이벤트 설계는 [SERVICE_DESIGN.md](SERVICE_DESIGN.md)의 "AI 사용 원칙"·"Roadmap" 절에 정리했다.
 
 ## 보안 및 운영 주의사항
 

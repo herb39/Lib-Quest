@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalizeIsbn, getDemoQuestById } from "@/lib/mock-data";
 import { getCoverUrl } from "@/lib/covers";
+import { getEditorial } from "@/lib/editorial";
 
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 
@@ -12,6 +13,9 @@ type VerifyResult =
       bookAuthor: string | null;
       bookClassName: string | null;
       bookImageUrl: string | null;
+      teaser: string | null;
+      hook: string | null;
+      question: string | null;
     }
   | { success: false; message: string };
 
@@ -53,7 +57,7 @@ async function verifyAgainstDatabase(
 
   const step = await prisma.questStep.findFirst({
     where: { id: stepId, questId },
-    include: { candidates: { include: { book: true } } },
+    include: { candidates: { include: { book: { include: { library: true } } } } },
   });
 
   if (!step) {
@@ -65,6 +69,8 @@ async function verifyAgainstDatabase(
     return { success: false, message: "이 단계의 후보 도서가 아니에요. 다시 확인해주세요." };
   }
 
+  const editorial = getEditorial(matched.book.library.code, matched.book.isbn13);
+
   return {
     success: true,
     bookId: matched.book.id,
@@ -72,6 +78,9 @@ async function verifyAgainstDatabase(
     bookAuthor: matched.book.author,
     bookClassName: matched.book.className,
     bookImageUrl: getCoverUrl(matched.book.isbn13),
+    teaser: editorial?.teaser ?? null,
+    hook: editorial?.hook ?? null,
+    question: editorial?.question ?? null,
   };
 }
 
@@ -95,5 +104,8 @@ function verifyAgainstDemo(questId: string, stepId: string, normalizedIsbn: stri
     bookAuthor: matched.book.author,
     bookClassName: null,
     bookImageUrl: getCoverUrl(matched.book.isbn13),
+    teaser: null,
+    hook: null,
+    question: null,
   };
 }

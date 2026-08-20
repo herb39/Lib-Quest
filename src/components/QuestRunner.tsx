@@ -6,6 +6,8 @@ import type { QuestSummary } from "@/lib/types";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { DiscoveryCard3D } from "@/components/DiscoveryCard3D";
 import { recordDiscovery } from "@/lib/discovery-storage";
+import { loadInterestStore, toggleInterest, isInterested, type InterestStore } from "@/lib/interest-storage";
+import { saveFinalSelection, getFinalSelection, type FinalSelection } from "@/lib/final-selection-storage";
 
 type FoundBook = {
   id: string;
@@ -14,6 +16,9 @@ type FoundBook = {
   callNumber: string | null;
   shelfLocation: string | null;
   coverUrl: string | null;
+  teaser: string | null;
+  hook: string | null;
+  question: string | null;
 };
 
 type SessionState = {
@@ -24,9 +29,13 @@ type SessionState = {
 };
 
 type SuccessInfo = {
+  bookId: string;
   title: string;
   author: string | null;
   coverUrl: string | null;
+  teaser: string | null;
+  hook: string | null;
+  question: string | null;
   isLast: boolean;
   isNew: boolean;
 };
@@ -119,6 +128,8 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const [showHint, setShowHint] = useState(false);
   const [candidateIndex, setCandidateIndex] = useState(0);
   const [verifying, setVerifying] = useState(false);
+  const [interestStore, setInterestStore] = useState<InterestStore>({ version: 1, bookIds: [] });
+  const [finalSelection, setFinalSelection] = useState<FinalSelection | null>(null);
 
   useEffect(() => {
     // localStorage 기반 익명 세션은 클라이언트에서만 읽을 수 있어 마운트 시 1회 동기화한다.
@@ -128,6 +139,11 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     const isValid = loaded.completedAt !== null || loaded.currentStep < quest.steps.length;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSession(isValid ? loaded : EMPTY_SESSION);
+    // 관심 표시/오늘의 한 권 선택은 QuestSession과 완전히 분리된 별도 저장소에서 읽는다.
+     
+    setInterestStore(loadInterestStore());
+     
+    setFinalSelection(getFinalSelection(quest.id));
     setHydrated(true);
   }, [quest.id, quest.steps.length]);
 
@@ -171,9 +187,20 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     setSuccessInfo(null);
   }
 
+  function handleToggleInterest(bookId: string) {
+    const { store } = toggleInterest(bookId);
+    setInterestStore(store);
+  }
+
+  function handleSelectFinalBook(bookId: string) {
+    const selection = saveFinalSelection(quest.id, bookId);
+    setFinalSelection(selection);
+  }
+
   // 성공 직후에는 세션이 이미 다음 단계로 넘어가 있어도, 사용자가 "다음 탐사지역 열기"를 눌러
   // 직접 화면을 넘기기 전까지는 발견의 보상감(발표에서는 심사위원이 볼 시간)을 위해 성공 패널을 유지한다.
   if (successInfo) {
+    const interested = isInterested(interestStore, successInfo.bookId);
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-5 py-10 text-center">
         <div
@@ -204,6 +231,50 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           ) : (
             <p className="mt-2 text-xs font-semibold text-stone-400">도감에는 이미 기록되어 있어요</p>
           )}
+
+          {successInfo.hook && (
+            <div
+              className="lq-animate-in mt-4 rounded-xl bg-white p-3 text-left"
+              style={{ animationDelay: "0.5s", animationFillMode: "backwards" }}
+            >
+              <p className="text-[11px] font-semibold text-emerald-700">이 책이 끌리는 이유</p>
+              <p className="mt-1 break-keep text-sm font-medium text-stone-800">{successInfo.hook}</p>
+            </div>
+          )}
+
+          {successInfo.teaser && (
+            <div
+              className="lq-animate-in mt-2 rounded-xl bg-white p-3 text-left"
+              style={{ animationDelay: "0.65s", animationFillMode: "backwards" }}
+            >
+              <p className="text-[11px] font-semibold text-stone-400">이런 책이에요</p>
+              <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.teaser}</p>
+            </div>
+          )}
+
+          {successInfo.question && (
+            <div
+              className="lq-animate-in mt-2 rounded-xl bg-white p-3 text-left"
+              style={{ animationDelay: "0.8s", animationFillMode: "backwards" }}
+            >
+              <p className="text-[11px] font-semibold text-stone-400">책을 펼치기 전에</p>
+              <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.question}</p>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => handleToggleInterest(successInfo.bookId)}
+            className={`lq-animate-in mt-3 flex h-10 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+              interested
+                ? "border-rose-300 bg-rose-50 text-rose-600"
+                : "border-stone-300 bg-white text-stone-600 active:bg-stone-50"
+            }`}
+            style={{ animationDelay: "0.95s", animationFillMode: "backwards" }}
+          >
+            <span aria-hidden="true">{interested ? "♥" : "♡"}</span>
+            {interested ? "읽어보고 싶은 책에 담았어요" : "읽어보고 싶어요"}
+          </button>
         </div>
 
         <button
@@ -225,9 +296,63 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     );
   }
 
+  if (isCompleted && !finalSelection) {
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
+        <p className="text-center text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          오늘 만난 세 권
+        </p>
+        <h1 className="mt-1 text-center text-xl font-bold text-stone-900">
+          이 중 한 권을 골라볼까요?
+        </h1>
+        <p className="mt-1 text-center text-sm text-stone-500">오늘 읽고 싶은 책을 선택해주세요.</p>
+
+        <div className="mt-6 flex flex-col gap-3">
+          {foundBooks.map((book) => (
+            <button
+              key={book.id}
+              type="button"
+              onClick={() => handleSelectFinalBook(book.id)}
+              className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 text-left shadow-sm transition active:scale-[0.99] active:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <BookThumb coverUrl={book.coverUrl} />
+              <div className="min-w-0 flex-1">
+                <p className="break-keep font-semibold text-stone-900">{book.title}</p>
+                {book.author && <p className="text-sm text-stone-500">{book.author}</p>}
+              </div>
+              <span aria-hidden="true" className="shrink-0 text-stone-300">
+                →
+              </span>
+            </button>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
   if (isCompleted) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
+        {finalSelection && (
+          <div className="lq-animate-in mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">오늘의 선택</p>
+            {(() => {
+              const chosen = foundBooks.find((b) => b.id === finalSelection.bookId);
+              if (!chosen) return null;
+              return (
+                <>
+                  <div className="mx-auto mt-2 h-28 w-20">
+                    <DiscoveryCard3D revealed coverUrl={chosen.coverUrl} title={chosen.title} size="active" />
+                  </div>
+                  <h2 className="mt-2 break-keep text-lg font-bold text-stone-900">{chosen.title}</h2>
+                  {chosen.hook && <p className="mt-1 break-keep text-sm font-medium text-stone-700">{chosen.hook}</p>}
+                  <p className="mt-2 text-xs font-semibold text-amber-700">이제 책을 펼쳐볼까요?</p>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
         <div className="lq-animate-in rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
           <p aria-hidden="true" className="text-3xl">
             🎉
@@ -389,6 +514,9 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         callNumber: matchedCandidate?.book.callNumber ?? null,
         shelfLocation: matchedCandidate?.book.shelfLocation ?? null,
         coverUrl,
+        teaser: result.teaser ?? null,
+        hook: result.hook ?? null,
+        question: result.question ?? null,
       };
       const next: SessionState = {
         currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
@@ -412,7 +540,17 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         className: result.bookClassName ?? null,
         discoveredAt: new Date().toISOString(),
       });
-      setSuccessInfo({ title: result.bookTitle, author: result.bookAuthor ?? null, coverUrl, isLast: isLastStep, isNew });
+      setSuccessInfo({
+        bookId: result.bookId,
+        title: result.bookTitle,
+        author: result.bookAuthor ?? null,
+        coverUrl,
+        teaser: result.teaser ?? null,
+        hook: result.hook ?? null,
+        question: result.question ?? null,
+        isLast: isLastStep,
+        isNew,
+      });
     } catch {
       setFeedback({ message: "서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.", isMismatch: false });
     } finally {
