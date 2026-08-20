@@ -35,8 +35,9 @@ function usePrefersReducedMotion() {
 
 const TILT_MAX_Y = 6; // 데스크톱 rotateY deg, pointer 추가분
 const TILT_MAX_X = 4; // 데스크톱 rotateX deg, pointer 추가분
-const TOUCH_TILT_MAX_Y = 4; // 모바일 rotateY deg — 데스크톱보다 좁게, 화면이 흔들리는 느낌 방지
-const TOUCH_TILT_MAX_X = 3; // 모바일 rotateX deg
+const TOUCH_TILT_MAX_Y = 8; // 모바일 rotateY deg(좌우) — spine/page edge 노출 변화가 육안으로 느껴지도록 X보다 크게
+const TOUCH_TILT_MAX_X = 5; // 모바일 rotateX deg(상하)
+const TOUCH_TILT_SCALE = 1.025; // 터치 중 살짝 들어올려지는 느낌
 
 /**
  * 책 한 권의 "숨김 ↔ 발견" 상태를 표현하는 순수 CSS 3D 오브젝트.
@@ -119,8 +120,10 @@ export function DiscoveryCard3D({
     // 모바일: pointerdown에서 저장해둔 rect 기준으로 손가락 위치를 계속 따라간다.
     // preventDefault를 호출하지 않고 touch-action: pan-y를 유지하므로, 제스처가 세로
     // 스크롤로 판단되면 브라우저가 자체적으로 pointercancel을 보내 추적이 자연스럽게 멈춘다.
-    if (!interacting) return;
-    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, 1.015);
+    // interacting(React state)이 아니라 rectRef(동기 ref)로만 게이팅한다 — pointerdown 직후
+    // 곧바로 이어지는 pointermove가 아직 커밋되지 않은 setInteracting(true)의 stale closure를
+    // 만나 프레임을 놓치는 것을 막기 위함이다.
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE);
   }
 
   function handlePointerLeave(e: ReactPointerEvent<HTMLDivElement>) {
@@ -140,7 +143,7 @@ export function DiscoveryCard3D({
     if (!rect) return;
     rectRef.current = rect;
     setInteracting(true);
-    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, 1.015);
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE);
   }
 
   function handlePointerUpOrCancel(e: ReactPointerEvent<HTMLDivElement>) {
