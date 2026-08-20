@@ -35,9 +35,12 @@ function usePrefersReducedMotion() {
 
 const TILT_MAX_Y = 6; // 데스크톱 rotateY deg, pointer 추가분
 const TILT_MAX_X = 4; // 데스크톱 rotateX deg, pointer 추가분
-const TOUCH_TILT_MAX_Y = 8; // 모바일 rotateY deg(좌우) — spine/page edge 노출 변화가 육안으로 느껴지도록 X보다 크게
-const TOUCH_TILT_MAX_X = 5; // 모바일 rotateX deg(상하)
+const TOUCH_TILT_MAX_Y = 9; // 모바일 rotateY deg(좌우) — spine/page edge 노출 변화가 육안으로 느껴지도록
+const TOUCH_TILT_MAX_X = 7; // 모바일 rotateX deg(상하) — 세로 이동에서도 확실히 체감되도록
 const TOUCH_TILT_SCALE = 1.025; // 터치 중 살짝 들어올려지는 느낌
+// 터치는 카드 중앙에서 조금만 움직여도 변화가 느껴지도록 정규화된 offset에 곱하는 민감도.
+// max deg 자체를 더 키우는 대신 "center 근처에서의 반응 속도"만 높이고, 결과는 항상 ±max로 clamp한다.
+const TOUCH_TILT_SENSITIVITY = 1.2;
 
 /**
  * 책 한 권의 "숨김 ↔ 발견" 상태를 표현하는 순수 CSS 3D 오브젝트.
@@ -98,13 +101,26 @@ export function DiscoveryCard3D({
     setInteracting(true);
   }
 
-  function applyTilt(clientX: number, clientY: number, rect: DOMRect, maxX: number, maxY: number, scale: number) {
+  function applyTilt(
+    clientX: number,
+    clientY: number,
+    rect: DOMRect,
+    maxX: number,
+    maxY: number,
+    scale: number,
+    sensitivity: number = 1
+  ) {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       const px = (clientX - rect.left) / rect.width;
       const py = (clientY - rect.top) / rect.height;
-      const rotateY = (px - 0.5) * maxY * 2;
-      const rotateX = -(py - 0.5) * maxX * 2;
+      // -1..1로 정규화한 offset에 sensitivity를 곱해 중앙 근처에서도 반응이 빨리 시작되게 하되,
+      // 항상 ±1로 clamp한 뒤 max deg를 곱한다 — sensitivity가 max deg 자체를 넘어서게 만들지 않는다.
+      const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+      const offsetY = clamp((px - 0.5) * 2 * sensitivity);
+      const offsetX = clamp((py - 0.5) * 2 * sensitivity);
+      const rotateY = offsetY * maxY;
+      const rotateX = -offsetX * maxX;
       setTilt(rotateX, rotateY, scale);
     });
   }
@@ -123,7 +139,7 @@ export function DiscoveryCard3D({
     // interacting(React state)이 아니라 rectRef(동기 ref)로만 게이팅한다 — pointerdown 직후
     // 곧바로 이어지는 pointermove가 아직 커밋되지 않은 setInteracting(true)의 stale closure를
     // 만나 프레임을 놓치는 것을 막기 위함이다.
-    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE);
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE, TOUCH_TILT_SENSITIVITY);
   }
 
   function handlePointerLeave(e: ReactPointerEvent<HTMLDivElement>) {
@@ -143,7 +159,7 @@ export function DiscoveryCard3D({
     if (!rect) return;
     rectRef.current = rect;
     setInteracting(true);
-    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE);
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, TOUCH_TILT_SCALE, TOUCH_TILT_SENSITIVITY);
   }
 
   function handlePointerUpOrCancel(e: ReactPointerEvent<HTMLDivElement>) {
