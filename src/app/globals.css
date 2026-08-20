@@ -39,88 +39,189 @@ body {
   }
 }
 
-/* DiscoveryCard3D: 순수 CSS 3D 카드 (외부 라이브러리/WebGL 없음). */
-.lq-card3d-tilt {
-  perspective: 900px;
+/*
+ * DiscoveryCard3D: 순수 CSS 3D "책 오브젝트" (외부 라이브러리/WebGL 없음).
+ * 카드 flip이 아니라 표지(cover)/책등(spine)/페이지 단면(pages)/뒤표지(back)를 서로 다른
+ * translateZ 깊이에 겹쳐 쌓고, 그룹 전체를 살짝 돌려(rotateX/Y/Z) 두께가 있는 책처럼 보이게
+ * 한다. transform 레이어를 역할별로 분리해 pointer tilt / idle motion / reveal 연출이
+ * 서로의 transform을 덮어쓰며 충돌하지 않게 한다 (컴포넌트 상단 주석의 레이어 트리 참고).
+ */
+.lq-book-scene {
+  perspective: 1100px;
+}
+
+.lq-book-interact {
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
+}
+
+.lq-book-interact.lq-book-will-change {
   will-change: transform;
 }
 
-.lq-card3d-flip {
+.lq-book-reveal {
+  transform-style: preserve-3d;
+}
+
+.lq-book-pose {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.34, 1.1, 0.64, 1);
+  transform: rotateX(3deg) rotateY(-10deg) rotateZ(-1deg);
 }
 
-.lq-card3d-flip.is-revealed {
-  transform: rotateY(180deg);
+.lq-book--hero {
+  --lq-depth: 22px;
+}
+.lq-book--active {
+  --lq-depth: 12px;
+}
+.lq-book--grid {
+  --lq-depth: 8px;
+}
+.lq-book--slot {
+  --lq-depth: 3px;
 }
 
-.lq-card3d-face {
+.lq-book-face {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
-  border-radius: 1rem;
+  border-radius: 0.85rem;
   overflow: hidden;
 }
 
-.lq-card3d-face.lq-card3d-back {
-  transform: rotateY(180deg);
+.lq-book-cover {
+  transform: translateZ(0);
+  background: #fff;
+  box-shadow: 0 12px 20px -10px rgb(43 38 32 / 45%);
+  border: 1px solid rgb(41 37 36 / 8%);
 }
 
-/* reduced-motion: 회전 대신 짧은 크로스페이드로 대체한다 */
-.lq-card3d-flip.lq-reduced-motion {
-  transition: none;
-  transform: none;
+.lq-book-pages {
+  transform: translateZ(calc(var(--lq-depth) * -0.45));
+  background: repeating-linear-gradient(
+    to bottom,
+    #f6efdf 0px,
+    #f6efdf 2px,
+    #e9dfc8 3px
+  );
 }
 
-.lq-card3d-flip.lq-reduced-motion .lq-card3d-face {
+.lq-book-spine {
+  transform: translateZ(calc(var(--lq-depth) * -0.75));
+  background: linear-gradient(100deg, #57493a 0%, #7a6650 55%, #57493a 100%);
+}
+
+.lq-book-back {
+  transform: translateZ(calc(var(--lq-depth) * -1));
+  background: linear-gradient(135deg, #e7e0d3, #d3c9b7);
+}
+
+.lq-book-cover-layer {
   position: absolute;
   inset: 0;
-  backface-visibility: visible;
-  transform: none;
-  transition: opacity 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
 }
 
-.lq-card3d-flip.lq-reduced-motion .lq-card3d-front {
+.lq-book-cover-layer.is-visible {
   opacity: 1;
 }
 
-.lq-card3d-flip.lq-reduced-motion.is-revealed .lq-card3d-front {
-  opacity: 0;
+.lq-book-mark {
+  font-weight: 800;
+  color: #a8a29e;
+}
+
+.lq-book--hero .lq-book-mark {
+  font-size: 3.25rem;
+}
+.lq-book--active .lq-book-mark {
+  font-size: 1.75rem;
+}
+.lq-book--grid .lq-book-mark,
+.lq-book--slot .lq-book-mark {
+  font-size: 1.25rem;
+}
+
+.lq-book-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  width: 68%;
+  height: 12%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgb(43 38 32 / 30%) 0%, transparent 72%);
+  border-radius: 50%;
+  filter: blur(4px);
   pointer-events: none;
 }
 
-.lq-card3d-flip.lq-reduced-motion .lq-card3d-back {
-  opacity: 0;
+@keyframes lq-book-materialize {
+  0% {
+    transform: translateZ(-70px) scale(0.9);
+  }
+  35% {
+    transform: translateZ(24px) scale(1.06);
+  }
+  65% {
+    transform: translateZ(-8px) scale(0.99);
+  }
+  100% {
+    transform: translateZ(0) scale(1);
+  }
 }
 
-.lq-card3d-flip.lq-reduced-motion.is-revealed .lq-card3d-back {
-  opacity: 1;
+.lq-book-materialize {
+  animation: lq-book-materialize 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes lq-card-idle {
+@keyframes lq-book-shadow-pulse {
+  0% {
+    opacity: 0.5;
+    transform: translateX(-50%) scale(0.85);
+  }
+  35% {
+    opacity: 0.2;
+    transform: translateX(-50%) scale(1.18);
+  }
+  100% {
+    opacity: 0.6;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.lq-book-shadow-float {
+  animation: lq-book-shadow-pulse 0.9s ease-out;
+}
+
+@keyframes lq-book-idle {
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-2px) rotate(0.6deg);
+    transform: translateY(-3px) rotate(0.6deg);
   }
 }
 
-.lq-card3d-idle {
-  animation: lq-card-idle 7s ease-in-out infinite;
-}
-
-.lq-card3d-idle.lq-card3d-interacting {
-  animation-play-state: paused;
+.lq-book-idle {
+  animation: lq-book-idle 7s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lq-card3d-idle {
+  .lq-book-idle,
+  .lq-book-materialize,
+  .lq-book-shadow-float {
     animation: none;
+  }
+  .lq-book-interact {
+    transition: none;
   }
 }
 
@@ -150,18 +251,3 @@ body {
   }
 }
 
-@keyframes lq-card-pulse {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.lq-card3d-pulse {
-  animation: lq-card-pulse 0.5s ease-out;
-}

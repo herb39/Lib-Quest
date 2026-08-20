@@ -58,7 +58,7 @@ src/
   components/
     Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: /admin 이외 라우트에서 "처음부터" 전체 초기화 버튼)
     QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션 + 도감/관심/오늘의 한 권)
-    DiscoveryCard3D.tsx        # 순수 CSS 3D flip 카드 (hidden ↔ revealed)
+    DiscoveryCard3D.tsx        # 순수 CSS 3D 책 오브젝트 (표지/책등/페이지/뒤표지, hidden ↔ revealed)
     DiscoveriesView.tsx        # /discoveries 클라이언트 화면 (도감/XP/칭호/필터)
     MyExploration.tsx          # 홈 "나의 탐험" 요약 (client)
     LibraryProgress.tsx        # 홈 도서관 카드의 "N/전체 발견" 진행도 (client)
@@ -198,15 +198,48 @@ XP는 `getXp = 발견 도감 unique 권수 × 10`으로 **항상 재계산**하�
 
 Header의 `처음부터` 버튼이 호출하는 `resetLibQuestUserState()`는 위 표의 **Lib Quest 소유 key만** 선택 삭제한다 — `libquest_session_` prefix를 가진 모든 key(현재까지 플레이한 모든 Quest 세션)를 순회 삭제하고, `libquest_discoveries`/`libquest_interests`/`libquest_final_selections`를 지운다. `localStorage.clear()`는 쓰지 않는다(같은 origin에 Lib Quest가 모르는 다른 값이 있을 수 있으므로). 확인 모달에서 "처음부터 시작"을 누르면 실행 후 `window.location.href = "/"`로 완전한 새로고침을 한다 — `router.push`가 아니라 전체 새로고침을 택한 이유는, 홈/도서관 카드/QuestRunner 등 여러 클라이언트 컴포넌트가 마운트 시점에만 localStorage를 읽으므로(hydration-safe 패턴) 라우팅만으로는 이미 렌더된 컴포넌트들이 새 상태를 반영하지 못할 수 있기 때문이다.
 
-### DiscoveryCard3D (`src/components/DiscoveryCard3D.tsx`)
+### DiscoveryCard3D — 3D 책 오브젝트 (`src/components/DiscoveryCard3D.tsx`)
 
-순수 CSS 3D 카드(`perspective`/`transform-style: preserve-3d`/`backface-visibility`/`rotateY`) — 외부 애니메이션 라이브러리나 WebGL/Three.js는 쓰지 않는다.
+P0-3에서 "카드 flip"이 아니라 **두께가 있는 책 오브젝트**로 재구성했다(이름은 호출부 변경 범위를 늘리지 않기 위해 유지). 순수 CSS 3D(`perspective`/`transform-style: preserve-3d`/`translateZ`/`rotateX·Y·Z`)만 쓰고 외부 애니메이션 라이브러리·WebGL·Three.js는 쓰지 않는다.
 
-- **hidden ↔ revealed**: `revealed` prop으로 앞/뒷면 전환. `justRevealed`가 true면 마운트 후 짧은 지연을 두고 flip을 재생해(발견 성공 연출) 이미 발견된 슬롯/도감 카드는 애니메이션 없이 바로 최종 상태로 그린다.
-- **PC pointer tilt**: `pointermove`(mouse만) 기준 카드 중심 대비 오프셋을 계산해 `requestAnimationFrame`으로 스로틀링한 뒤 ref의 `style.transform`을 직접 갱신한다(React state로 매 프레임 리렌더하지 않음).
+**DOM/transform 레이어 구조** (역할별로 분리 — 하나의 element에 pointer tilt/idle/reveal/기본 자세를 전부 몰아넣으면 서로의 transform을 덮어써 충돌한다):
+
+```
+lq-book-scene      perspective(1100px)만 담당
+└ lq-book-interact  ref 대상. pointer tilt만 이 레이어의 style.transform을 직접 갱신
+  └ lq-book-reveal   발견 순간 1회성 materialize 키프레임 전용 (평소엔 transform 없음)
+    └ lq-book-pose     책의 고정 기본 자세: rotateX(3deg) rotateY(-10deg) rotateZ(-1deg)
+      ├ lq-book-back    translateZ(-depth)      뒤표지 — generic neutral gradient
+      ├ lq-book-pages   translateZ(-depth*0.45) 페이지 단면 — ivory/warm-white repeating-gradient
+      ├ lq-book-spine   translateZ(-depth*0.75) 책등 — 어두운 gradient (실제 책등 정보 없음, 두께감 목적)
+      └ lq-book-cover   translateZ(0)           표지 — 가장 큰 면, cover-layer 2장을 opacity crossfade
+```
+
+`--lq-depth`는 size별 CSS 변수(hero 22px / active 12px / grid 8px / slot 3px)로 책 두께를 조절한다. 표지(`lq-book-cover`) 안에는 hidden(`?` + "숨겨진 책") / revealed(실제 이미지 또는 fallback) 두 레이어가 겹쳐 있고 `opacity` transition으로 크로스페이드한다 — flip처럼 180도 회전시키지 않는다(뒤표지/책등이 실제 정보 없이 두께 표현용이라 회전시켜도 얻을 게 없고, "숨겨진 책 → 발견된 책"은 회전보다 "눈앞에 나타나는" materialize 쪽이 더 자연스럽다).
+
+- **hidden ↔ revealed**: `revealed` prop으로 표지 레이어 크로스페이드. `justRevealed`가 true면 마운트 후 짧은 지연을 두고 `lq-book-reveal`에 `lq-book-materialize` 키프레임(약 0.9초 — 뒤로 살짝 물러났다 떠오르며 정착, `translateZ`+`scale`만 사용)을 재생하고 그 순간 표지가 크로스페이드된다. 이미 발견된 슬롯/도감 책은 애니메이션 없이 바로 최종 상태로 그린다.
+- **ground shadow**: 책 아래 별도 `lq-book-shadow` 엘리먼트(정적 `radial-gradient` + `filter: blur`)가 materialize와 같은 타이밍에 opacity/scale만 애니메이션한다(blur 값 자체는 애니메이션하지 않음 — 매 프레임 blur 재계산은 성능 비용이 크다).
+- **PC pointer tilt**: `pointermove`(mouse만) 기준 카드 중심 대비 오프셋을 계산해 `requestAnimationFrame`으로 스로틀링한 뒤 `lq-book-interact` ref의 `style.transform`을 직접 갱신한다(React state로 매 프레임 리렌더하지 않음). 이 tilt는 `lq-book-pose`의 고정 자세와는 별도 레이어라 서로 곱해져(중첩 3D transform) 자연스럽게 더해진다.
 - **모바일 touch tilt**: `pointermove`를 추적하지 않고 `pointerdown` 시점 위치로 한 번만 기울인 뒤 `pointerup/cancel`에서 원위치한다. `touch-action: pan-y`를 명시해 세로 스크롤을 절대 막지 않는다.
-- **idle motion**: 현재 탐색 중인 hidden 카드(`active && !revealed`)에만 은은한 CSS keyframe 적용, 상호작용 중에는 일시정지.
-- **reduced motion**: `prefers-reduced-motion` 감지 시 tilt 비활성화, flip은 rotateY 대신 opacity crossfade로 대체.
+- **idle motion**: 현재 탐색 중인 hidden 책(`active && !revealed`)에만 `lq-book-reveal` 레이어에 은은한 CSS keyframe(translateY/rotate) 적용, 상호작용 중에는 클래스 자체를 떼어 정지한다.
+- **reduced motion**: `prefers-reduced-motion` 감지 시 idle/materialize/shadow 애니메이션과 tilt transition을 전부 제거하고, 표지 크로스페이드(0.35s opacity transition)만으로 상태 전환을 표현한다.
+- **성능**: `will-change: transform`은 상호작용 중이거나 idle 대상인 책에만 조건부로 붙인다(`lq-book-will-change` 클래스) — 도감 grid의 정적인 책 수십 장에 항상 걸어두지 않는다. 애니메이션은 `transform`/`opacity`만 사용(매 프레임 width/height/blur 재계산 없음).
+- **표지 fallback**: `coverUrl`이 없거나 로드 실패(`onError`)하면 📕 아이콘 + "표지 이미지 없음" 텍스트로 대체하되 같은 책 오브젝트 레이어 구조(표지/책등/페이지) 그대로 유지한다 — 표지가 없다고 3D 구조 자체가 무너지지 않는다. 이 실패는 verify 성공/XP/도감 기록/다음 Step 진행에 전혀 영향을 주지 않는다(발견 로직과 표지 렌더링은 완전히 분리되어 있다).
+
+### Mission → Discovery → BookInfo 화면 상태 (`QuestRunner.tsx`)
+
+한 Step 안에서 발견 순간(감정적 보상)과 책 정보(독서 호기심)를 완전히 분리된 화면으로 나눈다. 별도 Next.js route를 만들지 않고 `QuestRunner` 내부 state(`stepView: "mission" | "discovery" | "bookInfo"`)만으로 전환한다 — history를 추가로 쌓지 않는다.
+
+```
+mission  (Mission Narrative + 탐험 단서 + hidden 책 + ISBN 인증 CTA)
+  → verify 성공 → discovery (큰 revealed 책 + 제목/저자 + XP만, hook/teaser/question 없음)
+    → "책 살펴보기" → bookInfo (작은 책 + hook 우선 + 읽어보고 싶어요 + teaser/question은 "책 더 알아보기"로 접힘)
+      → "다음 탐사지역 열기" → 다음 Step의 mission (또는 마지막 Step이면 "결과 카드 보기" → 완료 화면)
+```
+
+`session.currentStep`(어느 Step인지)은 verify 성공 시점에 이미 다음 값으로 넘어가 있고, `stepView`는 그와 별개로 사용자가 "책 살펴보기"/"다음 탐사지역 열기"를 눌러야만 전환된다. 단계가 바뀔 때(`session.currentStep` 변경) 실행되는 정리용 `useEffect`는 `showHint`/`feedback`/`isbnInput`만 초기화하고 **`stepView`는 절대 건드리지 않는다** — 같은 이벤트 핸들러 안에서 `setSession`(단계 이동) 다음에 `setStepView("discovery")`를 호출하는데, 이 effect가 `stepView`를 "mission"으로 되돌리면 Discovery/BookInfo 화면을 건너뛰고 곧장 다음 Step으로 넘어가버리는 버그가 생긴다(실제로 이 문제가 있었고, effect에서 `stepView` 초기화 로직을 제거해 해결했다).
+
+**Reload 정책**: `stepView`/`successInfo`는 컴포넌트 state일 뿐 localStorage에 저장하지 않는다. 사용자가 Discovery/BookInfo 화면에서 새로고침하면 `session`(이미 다음 단계로 이동된 상태)만 복구되어 **다음 Step의 Mission 화면**(또는 완료 상태면 결과 화면)으로 이어진다 — 방금 봤던 Discovery/BookInfo 화면이 재생되지는 않는다. 이 화면들을 복구하려면 세션에 "직전 발견 정보"까지 저장해야 하는데, 발표 환경에서 새로고침 도중 발견 연출을 다시 보여줘야 할 필요성은 낮고 저장 구조만 복잡해지므로 의도적으로 단순한 정책을 택했다.
 
 ## 인증 전 데이터 redaction (보안 경계)
 

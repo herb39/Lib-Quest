@@ -41,6 +41,12 @@ type SuccessInfo = {
   isNew: boolean;
 };
 
+// 발견 순간(Discovery)과 책 정보(BookInfo)를 완전히 분리된 화면으로 나눈다 — 인증 직후에는
+// 큰 책 오브젝트와 발견 보상만 보여주고, 사용자가 "책 살펴보기"를 눌러야 hook/teaser/question ·
+// 읽어보고 싶어요 · 다음 탐사지역 CTA가 있는 정보 화면으로 넘어간다. Next.js route는 늘리지
+// 않고 같은 Step 안에서 화면 state만 전환한다(history 추가 없음).
+type StepView = "mission" | "discovery" | "bookInfo";
+
 function BookThumb({ coverUrl }: { coverUrl: string | null }) {
   const [error, setError] = useState(false);
   return (
@@ -125,6 +131,8 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const [isbnInput, setIsbnInput] = useState("");
   const [feedback, setFeedback] = useState<{ message: string; isMismatch: boolean } | null>(null);
   const [successInfo, setSuccessInfo] = useState<SuccessInfo | null>(null);
+  const [stepView, setStepView] = useState<StepView>("mission");
+  const [showMoreBookInfo, setShowMoreBookInfo] = useState(false);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
   const [showHint, setShowHint] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -149,6 +157,13 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
 
   useEffect(() => {
     // 단계가 바뀔 때마다 단계 전용 UI 상태를 초기화한다.
+    //
+    // 주의: stepView는 여기서 건드리지 않는다. handleVerify가 성공 시 session.currentStep을
+    // 이미 다음 단계로 옮겨두고 나서(같은 이벤트 안에서) stepView를 "discovery"로 바꾸는데,
+    // 만약 이 effect가 session.currentStep 변경에 반응해 stepView를 "mission"으로 되돌리면
+    // 그 즉시 Discovery/BookInfo 화면을 건너뛰고 다음 Step의 Mission 화면으로 넘어가버린다.
+    // stepView 전환은 오직 handleVerify(→discovery)/handleExamineBook(→bookInfo)/
+    // handleContinue(→mission)에서만 명시적으로 일어난다.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowHint(false);
     setFeedback(null);
@@ -184,6 +199,12 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
 
   function handleContinue() {
     setSuccessInfo(null);
+    setStepView("mission");
+    setShowMoreBookInfo(false);
+  }
+
+  function handleExamineBook() {
+    setStepView("bookInfo");
   }
 
   function handleToggleInterest(bookId: string) {
@@ -196,85 +217,123 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     setFinalSelection(selection);
   }
 
-  // 성공 직후에는 세션이 이미 다음 단계로 넘어가 있어도, 사용자가 "다음 탐사지역 열기"를 눌러
-  // 직접 화면을 넘기기 전까지는 발견의 보상감(발표에서는 심사위원이 볼 시간)을 위해 성공 패널을 유지한다.
-  if (successInfo) {
-    const interested = isInterested(interestStore, successInfo.bookId);
+  // Discovery(발견 순간의 감정적 보상)와 BookInfo(발견 후 독서 관심)를 완전히 분리된 화면으로
+  // 보여준다. 세션은 인증 성공 시점에 이미 다음 단계로 넘어가 있지만, 사용자가 "책 살펴보기" →
+  // "다음 탐사지역 열기"를 직접 누르기 전까지는 이 두 화면에 머무른다.
+  if (successInfo && stepView === "discovery") {
     return (
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-5 py-10 text-center">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center px-5 py-8 text-center">
+        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">새로운 책 발견</p>
+
         <div
-          role="status"
-          aria-live="polite"
-          className="lq-animate-in w-full rounded-2xl border border-emerald-200 bg-emerald-50 p-6"
+          className="mx-auto mt-4"
+          style={{ width: "clamp(220px, 66vw, 300px)", aspectRatio: "2 / 3" }}
         >
-          <div className="mx-auto h-40 w-28">
-            <DiscoveryCard3D
-              revealed
-              justRevealed
-              active
-              interactive={false}
-              size="active"
-              coverUrl={successInfo.coverUrl}
-              title={successInfo.title}
-            />
-          </div>
-          <p className="mt-3 text-sm font-semibold text-emerald-700">
-            {successInfo.isNew ? "새로운 책을 발견했어요!" : "다시 만난 책이에요"}
-          </p>
-          <h2 className="mt-1 break-keep text-lg font-bold text-stone-900">{successInfo.title}</h2>
-          {successInfo.author && <p className="mt-0.5 text-sm text-stone-500">{successInfo.author}</p>}
+          <DiscoveryCard3D
+            revealed
+            justRevealed
+            active
+            interactive
+            size="hero"
+            coverUrl={successInfo.coverUrl}
+            title={successInfo.title}
+          />
+        </div>
+
+        <div role="status" aria-live="polite" className="lq-animate-in mt-5 w-full">
+          <h1 className="break-keep text-xl font-bold text-stone-900">{successInfo.title}</h1>
+          {successInfo.author && <p className="mt-1 text-sm text-stone-500">{successInfo.author}</p>}
+
           {successInfo.isNew ? (
-            <span className="lq-xp-pop mt-2 inline-block whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+            <span className="lq-xp-pop mt-3 inline-block whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
               +10 XP
             </span>
           ) : (
-            <p className="mt-2 text-xs font-semibold text-stone-400">도감에는 이미 기록되어 있어요</p>
+            <p className="mt-3 text-xs font-semibold text-stone-400">다시 만난 책</p>
           )}
-
-          {successInfo.hook && (
-            <div
-              className="lq-animate-in mt-4 rounded-xl bg-white p-3 text-left"
-              style={{ animationDelay: "0.5s", animationFillMode: "backwards" }}
-            >
-              <p className="text-[11px] font-semibold text-emerald-700">이 책이 끌리는 이유</p>
-              <p className="mt-1 break-keep text-sm font-medium text-stone-800">{successInfo.hook}</p>
-            </div>
-          )}
-
-          {successInfo.teaser && (
-            <div
-              className="lq-animate-in mt-2 rounded-xl bg-white p-3 text-left"
-              style={{ animationDelay: "0.65s", animationFillMode: "backwards" }}
-            >
-              <p className="text-[11px] font-semibold text-stone-400">이런 책이에요</p>
-              <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.teaser}</p>
-            </div>
-          )}
-
-          {successInfo.question && (
-            <div
-              className="lq-animate-in mt-2 rounded-xl bg-white p-3 text-left"
-              style={{ animationDelay: "0.8s", animationFillMode: "backwards" }}
-            >
-              <p className="text-[11px] font-semibold text-stone-400">책을 펼치기 전에</p>
-              <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.question}</p>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={() => handleToggleInterest(successInfo.bookId)}
-            className={`lq-animate-in mt-3 flex h-10 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-              interested
-                ? "border-rose-300 bg-rose-50 text-rose-600"
-                : "border-stone-300 bg-white text-stone-600 active:bg-stone-50"
-            }`}
-            style={{ animationDelay: "0.95s", animationFillMode: "backwards" }}
-          >
-            <span aria-hidden="true">{interested ? "♥" : "♡"}</span>
-            {interested ? "읽어보고 싶은 책에 담았어요" : "읽어보고 싶어요"}
-          </button>
         </div>
+
+        <button
+          type="button"
+          onClick={handleExamineBook}
+          className="mt-8 flex h-12 w-full items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-emerald-600 text-sm font-semibold text-white transition active:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        >
+          책 살펴보기 <span aria-hidden="true">→</span>
+        </button>
+      </main>
+    );
+  }
+
+  if (successInfo && stepView === "bookInfo") {
+    const interested = isInterested(interestStore, successInfo.bookId);
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
+        <div className="flex items-center gap-3">
+          <div className="h-24 w-16 shrink-0">
+            <DiscoveryCard3D
+              revealed
+              interactive={false}
+              size="active"
+              caption={false}
+              coverUrl={successInfo.coverUrl}
+              title={null}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold text-emerald-700">발견 완료</p>
+            <h1 className="mt-0.5 break-keep text-lg font-bold text-stone-900">{successInfo.title}</h1>
+            {successInfo.author && <p className="text-sm text-stone-500">{successInfo.author}</p>}
+          </div>
+        </div>
+
+        {successInfo.hook && (
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <p className="text-[11px] font-semibold text-emerald-700">이 책이 끌리는 이유</p>
+            <p className="mt-1 break-keep text-base font-semibold text-stone-900">{successInfo.hook}</p>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => handleToggleInterest(successInfo.bookId)}
+          className={`mt-3 flex h-11 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+            interested
+              ? "border-rose-300 bg-rose-50 text-rose-600"
+              : "border-stone-300 bg-white text-stone-600 active:bg-stone-50"
+          }`}
+        >
+          <span aria-hidden="true">{interested ? "♥" : "♡"}</span>
+          {interested ? "읽어보고 싶은 책에 담았어요" : "읽어보고 싶어요"}
+        </button>
+
+        {(successInfo.teaser || successInfo.question) && (
+          <div className="mt-3">
+            {!showMoreBookInfo ? (
+              <button
+                type="button"
+                onClick={() => setShowMoreBookInfo(true)}
+                className="whitespace-nowrap text-xs font-medium text-stone-500 underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                책 더 알아보기
+              </button>
+            ) : (
+              <div className="lq-animate-in rounded-xl bg-stone-50 p-3">
+                {successInfo.teaser && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-stone-400">이런 책이에요</p>
+                    <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.teaser}</p>
+                  </div>
+                )}
+                {successInfo.question && (
+                  <div className={successInfo.teaser ? "mt-3 border-t border-stone-200 pt-3" : ""}>
+                    <p className="text-[11px] font-semibold text-stone-400">책을 펼치기 전에</p>
+                    <p className="mt-1 break-keep text-sm text-stone-600">{successInfo.question}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <button
           type="button"
@@ -341,7 +400,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
               return (
                 <>
                   <div className="mx-auto mt-2 h-28 w-20">
-                    <DiscoveryCard3D revealed coverUrl={chosen.coverUrl} title={chosen.title} size="active" />
+                    <DiscoveryCard3D revealed coverUrl={chosen.coverUrl} size="active" caption={false} />
                   </div>
                   <h2 className="mt-2 break-keep text-lg font-bold text-stone-900">{chosen.title}</h2>
                   {chosen.hook && <p className="mt-1 break-keep text-sm font-medium text-stone-700">{chosen.hook}</p>}
@@ -554,6 +613,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         isLast: isLastStep,
         isNew,
       });
+      setStepView("discovery");
     } catch {
       setFeedback({ message: "서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.", isMismatch: false });
     } finally {

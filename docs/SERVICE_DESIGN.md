@@ -13,8 +13,8 @@ ISBN 인증은 이 여정의 중간 단계(책을 실제로 찾았다는 증거)
 ## 2. 핵심 사용자 경험
 
 ```
-Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → Discovery(발견: 3D flip, 표지, teaser/hook/question)
-  → Interest(읽어보고 싶어요) → Final Selection(오늘의 한 권 선택)
+Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → Discovery Moment(발견의 감정적 보상)
+  → Book Exploration(독서 호기심) → Interest(읽어보고 싶어요) → Final Selection(오늘의 한 권 선택)
 ```
 
 각 단계는 이전 P0 작업에서 순차적으로 쌓였다.
@@ -24,20 +24,21 @@ Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → D
 | Quest 탐험 경험 | P0-1 | intro 화면, Step 진행 경로, 후보 redaction |
 | Discovery(3D 발견) | P0-2 | `DiscoveryCard3D`, 표지 공개, XP, 발견 도감 |
 | Interest/Final Selection | P0-2.5 | teaser/hook/question, 읽어보고 싶어요, 오늘의 한 권 |
-| Mission Narrative | P0-2.6(이 문서 기준) | Step을 지시문이 아닌 탐험으로 표현하는 missionTitle/missionNarrative, "탐험 단서" 카드 |
+| Mission Narrative | P0-2.6 | Step을 지시문이 아닌 탐험으로 표현하는 missionTitle/missionNarrative, "탐험 단서" 카드 |
+| 3D Book Object · Discovery/BookInfo 분리 | P0-3(이 문서 기준) | 실제 두께가 있는 책 오브젝트(`DiscoveryCard3D`), 발견 순간과 책 정보 화면의 완전 분리 |
 
 ## 3. 게임화 원칙
 
 게임화는 독서를 대신하는 목적이 아니라 **사용자가 낯선 장서에 접근하게 만드는 동기 장치**다.
 
-3D flip/XP가 **발견 이후의 보상**이라면, Mission Narrative/탐험 단서는 **발견 이전의 동기**다. 둘을 연결하면 "탐험 동기 → 실제 이동 → 발견 → 관심 → 선택"이라는 하나의 loop가 된다.
-
-- **Mission Narrative** — 발견 이전의 동기. Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 업무 지시문이 아니라, 앞선 Step에서 자연스럽게 이어지는 짧은 탐험 서사(missionTitle/missionNarrative)로 감싼다. 단, 실제로 무엇을 찾아야 하는지는 절대 숨기지 않는다 — narrative 아래 "이번 미션"에 실제 Step 조건을 그대로 명시한다([mission-content.ts](../src/lib/mission-content.ts)).
+- **Mission Narrative** — 발견 **이전**의 기대감. Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 업무 지시문이 아니라, 앞선 Step에서 자연스럽게 이어지는 짧은 탐험 서사(missionTitle/missionNarrative)로 감싼다. 단, 실제로 무엇을 찾아야 하는지는 절대 숨기지 않는다 — narrative 아래 "이번 미션"에 실제 Step 조건을 그대로 명시한다([mission-content.ts](../src/lib/mission-content.ts)).
 - **탐험 단서** — 위치 정보를 목적이 아니라 단서로 취급한다. 서가 위치/분류(className)는 한 Step의 후보 전체에 공통되므로 안전하게 보여주고, 후보마다 다른 정확한 청구기호는 정답을 사실상 특정할 수 있어 인증 전에는 보여주지 않는다([DEVELOPMENT.md](DEVELOPMENT.md)의 "인증 전 데이터 redaction" 참고).
+- **3D Book Discovery** — 발견 **순간**의 보상. ISBN 인증 성공 직후에는 큰 책 오브젝트와 제목/저자/XP만 보여주고, hook/teaser/question 같은 정보는 절대 함께 띄우지 않는다 — 발견의 임팩트가 정보에 묻히지 않도록 화면 자체를 분리했다.
+- **Book Editorial(hook/teaser/question)** — 발견 **이후**의 독서 호기심. 사용자가 직접 `책 살펴보기`를 눌러야만 보여준다.
 - **XP** — 탐험 동기. 신규 발견 1권당 +10, 재발견은 0. `getXp = 발견 도감 unique 권수 × 10`으로 항상 계산해 별도 mutable 값을 저장하지 않는다([discovery-storage.ts](../src/lib/discovery-storage.ts)).
 - **발견 도감** — 발견 누적. Quest 진행 상태(QuestSession)와 완전히 분리된 별도 localStorage(`libquest_discoveries`).
-- **3D flip** — 발견의 보상감. 표지는 인증 성공 이후에만 공개되며, 인증 전에는 CSS만으로 만든 generic hidden card(`?`)만 보여준다.
 - **Interest(읽어보고 싶어요)** — 독서 의향 신호. **XP를 절대 부여하지 않는다** — 관심도 없는 책을 XP 때문에 누르게 만드는 유인을 피하기 위함이다.
+- **Final Selection(오늘의 한 권)** — 발견한 책들 중 실제로 읽을 한 권을 결정하는, 독서 관심의 최종 결과.
 
 ## 4. B2B2C
 
@@ -107,7 +108,8 @@ Quest 노출 → 시작 → 책 발견 → 읽고 싶어요 → 오늘의 한 �
 - 4개 도서관, 144권 실장서, Quest 12개 / Step 36개 / Candidate 144개
 - ISBN 카메라 스캔(ZXing) / 직접 입력, 서버 판정
 - 후보 정답 정보(title/author/ISBN/표지/콘텐츠) client redaction — 인증 전 노출 없음
-- Quest intro, Step 진행 경로, 숨겨진 발견 카드(3D flip), 실제 표지 공개
+- Quest intro, Step 진행 경로, 순수 CSS 3D 책 오브젝트(숨김 ↔ 발견), 실제 표지 공개
+- Discovery(발견 순간)와 Book Info(발견 후 정보) 화면 분리 — 발견 직후에는 큰 책과 제목/저자/XP만, `책 살펴보기`를 눌러야 hook/teaser/question이 노출
 - 신규 발견 +10 XP, 중복 발견 XP 방지, 탐험 칭호
 - 발견 도감(`/discoveries`), 도서관별 발견 진행도
 - 책마다 teaser/hook/question (원신흥도서관 36권 전체 작성, 그 외 도서관은 아직 미작성)
