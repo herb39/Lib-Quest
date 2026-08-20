@@ -32,7 +32,7 @@ data/
 
 ### 표지 이미지 (src/lib/cover-urls.json)
 
-`data/` 폴더 밖에 있지만 이 데이터를 그대로 가공한 파일이라 여기에 함께 기록한다. `data/snapshots/*.json`의 `bookImageURL` 필드를 ISBN 기준으로 추출해 `src/lib/cover-urls.json`(144권 중 142권 매칭)에 저장했다. `src/lib/covers.ts`의 `getCoverUrl(isbn13)`이 조회한다. ISBN 패턴으로 URL을 추측하거나 임의 생성한 값은 없다.
+`data/` 폴더 밖에 있지만 이 데이터를 그대로 가공한 파일이라 여기에 함께 기록한다. `data/snapshots/*.json`의 `bookImageURL` 필드를 ISBN 기준으로 추출해 `src/lib/cover-urls.json`(144권 중 139권 매칭, 호스트는 `image.aladin.co.kr` 122건·`shopping-phinf.pstatic.net` 17건)에 저장했다. `src/lib/covers.ts`의 `getCoverUrl(isbn13)`이 조회한다. ISBN 패턴으로 URL을 추측하거나 임의 생성한 값은 없다. 로딩/재시도 전략은 [DEVELOPMENT.md](../docs/DEVELOPMENT.md)의 "표지 이미지" 참고.
 
 ### book-editorial.json 작성 방식
 

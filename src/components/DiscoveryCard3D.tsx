@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
+import { useRetryingCoverImage } from "@/lib/use-retrying-cover-image";
 
 export type DiscoveryCard3DProps = {
   /** 이미 발견해 표지가 공개된 책인지 여부. */
@@ -70,14 +71,7 @@ export function DiscoveryCard3D({
   const rafRef = useRef<number | null>(null);
   const reducedMotion = usePrefersReducedMotion();
   const [interacting, setInteracting] = useState(false);
-  const [imgError, setImgError] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setImgError(false);
-    setImgLoaded(false);
-  }, [coverUrl]);
+  const { status: coverStatus, retryKey, handleLoad, handleError } = useRetryingCoverImage(coverUrl);
 
   useEffect(() => () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -228,17 +222,21 @@ export function DiscoveryCard3D({
                 {size !== "slot" && <p className="mt-1 text-[11px] font-medium text-stone-400">숨겨진 책</p>}
               </div>
               <div className={`lq-book-cover-layer ${displayRevealed ? "is-visible" : ""}`}>
-                {coverUrl && !imgError ? (
+                {coverUrl && coverStatus !== "failed" ? (
                   // 외부 표지 이미지 호스트가 여러 곳(aladin/naver)이라 next/image remotePatterns를
-                  // 무분별하게 넓히는 대신 일반 img로 안전하게 처리한다.
+                  // 무분별하게 넓히는 대신 일반 img로 안전하게 처리한다. key={retryKey}는 재시도 시
+                  // 엘리먼트를 리마운트해 실제 네트워크 재요청을 강제하기 위함(useRetryingCoverImage 참고).
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
+                    key={retryKey}
                     src={coverUrl}
                     alt=""
-                    onError={() => setImgError(true)}
-                    onLoad={() => setImgLoaded(true)}
+                    onError={handleError}
+                    onLoad={handleLoad}
+                    loading={size === "grid" ? "lazy" : "eager"}
+                    decoding="async"
                     className={`h-full w-full object-cover transition-opacity duration-200 ${
-                      imgLoaded ? "opacity-100" : "opacity-0"
+                      coverStatus === "loaded" ? "opacity-100" : "opacity-0"
                     }`}
                   />
                 ) : (

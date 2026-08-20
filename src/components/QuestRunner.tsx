@@ -9,6 +9,7 @@ import { recordDiscovery } from "@/lib/discovery-storage";
 import { loadInterestStore, toggleInterest, isInterested, type InterestStore } from "@/lib/interest-storage";
 import { saveFinalSelection, getFinalSelection, type FinalSelection } from "@/lib/final-selection-storage";
 import { getMissionContent } from "@/lib/mission-content";
+import { useRetryingCoverImage } from "@/lib/use-retrying-cover-image";
 
 type FoundBook = {
   id: string;
@@ -48,16 +49,22 @@ type SuccessInfo = {
 type StepView = "mission" | "discovery" | "bookInfo";
 
 function BookThumb({ coverUrl }: { coverUrl: string | null }) {
-  const [error, setError] = useState(false);
+  const { status, retryKey, handleLoad, handleError } = useRetryingCoverImage(coverUrl);
   return (
     <div className="h-16 w-11 shrink-0 overflow-hidden rounded-md bg-stone-100">
-      {coverUrl && !error ? (
+      {coverUrl && status !== "failed" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          key={retryKey}
           src={coverUrl}
           alt=""
-          onError={() => setError(true)}
-          className="h-full w-full object-cover"
+          onError={handleError}
+          onLoad={handleLoad}
+          loading="eager"
+          decoding="async"
+          className={`h-full w-full object-cover transition-opacity duration-200 ${
+            status === "loaded" ? "opacity-100" : "opacity-0"
+          }`}
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center text-lg text-stone-300" aria-hidden="true">
@@ -569,6 +576,13 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       const matchedCandidate = currentStep.candidates.find((c) => c.book.id === result.bookId);
       const isLastStep = session.currentStep === totalSteps - 1;
       const coverUrl: string | null = result.bookImageUrl ?? null;
+      // Discovery Hero가 이 URL로 <img>를 그리기 전에 브라우저 캐시에 먼저 올려 둔다(fire-and-forget —
+      // 실패해도 무시, 화면 전환을 기다리게 하지 않는다). 이후 실제 <img>가 같은 URL을 요청하면
+      // 캐시 히트로 즉시 표시되어 발견 순간의 깜빡임/지연 체감이 줄어든다.
+      if (coverUrl && typeof window !== "undefined") {
+        const preload = new window.Image();
+        preload.src = coverUrl;
+      }
       const foundBook: FoundBook = {
         id: result.bookId,
         title: result.bookTitle,
