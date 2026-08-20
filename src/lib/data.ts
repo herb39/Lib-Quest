@@ -148,6 +148,7 @@ export async function getQuestDetail(id: string): Promise<QuestSummary | undefin
           author: c.book.author,
           callNumber: c.book.callNumber,
           shelfLocation: c.book.shelfLocation,
+          className: c.book.className,
         },
       })),
     })),

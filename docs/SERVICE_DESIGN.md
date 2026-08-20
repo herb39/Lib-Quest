@@ -13,7 +13,7 @@ ISBN 인증은 이 여정의 중간 단계(책을 실제로 찾았다는 증거)
 ## 2. 핵심 사용자 경험
 
 ```
-Quest 선택 → 탐험(Step 진행) → Discovery(발견: 3D flip, 표지, teaser/hook/question)
+Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → Discovery(발견: 3D flip, 표지, teaser/hook/question)
   → Interest(읽어보고 싶어요) → Final Selection(오늘의 한 권 선택)
 ```
 
@@ -23,12 +23,17 @@ Quest 선택 → 탐험(Step 진행) → Discovery(발견: 3D flip, 표지, teas
 | --- | --- | --- |
 | Quest 탐험 경험 | P0-1 | intro 화면, Step 진행 경로, 후보 redaction |
 | Discovery(3D 발견) | P0-2 | `DiscoveryCard3D`, 표지 공개, XP, 발견 도감 |
-| Interest/Final Selection | P0-2.5(이 문서 기준) | teaser/hook/question, 읽어보고 싶어요, 오늘의 한 권 |
+| Interest/Final Selection | P0-2.5 | teaser/hook/question, 읽어보고 싶어요, 오늘의 한 권 |
+| Mission Narrative | P0-2.6(이 문서 기준) | Step을 지시문이 아닌 탐험으로 표현하는 missionTitle/missionNarrative, "탐험 단서" 카드 |
 
 ## 3. 게임화 원칙
 
 게임화는 독서를 대신하는 목적이 아니라 **사용자가 낯선 장서에 접근하게 만드는 동기 장치**다.
 
+3D flip/XP가 **발견 이후의 보상**이라면, Mission Narrative/탐험 단서는 **발견 이전의 동기**다. 둘을 연결하면 "탐험 동기 → 실제 이동 → 발견 → 관심 → 선택"이라는 하나의 loop가 된다.
+
+- **Mission Narrative** — 발견 이전의 동기. Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 업무 지시문이 아니라, 앞선 Step에서 자연스럽게 이어지는 짧은 탐험 서사(missionTitle/missionNarrative)로 감싼다. 단, 실제로 무엇을 찾아야 하는지는 절대 숨기지 않는다 — narrative 아래 "이번 미션"에 실제 Step 조건을 그대로 명시한다([mission-content.ts](../src/lib/mission-content.ts)).
+- **탐험 단서** — 위치 정보를 목적이 아니라 단서로 취급한다. 서가 위치/분류(className)는 한 Step의 후보 전체에 공통되므로 안전하게 보여주고, 후보마다 다른 정확한 청구기호는 정답을 사실상 특정할 수 있어 인증 전에는 보여주지 않는다([DEVELOPMENT.md](DEVELOPMENT.md)의 "인증 전 데이터 redaction" 참고).
 - **XP** — 탐험 동기. 신규 발견 1권당 +10, 재발견은 0. `getXp = 발견 도감 unique 권수 × 10`으로 항상 계산해 별도 mutable 값을 저장하지 않는다([discovery-storage.ts](../src/lib/discovery-storage.ts)).
 - **발견 도감** — 발견 누적. Quest 진행 상태(QuestSession)와 완전히 분리된 별도 localStorage(`libquest_discoveries`).
 - **3D flip** — 발견의 보상감. 표지는 인증 성공 이후에만 공개되며, 인증 전에는 CSS만으로 만든 generic hidden card(`?`)만 보여준다.
@@ -61,7 +66,7 @@ Data4Library 후보 → 콘텐츠 작성 → 운영자 검수 → 이용자 공�
 - 후보 도서 제외/교체
 - 검수 상태(초안/검수 완료)의 실제 저장·변경
 
-두 가지 모두 인증/권한 없이 접근 가능한 현재 `/admin/review` 구조에서 쓰기(write) 기능을 그대로 열면 누구나 production 데이터를 바꿀 수 있게 되므로, 이번 단계에서는 의도적으로 구현하지 않았다(13절, OPERATOR_GUIDE.md 참고).
+두 가지 모두 인증/권한 없이 접근 가능한 현재 `/admin/review` 구조에서 쓰기(write) 기능을 그대로 열면 누구나 production 데이터를 바꿀 수 있게 되므로, 이번 단계에서는 의도적으로 구현하지 않았다([OPERATOR_GUIDE.md](OPERATOR_GUIDE.md) 참고).
 
 ## 6. AI 사용 원칙
 
@@ -105,11 +110,13 @@ Quest 노출 → 시작 → 책 발견 → 읽고 싶어요 → 오늘의 한 �
 - Quest intro, Step 진행 경로, 숨겨진 발견 카드(3D flip), 실제 표지 공개
 - 신규 발견 +10 XP, 중복 발견 XP 방지, 탐험 칭호
 - 발견 도감(`/discoveries`), 도서관별 발견 진행도
-- 책마다 teaser/hook/question (원신흥도서관 36권 전체 작성, 그 외 도서관은 아직 미작성 — 34절 참고)
+- 책마다 teaser/hook/question (원신흥도서관 36권 전체 작성, 그 외 도서관은 아직 미작성)
+- Mission Narrative(missionTitle/missionNarrative) — 원신흥도서관 3개 Quest × 3 Step 전체 작성, "탐험 단서" 카드(서가 위치/분류/후보 수), 다른 도서관·나머지 Quest는 generic fallback
 - `읽어보고 싶어요`(관심 표시), `/discoveries` 관심 필터
 - Quest 완료 후 **오늘의 한 권** 선택, 결과 화면 반영
 - `/admin/review` 콘텐츠 검수 표시(읽기 전용), 운영 workflow 안내
 - `/data-source` 데이터 출처 안내
+- Header `처음부터` — 이 브라우저의 Lib Quest 사용자 진행 상태(Quest 세션 전체 + 발견 도감 + 관심 + 오늘의 한 권) 전체 초기화
 
 ## 9. Roadmap (아직 구현되지 않음)
 
@@ -119,6 +126,7 @@ Quest 노출 → 시작 → 책 발견 → 읽고 싶어요 → 오늘의 한 �
 - 익명 analytics 이벤트 수집·집계 대시보드 (이벤트 후보는 아래 참고)
 - 실제 도서관 대출/OPAC 시스템 연계
 - 갈마/가수원/노은도서관 108권 teaser/hook/question 작성
+- 나머지 도서관·Quest의 Mission Narrative(missionTitle/missionNarrative) 작성
 
 ### Analytics 이벤트 후보 (설계만, 서버 수집 미구현)
 

@@ -12,6 +12,7 @@ type VerifyResult =
       bookTitle: string;
       bookAuthor: string | null;
       bookClassName: string | null;
+      bookCallNumber: string | null;
       bookImageUrl: string | null;
       teaser: string | null;
       hook: string | null;
@@ -77,6 +78,7 @@ async function verifyAgainstDatabase(
     bookTitle: matched.book.title,
     bookAuthor: matched.book.author,
     bookClassName: matched.book.className,
+    bookCallNumber: matched.book.callNumber,
     bookImageUrl: getCoverUrl(matched.book.isbn13),
     teaser: editorial?.teaser ?? null,
     hook: editorial?.hook ?? null,
@@ -103,6 +105,7 @@ function verifyAgainstDemo(questId: string, stepId: string, normalizedIsbn: stri
     bookTitle: matched.book.title,
     bookAuthor: matched.book.author,
     bookClassName: null,
+    bookCallNumber: matched.book.callNumber,
     bookImageUrl: getCoverUrl(matched.book.isbn13),
     teaser: null,
     hook: null,

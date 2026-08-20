@@ -8,6 +8,7 @@ import { DiscoveryCard3D } from "@/components/DiscoveryCard3D";
 import { recordDiscovery } from "@/lib/discovery-storage";
 import { loadInterestStore, toggleInterest, isInterested, type InterestStore } from "@/lib/interest-storage";
 import { saveFinalSelection, getFinalSelection, type FinalSelection } from "@/lib/final-selection-storage";
+import { getMissionContent } from "@/lib/mission-content";
 
 type FoundBook = {
   id: string;
@@ -126,7 +127,6 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const [successInfo, setSuccessInfo] = useState<SuccessInfo | null>(null);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
   const [showHint, setShowHint] = useState(false);
-  const [candidateIndex, setCandidateIndex] = useState(0);
   const [verifying, setVerifying] = useState(false);
   const [interestStore, setInterestStore] = useState<InterestStore>({ version: 1, bookIds: [] });
   const [finalSelection, setFinalSelection] = useState<FinalSelection | null>(null);
@@ -150,7 +150,6 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   useEffect(() => {
     // 단계가 바뀔 때마다 단계 전용 UI 상태를 초기화한다.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCandidateIndex(0);
     setShowHint(false);
     setFeedback(null);
     setIsbnInput("");
@@ -477,7 +476,10 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     );
   }
 
-  const candidate = currentStep.candidates[candidateIndex];
+  // Step 안의 후보 4권은 항상 같은 서가(shelfLocation)/분류(className)를 공유하도록 큐레이션되어
+  // 있으므로(청구기호만 후보마다 다름), 첫 번째 후보 값을 Step 전체를 대표하는 탐색 범위로 쓴다.
+  const stepClue = currentStep.candidates[0]?.book;
+  const mission = getMissionContent(quest.libraryCode, quest.title, currentStep.order);
 
   async function handleVerify() {
     if (!isbnInput.trim()) {
@@ -502,8 +504,9 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         return;
       }
 
-      // 발견한 책의 서가 위치/청구기호는 이미 화면에 공개되어 있던 후보 목록에서 찾는다.
-      // (verify API는 정답 후보 전체를 노출하지 않도록 title/author/표지 등 최소 정보만 반환한다.)
+      // 청구기호는 후보마다 달라 인증 전에는 서버가 아예 보내지 않는다(redaction) — 발견 성공 후에만
+      // verify 응답(bookCallNumber)에서 받는다. 서가 위치는 Step 전체에 공통이라 화면에 이미 있던
+      // 후보 목록에서 그대로 가져온다.
       const matchedCandidate = currentStep.candidates.find((c) => c.book.id === result.bookId);
       const isLastStep = session.currentStep === totalSteps - 1;
       const coverUrl: string | null = result.bookImageUrl ?? null;
@@ -511,7 +514,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         id: result.bookId,
         title: result.bookTitle,
         author: result.bookAuthor ?? null,
-        callNumber: matchedCandidate?.book.callNumber ?? null,
+        callNumber: result.bookCallNumber ?? null,
         shelfLocation: matchedCandidate?.book.shelfLocation ?? null,
         coverUrl,
         teaser: result.teaser ?? null,
@@ -558,10 +561,6 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     }
   }
 
-  function handleShowAnotherSpot() {
-    setCandidateIndex((i) => (i + 1) % currentStep.candidates.length);
-  }
-
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
       <div className="flex items-center justify-between">
@@ -603,43 +602,46 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       <h1 className="mt-0.5 text-lg font-bold text-stone-900">{quest.title}</h1>
 
       <section className="mt-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold text-emerald-700">STEP {currentStep.order} · 탐사지역</p>
-        <h2 className="mt-1 text-base font-bold text-stone-900">{currentStep.title}</h2>
-        <p className="mt-1.5 text-sm text-stone-600">{currentStep.description}</p>
+        <p className="text-xs font-semibold text-emerald-700">
+          MISSION {currentStep.order} / {totalSteps}
+        </p>
+        <h2 className="mt-1 break-keep text-lg font-bold text-stone-900">
+          {mission?.missionTitle ?? "새로운 탐사지역"}
+        </h2>
+        <p className="mt-1.5 break-keep text-sm text-stone-600">
+          {mission?.missionNarrative ?? "이번에는 새로운 책 한 권을 발견해볼까요?"}
+        </p>
 
-        <div className="mt-3 flex items-center gap-3 rounded-xl bg-stone-50 p-3">
+        <div className="mt-3 rounded-xl bg-stone-50 p-3">
+          <p className="text-[11px] font-semibold text-stone-400">이번 미션</p>
+          <p className="mt-1 break-keep text-sm font-medium text-stone-800">{currentStep.description}</p>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3 rounded-xl bg-amber-50 p-3">
           <div className="h-28 w-20 shrink-0">
             <DiscoveryCard3D revealed={false} active interactive size="active" />
           </div>
-          <p className="text-xs font-medium text-stone-500">
-            이 서가에는 발견 가능한 책이{" "}
-            <span className="font-semibold text-stone-700">{currentStep.candidates.length}권</span> 있어요.
-            <br />
-            책을 찾아 ISBN을 인증하면 정체가 밝혀져요.
-          </p>
-        </div>
-
-        <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5">
-          <p className="text-xs font-semibold text-amber-800">
-            <span aria-hidden="true">📍</span> 찾아갈 곳
-          </p>
-          <p className="mt-0.5 break-keep text-sm font-medium text-stone-800">
-            {candidate.book.shelfLocation ?? "서가 정보 없음"}
-          </p>
-          {candidate.book.callNumber && (
-            <p className="mt-0.5 whitespace-nowrap text-xs text-stone-500">
-              청구기호 <span className="font-mono">{candidate.book.callNumber}</span>
-            </p>
-          )}
-          {currentStep.candidates.length > 1 && (
-            <button
-              type="button"
-              onClick={handleShowAnotherSpot}
-              className="mt-2 whitespace-nowrap text-xs font-medium text-amber-800 underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-            >
-              다른 위치 보기 ({candidateIndex + 1}/{currentStep.candidates.length})
-            </button>
-          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-amber-800">탐험 단서</p>
+            <dl className="mt-1.5 flex flex-col gap-1 text-xs text-stone-600">
+              {stepClue?.shelfLocation && (
+                <div className="flex items-center gap-1.5">
+                  <span aria-hidden="true">📍</span>
+                  <span className="break-keep">{stepClue.shelfLocation}</span>
+                </div>
+              )}
+              {stepClue?.className && (
+                <div className="flex items-center gap-1.5">
+                  <span aria-hidden="true">📚</span>
+                  <span className="break-keep">{stepClue.className}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
+                <span aria-hidden="true">🔎</span>
+                <span className="whitespace-nowrap">발견 후보 {currentStep.candidates.length}권</span>
+              </div>
+            </dl>
+          </div>
         </div>
 
         {currentStep.hint && (

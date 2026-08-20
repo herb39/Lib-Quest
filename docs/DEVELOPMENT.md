@@ -56,7 +56,7 @@ src/
     data-source/page.tsx     # 데이터 출처 화면
     api/quests/[questId]/steps/[stepId]/verify/route.ts  # ISBN 서버 판정 API
   components/
-    Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: 홈이 아닐 때만 "홈" 버튼)
+    Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: /admin 이외 라우트에서 "처음부터" 전체 초기화 버튼)
     QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션 + 도감/관심/오늘의 한 권)
     DiscoveryCard3D.tsx        # 순수 CSS 3D flip 카드 (hidden ↔ revealed)
     DiscoveriesView.tsx        # /discoveries 클라이언트 화면 (도감/XP/칭호/필터)
@@ -73,9 +73,11 @@ src/
     types.ts                   # 화면용 공용 타입
     covers.ts / cover-urls.json     # ISBN → 표지 이미지 URL 정적 조회 (raw snapshot 기반)
     editorial.ts               # ISBN → teaser/hook/question 정적 조회 (book-editorial.json 기반)
+    mission-content.ts          # (도서관, 퀘스트 제목, step order) → missionTitle/missionNarrative 정적 조회 (quest-missions.json 기반)
     discovery-storage.ts        # 발견 도감 localStorage (QuestSession과 분리)
     interest-storage.ts         # "읽어보고 싶어요" 관심 표시 localStorage (도감과 별도 개념)
     final-selection-storage.ts   # Quest별 "오늘의 한 권" 선택 localStorage
+    reset-user-state.ts          # Header "처음부터" 전용 — Lib Quest 소유 localStorage key만 선택 삭제
 prisma/
   schema.prisma
   migrations/                 # 라이브 DB 연결 없이 `migrate diff`로 생성한 초기 마이그레이션 포함
@@ -88,7 +90,10 @@ data/
   snapshots/                  # itemSrch 원본 응답 (파일명에 libCode 포함, authKey 미포함)
   libraries/
     130026/  125004/  125010/  130012/   # 도서관별 collected-books.json + quest-curation.json
+    130026/book-editorial.json           # (원신흥만) teaser/hook/question
+    130026/quest-missions.json           # (원신흥만) missionTitle/missionNarrative
 docs/
+  SERVICE_DESIGN.md             # 제품 방향 / B2B2C / 게임화 원칙
   DEVELOPMENT.md               # 이 문서 (개발자/시스템 관리자용)
   OPERATOR_GUIDE.md            # 사서/운영자용 검수 가이드
   DEMO_GUIDE.md                 # 심사자/발표자용 시연 시나리오
@@ -165,6 +170,19 @@ Data4Library `itemSrch` 원본 응답에는 `bookImageURL` 필드로 실제 표�
 
 책 발견 직후 보여주는 teaser(짧은 소개)/hook(끌리는 이유 한 줄)/question(읽기 전 질문)은 Lib Quest가 실제 제목·부제·저자·KDC 분류만 근거로 직접 작성한 정적 콘텐츠다. Data4Library API는 줄거리/키워드 필드를 제공하지 않으므로(`class_no`/`class_nm`/`bookname`/`authors` 등만 존재), 소설류는 구체적 줄거리를 상상하지 않고 장르·작가 소개 수준으로 제한했다. `getEditorial(libraryCode, isbn13)`이 해당 도서관 JSON을 찾아 반환하며, 없으면 `null`(빈 콘텐츠를 억지로 채우지 않음). 현재 대전 원신흥도서관 36권만 작성되어 있다(`data/README.md` 참고).
 
+### Mission Narrative (`src/lib/mission-content.ts`, `data/libraries/<libCode>/quest-missions.json`)
+
+Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 지시문이 아니라, 앞 Step에서 자연스럽게 이어지는 짧은 탐험 서사(`missionTitle`/`missionNarrative`)로 감싼다. **Mission Editorial(발견 이전)과 Book Editorial(발견 이후)은 서로 다른 콘텐츠다:**
+
+| | Mission Editorial(`mission-content.ts`) | Book Editorial(`editorial.ts`) |
+| --- | --- | --- |
+| 언제 보여주는가 | 책을 찾기 전(Step 진입 시) | 책을 발견한 후(verify 성공 시) |
+| 무엇에 대한 콘텐츠인가 | Quest/Step 자체의 분위기·서사 | 특정 책 한 권의 소개 |
+| 정답 정보인가 | 아니다 — 공개해도 안전 | 그렇다 — 인증 전 redaction 대상 |
+| 연결 키 | (도서관 코드, 퀘스트 제목, step order) | ISBN |
+
+실제 행동 지시("무엇을 찾아야 하는지")는 이 파일이 다루지 않고 항상 실제 `QuestStep.description`을 그대로 보여준다 — narrative는 그 앞을 감싸는 분위기일 뿐이다. quest/step identity는 재시드하면 바뀌는 cuid 대신 (도서관 코드, 퀘스트 제목, step order) 조합으로 연결한다(DEMO_GUIDE가 퀘스트를 항상 제목으로 안내하는 것과 같은 이유). 콘텐츠가 없는 Quest/Step은 generic fallback("새로운 탐사지역" / "이번에는 새로운 책 한 권을 발견해볼까요?")으로 대체되어 깨지지 않는다. 현재 대전 원신흥도서관의 3개 Quest × 3 Step(9개) 전체가 작성되어 있고, 그 외 도서관/Quest는 fallback을 사용한다.
+
 ### 발견 도감 / 관심 / 오늘의 한 권 (localStorage, 서로 분리된 3개 저장소)
 
 | 저장소 | 키 | 의미 | QuestSession과의 관계 |
@@ -172,8 +190,13 @@ Data4Library `itemSrch` 원본 응답에는 `bookImageURL` 필드로 실제 표�
 | `discovery-storage.ts` | `libquest_discoveries` | 실제로 발견한 책 누적 기록(도감). `bookId`당 1건, 중복 발견 시 새로 추가하지 않음 | 완전히 분리 — 도감 초기화가 진행 중인 Quest에 영향을 주지 않음 |
 | `interest-storage.ts` | `libquest_interests` | "읽어보고 싶어요" 표시한 `bookId` 목록 | 도감과도 분리 — 발견 여부와 관심 여부는 다른 개념이라 한 레코드에 묶지 않았다 |
 | `final-selection-storage.ts` | `libquest_final_selections` | Quest별 "오늘의 한 권" 선택(`questId`→`bookId`+`selectedAt`) | Quest 하나당 최신 선택 1건. 실제 대출 여부와는 무관 |
+| `QuestRunner.tsx`(session) | `libquest_session_<questId>` | Quest별 현재 진행 상태(`currentStep`/`foundBooks`/`completedAt`/`started`) | 위 3개 저장소와 별개. Quest마다 key가 따로 있다(prefix `libquest_session_`) |
 
-XP는 `getXp = 발견 도감 unique 권수 × 10`으로 **항상 재계산**하며 별도 mutable 숫자를 저장하지 않는다. 탐험 칭호(`getExplorerTitle`)도 XP 임계값 기반 순수 함수다. 세 저장소 모두 SSR-safe(`typeof window` 가드), JSON 파싱 실패/버전 불일치 시 빈 상태로 안전하게 대체한다.
+XP는 `getXp = 발견 도감 unique 권수 × 10`으로 **항상 재계산**하며 별도 mutable 숫자를 저장하지 않는다. 탐험 칭호(`getExplorerTitle`)도 XP 임계값 기반 순수 함수다. 네 저장소 모두 SSR-safe(`typeof window` 가드), JSON 파싱 실패/버전 불일치 시 빈 상태로 안전하게 대체한다.
+
+### 전체 사용자 상태 초기화 (`src/lib/reset-user-state.ts`)
+
+Header의 `처음부터` 버튼이 호출하는 `resetLibQuestUserState()`는 위 표의 **Lib Quest 소유 key만** 선택 삭제한다 — `libquest_session_` prefix를 가진 모든 key(현재까지 플레이한 모든 Quest 세션)를 순회 삭제하고, `libquest_discoveries`/`libquest_interests`/`libquest_final_selections`를 지운다. `localStorage.clear()`는 쓰지 않는다(같은 origin에 Lib Quest가 모르는 다른 값이 있을 수 있으므로). 확인 모달에서 "처음부터 시작"을 누르면 실행 후 `window.location.href = "/"`로 완전한 새로고침을 한다 — `router.push`가 아니라 전체 새로고침을 택한 이유는, 홈/도서관 카드/QuestRunner 등 여러 클라이언트 컴포넌트가 마운트 시점에만 localStorage를 읽으므로(hydration-safe 패턴) 라우팅만으로는 이미 렌더된 컴포넌트들이 새 상태를 반영하지 못할 수 있기 때문이다.
 
 ### DiscoveryCard3D (`src/components/DiscoveryCard3D.tsx`)
 
@@ -187,7 +210,15 @@ XP는 `getXp = 발견 도감 unique 권수 × 10`으로 **항상 재계산**하�
 
 ## 인증 전 데이터 redaction (보안 경계)
 
-`/quests/[id]/page.tsx`의 `redactCandidatesForPlay()`가 서버 컴포넌트 단계에서 각 Step의 후보(`title`/`author`/`isbn13`)를 빈 값으로 치환한 뒤에만 클라이언트 컴포넌트(`QuestRunner`)에 전달한다. 서가 위치/청구기호는 책을 찾는 데 필요한 정보라 그대로 전달한다. **표지 URL과 teaser/hook/question도 같은 이유로 redaction 대상이다** — verify API가 `success: true`를 반환한 이후에만(`bookImageUrl`, `teaser`, `hook`, `question` 필드) 클라이언트가 받는다. 실패 응답에는 이 필드들이 전혀 포함되지 않는다. `/admin/review`는 이 redaction을 거치지 않는 별도 조회(`getAdminReviewData`)라 후보 전체와 콘텐츠가 그대로 노출된다(운영자 검수 목적이므로 의도된 동작).
+`/quests/[id]/page.tsx`의 `redactCandidatesForPlay()`가 서버 컴포넌트 단계에서 각 Step의 후보(`title`/`author`/`isbn13`/`callNumber`)를 빈 값으로 치환한 뒤에만 클라이언트 컴포넌트(`QuestRunner`)에 전달한다.
+
+**청구기호(callNumber)를 redact하는 이유**: 실제 큐레이션 데이터를 확인해보면 한 Step의 후보 4권은 `shelfLocation`/`className`이 항상 동일하지만 `callNumber`만 후보마다 다르다(예: 은942ㅅ vs 천423ㅇ). 즉 shelfLocation/className은 Step 전체에 공통되는 "탐색 범위" 정보라 인증 전에도 안전하지만, callNumber는 사실상 후보 한 권의 정체와 직접 연결되는 정보라 인증 전에는 아예 보내지 않는다. 발견 성공 후의 정확한 청구기호는 verify API 응답의 `bookCallNumber` 필드로 별도로 받는다(서가 위치는 Step 공통 값이라 클라이언트가 이미 가진 값을 그대로 쓴다).
+
+**표지 URL과 teaser/hook/question도 같은 이유로 redaction 대상이다** — verify API가 `success: true`를 반환한 이후에만(`bookImageUrl`, `bookCallNumber`, `teaser`, `hook`, `question` 필드) 클라이언트가 받는다. 실패 응답에는 이 필드들이 전혀 포함되지 않는다.
+
+**Mission Narrative(missionTitle/missionNarrative)는 redaction 대상이 아니다** — Quest/Step 자체의 분위기 콘텐츠일 뿐 특정 후보의 정답 정보가 아니므로 인증 전에도 그대로 노출된다.
+
+`/admin/review`는 이 redaction을 거치지 않는 별도 조회(`getAdminReviewData`)라 후보 전체(청구기호 포함)와 콘텐츠가 그대로 노출된다(운영자 검수 목적이므로 의도된 동작).
 
 ## Prisma / Neon
 

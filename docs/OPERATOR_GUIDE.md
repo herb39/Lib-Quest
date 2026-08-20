@@ -78,6 +78,10 @@ Data4Library 후보 → 콘텐츠 작성 → 운영자 검수 → 이용자 공�
 
 현재 teaser/hook/question은 **대전 원신흥도서관 36권 전체**에 작성되어 있다. 다른 3개 도서관(갈마·가수원·노은)은 아직 작성되지 않아 `콘텐츠 없음`으로 표시된다 — 이는 오류가 아니라 근거 없는 문구를 억지로 채우지 않기 위한 의도된 상태다.
 
+### 향후 검수 대상 (아직 이 화면에 없음)
+
+Step 진입 시 사용자가 보는 미션 제목/짧은 서사(Mission Narrative, `missionTitle`/`missionNarrative`)도 teaser/hook/question과 마찬가지로 사람이 작성·검수해야 하는 콘텐츠다. 현재 대전 원신흥도서관의 3개 Quest × 3 Step(9개) 전체가 `data/libraries/130026/quest-missions.json`에 작성되어 있지만, **이 화면(`/admin/review`)에서는 아직 확인할 수 없다** — teaser/hook/question처럼 화면에 노출하는 기능은 향후 계획일 뿐 지금 동작하는 기능이 아니다.
+
 ## ISBN 복사
 
 발표·데모 환경에서는 실제 도서관에 가지 않고도 후보 도서의 ISBN을 그대로 복사해 사용자 화면의 "ISBN 직접 입력"에 붙여넣어 테스트할 수 있다.

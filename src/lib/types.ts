@@ -8,6 +8,7 @@ export type BookSummary = {
   author: string | null;
   callNumber: string | null;
   shelfLocation: string | null;
+  className: string | null;
 };
 
 export type CandidateSummary = {

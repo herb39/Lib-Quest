@@ -13,7 +13,7 @@ function book(
   callNumber: string,
   shelfLocation: string
 ): BookSummary {
-  return { id: isbn13, isbn13, title, author, callNumber, shelfLocation };
+  return { id: isbn13, isbn13, title, author, callNumber, shelfLocation, className: null };
 }
 
 const 채식주의자 = book("9788936434120", "채식주의자", "한강", "813.7-한15ㅊ", "종합자료실 2층");
