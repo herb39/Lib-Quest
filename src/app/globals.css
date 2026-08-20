@@ -87,32 +87,15 @@ body {
 .lq-book-face {
   position: absolute;
   inset: 0;
-}
-
-/* back/pages/spine는 이미지가 없는 정적 gradient라 클리핑을 자기 자신의 transform과
-   함께 둬도 안전하다 — position+transform+clip을 한 요소에 합친 채로 유지한다. */
-.lq-book-face-clip {
   border-radius: 0.85rem;
   overflow: hidden;
 }
 
 .lq-book-cover {
   transform: translateZ(0);
+  background: #fff;
   box-shadow: 0 12px 20px -10px rgb(43 38 32 / 45%);
   border: 1px solid rgb(41 37 36 / 8%);
-  /* 표지에는 overflow/border-radius를 여기 두지 않는다. iOS WebKit은 preserve-3d 안에서
-     "transform + overflow:hidden"을 함께 가진 요소의 자식 <img>가 비동기 로드/opacity
-     transition을 거칠 때 compositing이 누락되어 이미지가 안 보이는 경우가 있다(다른 3D
-     face는 정적 gradient라 증상이 없었다). 클리핑은 transform이 없는 자식 lq-book-cover-clip
-     으로 분리해 이 조합 자체를 피한다. */
-}
-
-.lq-book-cover-clip {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: 0.85rem;
-  background: #fff;
 }
 
 .lq-book-pages {
