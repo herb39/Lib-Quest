@@ -1,14 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { BookSummary, QuestSummary } from "@/lib/types";
+import type { QuestSummary } from "@/lib/types";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+
+type FoundBook = {
+  id: string;
+  title: string;
+  author: string | null;
+  callNumber: string | null;
+  shelfLocation: string | null;
+};
 
 type SessionState = {
   currentStep: number; // 0-based index of the step currently in progress
-  foundBookIds: string[];
+  foundBooks: FoundBook[];
   completedAt: string | null;
+  started: boolean;
 };
 
 type SuccessInfo = {
@@ -17,20 +26,27 @@ type SuccessInfo = {
   isLast: boolean;
 };
 
+const EMPTY_SESSION: SessionState = { currentStep: 0, foundBooks: [], completedAt: null, started: false };
+
 function sessionKey(questId: string) {
   return `libquest_session_${questId}`;
 }
 
 function loadSession(questId: string): SessionState {
-  if (typeof window === "undefined") {
-    return { currentStep: 0, foundBookIds: [], completedAt: null };
-  }
+  if (typeof window === "undefined") return EMPTY_SESSION;
   try {
     const raw = window.localStorage.getItem(sessionKey(questId));
-    if (!raw) return { currentStep: 0, foundBookIds: [], completedAt: null };
-    return JSON.parse(raw) as SessionState;
+    if (!raw) return EMPTY_SESSION;
+    const parsed = JSON.parse(raw) as Partial<SessionState> & { foundBookIds?: string[] };
+    const foundBooks = Array.isArray(parsed.foundBooks) ? parsed.foundBooks : [];
+    const currentStep = typeof parsed.currentStep === "number" ? parsed.currentStep : 0;
+    const completedAt = parsed.completedAt ?? null;
+    // started가 없는 이전 버전 세션(구 foundBookIds 구조 포함)도 이미 진행 중이었다면
+    // 탐험 시작 화면을 다시 강제로 보여주지 않는다.
+    const started = parsed.started ?? (currentStep > 0 || foundBooks.length > 0 || completedAt !== null);
+    return { currentStep, foundBooks, completedAt, started };
   } catch {
-    return { currentStep: 0, foundBookIds: [], completedAt: null };
+    return EMPTY_SESSION;
   }
 }
 
@@ -68,11 +84,7 @@ function StepDots({ total, current }: { total: number; current: number }) {
 }
 
 export function QuestRunner({ quest }: { quest: QuestSummary }) {
-  const [session, setSession] = useState<SessionState>({
-    currentStep: 0,
-    foundBookIds: [],
-    completedAt: null,
-  });
+  const [session, setSession] = useState<SessionState>(EMPTY_SESSION);
   const [hydrated, setHydrated] = useState(false);
   const [isbnInput, setIsbnInput] = useState("");
   const [feedback, setFeedback] = useState<{ message: string; isMismatch: boolean } | null>(null);
@@ -89,7 +101,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     // (그렇지 않으면 존재하지 않는 단계를 기다리며 "불러오는 중..."에서 멈춘다).
     const isValid = loaded.completedAt !== null || loaded.currentStep < quest.steps.length;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSession(isValid ? loaded : { currentStep: 0, foundBookIds: [], completedAt: null });
+    setSession(isValid ? loaded : EMPTY_SESSION);
     setHydrated(true);
   }, [quest.id, quest.steps.length]);
 
@@ -105,12 +117,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const totalSteps = quest.steps.length;
   const isCompleted = session.completedAt !== null;
   const currentStep = quest.steps[session.currentStep];
-  const foundBooks: BookSummary[] = useMemo(() => {
-    const all = quest.steps.flatMap((s) => s.candidates.map((c) => c.book));
-    return session.foundBookIds
-      .map((id) => all.find((b) => b.id === id))
-      .filter((b): b is BookSummary => Boolean(b));
-  }, [quest.steps, session.foundBookIds]);
+  const foundBooks = session.foundBooks;
 
   async function handleShare() {
     const shareText = `Lib Quest에서 '${quest.title}' 퀘스트를 완료하고 책 ${foundBooks.length}권을 발견했어요.`;
@@ -128,12 +135,18 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     }
   }
 
+  function handleStart() {
+    const next: SessionState = { ...session, started: true };
+    saveSession(quest.id, next);
+    setSession(next);
+  }
+
   function handleContinue() {
     setSuccessInfo(null);
   }
 
-  // 성공 직후에는 세션이 이미 다음 단계로 넘어가 있어도, 사용자가 "다음 미션"을 눌러
-  // 직접 화면을 넘기기 전까지는 발표자가 결과를 보여줄 수 있도록 성공 패널을 유지한다.
+  // 성공 직후에는 세션이 이미 다음 단계로 넘어가 있어도, 사용자가 "다음 탐사지역 열기"를 눌러
+  // 직접 화면을 넘기기 전까지는 발견의 보상감(발표에서는 심사위원이 볼 시간)을 위해 성공 패널을 유지한다.
   if (successInfo) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-5 py-10 text-center">
@@ -148,9 +161,10 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           >
             ✓
           </div>
-          <p className="mt-3 text-sm font-semibold text-emerald-700">책을 발견했어요!</p>
+          <p className="mt-3 text-sm font-semibold text-emerald-700">새로운 책을 발견했어요!</p>
           <h2 className="mt-1 break-keep text-lg font-bold text-stone-900">{successInfo.title}</h2>
           {successInfo.author && <p className="mt-0.5 text-sm text-stone-500">{successInfo.author}</p>}
+          <p className="mt-2 text-xs font-semibold text-emerald-600">발견 완료</p>
         </div>
 
         <button
@@ -158,8 +172,16 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           onClick={handleContinue}
           className="mt-6 flex h-12 w-full items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-emerald-600 text-sm font-semibold text-white transition active:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
-          {successInfo.isLast ? "결과 카드 보기" : "다음 미션"} <span aria-hidden="true">→</span>
+          {successInfo.isLast ? "결과 카드 보기" : "다음 탐사지역 열기"} <span aria-hidden="true">→</span>
         </button>
+      </main>
+    );
+  }
+
+  if (!hydrated) {
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 items-center justify-center px-5 py-8 text-sm text-stone-400">
+        불러오는 중...
       </main>
     );
   }
@@ -251,7 +273,40 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     );
   }
 
-  if (!hydrated || !currentStep) {
+  if (!session.started) {
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-8">
+        <div className="lq-animate-in rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">오늘의 탐험</p>
+          <p className="mt-1 text-xs text-stone-400">{quest.libraryName}</p>
+          <h1 className="mt-2 break-keep text-xl font-bold text-stone-900">{quest.title}</h1>
+          {quest.theme && (
+            <span className="mt-2 inline-block rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-500">
+              {quest.theme}
+            </span>
+          )}
+          <p className="mt-3 break-keep text-sm text-stone-600">{quest.description}</p>
+          <div className="mt-4 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span aria-hidden="true">🧭</span> 총 {totalSteps}개의 미션
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleStart}
+          className="mt-6 flex h-12 w-full items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-emerald-600 text-sm font-semibold text-white transition active:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        >
+          탐험 시작하기 <span aria-hidden="true">→</span>
+        </button>
+
+        <Link href="/quests" className="mt-3 self-center text-xs text-stone-400">
+          ← 퀘스트 목록으로
+        </Link>
+      </main>
+    );
+  }
+
+  if (!currentStep) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 items-center justify-center px-5 py-8 text-sm text-stone-400">
         불러오는 중...
@@ -284,11 +339,22 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         return;
       }
 
+      // 발견한 책의 서가 위치/청구기호는 이미 화면에 공개되어 있던 후보 목록에서 찾는다.
+      // (verify API는 정답 후보 전체를 노출하지 않도록 title/author만 최소로 반환한다.)
+      const matchedCandidate = currentStep.candidates.find((c) => c.book.id === result.bookId);
       const isLastStep = session.currentStep === totalSteps - 1;
+      const foundBook: FoundBook = {
+        id: result.bookId,
+        title: result.bookTitle,
+        author: result.bookAuthor ?? null,
+        callNumber: matchedCandidate?.book.callNumber ?? null,
+        shelfLocation: matchedCandidate?.book.shelfLocation ?? null,
+      };
       const next: SessionState = {
         currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
-        foundBookIds: [...session.foundBookIds, result.bookId as string],
+        foundBooks: [...session.foundBooks, foundBook],
         completedAt: isLastStep ? new Date().toISOString() : null,
+        started: true,
       };
       saveSession(quest.id, next);
       setFeedback(null);
@@ -301,7 +367,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     }
   }
 
-  function handleShowAnother() {
+  function handleShowAnotherSpot() {
     setCandidateIndex((i) => (i + 1) % currentStep.candidates.length);
   }
 
@@ -321,25 +387,45 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       </div>
 
       {foundBooks.length > 0 && (
-        <ul className="mt-3 flex flex-wrap justify-center gap-x-3 gap-y-1">
-          {foundBooks.map((b) => (
-            <li key={b.id} className="flex max-w-[9.5rem] items-center gap-1 text-xs text-stone-400">
-              <span aria-hidden="true" className="text-emerald-600">
-                ✓
-              </span>
-              <span className="truncate">{b.title}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-3">
+          <p className="text-center text-[11px] font-medium text-stone-400">지금까지의 발견</p>
+          <ul className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1">
+            {foundBooks.map((b) => (
+              <li key={b.id} className="flex max-w-[9.5rem] items-center gap-1 text-xs text-stone-400">
+                <span aria-hidden="true" className="text-emerald-600">
+                  ✓
+                </span>
+                <span className="truncate">{b.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <p className="mt-5 text-xs font-medium text-stone-400">{quest.libraryName}</p>
       <h1 className="mt-0.5 text-lg font-bold text-stone-900">{quest.title}</h1>
 
       <section className="mt-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold text-emerald-700">STEP {currentStep.order}</p>
+        <p className="text-xs font-semibold text-emerald-700">STEP {currentStep.order} · 탐사지역</p>
         <h2 className="mt-1 text-base font-bold text-stone-900">{currentStep.title}</h2>
         <p className="mt-1.5 text-sm text-stone-600">{currentStep.description}</p>
+
+        <div className="mt-3 rounded-xl bg-stone-50 px-3 py-2.5">
+          <p className="text-xs font-medium text-stone-500">
+            이 서가에는 발견 가능한 책이{" "}
+            <span className="font-semibold text-stone-700">{currentStep.candidates.length}권</span> 있어요.
+          </p>
+          <div className="mt-2 flex gap-1.5" aria-hidden="true">
+            {currentStep.candidates.map((c) => (
+              <span
+                key={c.book.id}
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sm font-bold text-stone-300 shadow-sm"
+              >
+                ?
+              </span>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5">
           <p className="text-xs font-semibold text-amber-800">
@@ -356,10 +442,10 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           {currentStep.candidates.length > 1 && (
             <button
               type="button"
-              onClick={handleShowAnother}
+              onClick={handleShowAnotherSpot}
               className="mt-2 whitespace-nowrap text-xs font-medium text-amber-800 underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
-              다른 책 보기 ({candidateIndex + 1}/{currentStep.candidates.length})
+              다른 위치 보기 ({candidateIndex + 1}/{currentStep.candidates.length})
             </button>
           )}
         </div>
@@ -379,7 +465,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       </section>
 
       <section className="mt-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold text-stone-400">책을 찾았다면 확인해주세요</p>
+        <p className="text-xs font-semibold text-stone-400">책을 발견했다면 인증해주세요</p>
 
         {/* key로 단계마다 새 인스턴스를 만들어 단계 이동 시 이전 카메라 스트림이 확실히 종료되게 한다. */}
         <BarcodeScanner key={currentStep.id} onScanned={(value) => setIsbnInput(value)} />
@@ -402,7 +488,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
               disabled={verifying}
               className="h-11 shrink-0 whitespace-nowrap rounded-xl bg-stone-900 px-4 text-sm font-semibold text-white transition active:bg-stone-800 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
-              {verifying ? "확인 중..." : "확인"}
+              {verifying ? "확인 중..." : "책 발견하기"}
             </button>
           </div>
         </div>
