@@ -251,6 +251,24 @@ mission  (Mission Narrative + 탐험 단서 + hidden 책 + ISBN 인증 CTA)
 
 **Reload 정책**: `stepView`/`successInfo`는 컴포넌트 state일 뿐 localStorage에 저장하지 않는다. 사용자가 Discovery/BookInfo 화면에서 새로고침하면 `session`(이미 다음 단계로 이동된 상태)만 복구되어 **다음 Step의 Mission 화면**(또는 완료 상태면 결과 화면)으로 이어진다 — 방금 봤던 Discovery/BookInfo 화면이 재생되지는 않는다. 이 화면들을 복구하려면 세션에 "직전 발견 정보"까지 저장해야 하는데, 발표 환경에서 새로고침 도중 발견 연출을 다시 보여줘야 할 필요성은 낮고 저장 구조만 복잡해지므로 의도적으로 단순한 정책을 택했다.
 
+### Exploration Result — 결과 화면 (`QuestRunner.tsx`의 `isCompleted` 분기, P0-4)
+
+Quest의 마지막 Step까지 완료하고 "오늘의 한 권"을 고르면(`finalSelection`이 존재하면) 보여주는 화면이다. 새 localStorage key를 추가하지 않고, **이미 존재하는 4개의 독립 저장소를 그 자리에서 조합**해서 렌더링한다.
+
+| 표시 항목 | 계산 방식 |
+| --- | --- |
+| 오늘의 한 권 Hero | `finalSelection.bookId`로 `session.foundBooks`에서 찾은 책. `DiscoveryCard3D`를 `revealed interactive size="active"`로 재사용(발견 연출 `justRevealed` 없이 — 여기는 발견이 아니라 선택의 결과) |
+| 발견한 책 목록 | `session.foundBooks` 그대로, 3D Book이 아니라 기존 `BookThumb`(2D 썸네일) 재사용 — 성능/밀도 때문에 큰 3D 카드를 여러 장 그리지 않는다 |
+| 관심 수 / ♥ 표시 | `interestStore`(`isInterested`)로 `foundBooks` 각각을 필터 |
+| 현재 XP / 칭호 | `discoveryStore`(`getXp`/`getExplorerTitle`) — 도감 전체 기준, Quest와 무관하게 항상 정확 |
+| 이번 탐험 XP | `foundBooks[].isNew`(아래 참고) 중 `true`인 개수 × 10 |
+
+**"이번 탐험에서 실제로 새로 얻은 XP" 계산의 함정**: 발견 도감(`discovery-storage.ts`)은 book마다 **최초 발견 시점 1건만** 기록하므로, 이미 예전에 발견한 책을 이번 Quest에서 다시 만나도 도감에는 흔적이 남지 않는다 — 즉 도감만 봐서는 "이번 탐험에서 새로 얻은 XP"를 역산할 수 없다. 그래서 `FoundBook` 타입(이미 `libquest_session_<questId>`에 저장되던 것)에 `isNew?: boolean` 필드 하나만 추가해, `handleVerify`가 `recordDiscovery()`의 반환값을 그대로 세션에 함께 저장하게 했다 — **새 저장소가 아니라 기존 세션 레코드의 필드 추가**다. 이 필드 추가 이전에 저장된 세션(즉 이 필드가 없는 `foundBooks`)에 대해서는 "이번 탐험 XP"를 억지로 추정하지 않고, 대신 "현재 XP"(도감 전체 XP)만 보여준다(`foundBooks.every(b => typeof b.isNew === "boolean")`로 판별).
+
+**중복 발견 문구**: 이번 탐험에서 만난 3권이 전부 신규 발견이면 "새로 발견한 책 3권"/"3권을 발견했고, 그중 한 권을 골랐어요.", 재발견이 하나라도 섞여 있으면 "이번 탐험에서 만난 책 3권"/"이번 탐험에서 3권의 책을 만났고, 그중 한 권을 골랐어요."로 표현을 구분한다 — "발견 3권"이 "신규 발견 3권"으로 오해되지 않게 하기 위함이다.
+
+**정보 반복 금지**: 이 화면은 BookInfo에서 이미 보여준 teaser/question/청구기호/서가위치를 다시 노출하지 않는다 — "정보 소비 화면"이 아니라 "탐험 기록 화면"으로 설계했다.
+
 ## 인증 전 데이터 redaction (보안 경계)
 
 `/quests/[id]/page.tsx`의 `redactCandidatesForPlay()`가 서버 컴포넌트 단계에서 각 Step의 후보(`title`/`author`/`isbn13`/`callNumber`)를 빈 값으로 치환한 뒤에만 클라이언트 컴포넌트(`QuestRunner`)에 전달한다.

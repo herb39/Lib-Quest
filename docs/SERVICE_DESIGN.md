@@ -15,6 +15,7 @@ ISBN 인증은 이 여정의 중간 단계(책을 실제로 찾았다는 증거)
 ```
 Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → Discovery Moment(발견의 감정적 보상)
   → Book Exploration(독서 호기심) → Interest(읽어보고 싶어요) → Final Selection(오늘의 한 권 선택)
+  → Exploration Result(탐험 기록)
 ```
 
 각 단계는 이전 P0 작업에서 순차적으로 쌓였다.
@@ -25,7 +26,8 @@ Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → D
 | Discovery(3D 발견) | P0-2 | `DiscoveryCard3D`, 표지 공개, XP, 발견 도감 |
 | Interest/Final Selection | P0-2.5 | teaser/hook/question, 읽어보고 싶어요, 오늘의 한 권 |
 | Mission Narrative | P0-2.6 | Step을 지시문이 아닌 탐험으로 표현하는 missionTitle/missionNarrative, "탐험 단서" 카드 |
-| 3D Book Object · Discovery/BookInfo 분리 | P0-3(이 문서 기준) | 실제 두께가 있는 책 오브젝트(`DiscoveryCard3D`), 발견 순간과 책 정보 화면의 완전 분리 |
+| 3D Book Object · Discovery/BookInfo 분리 | P0-3 | 실제 두께가 있는 책 오브젝트(`DiscoveryCard3D`), 발견 순간과 책 정보 화면의 완전 분리 |
+| Exploration Result(결과 화면 강화) | P0-4(이 문서 기준) | Quest 완료 후 "오늘의 탐험 완료" 결과 화면 — 오늘의 한 권 Hero, 발견/관심/XP/칭호 요약, 발견 기록 |
 
 ## 3. 게임화 원칙
 
@@ -39,7 +41,8 @@ Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → D
 - **XP** — 탐험 동기. 신규 발견 1권당 +10, 재발견은 0. `getXp = 발견 도감 unique 권수 × 10`으로 항상 계산해 별도 mutable 값을 저장하지 않는다([discovery-storage.ts](../src/lib/discovery-storage.ts)).
 - **발견 도감** — 발견 누적. Quest 진행 상태(QuestSession)와 완전히 분리된 별도 localStorage(`libquest_discoveries`).
 - **Interest(읽어보고 싶어요)** — 독서 의향 신호. **XP를 절대 부여하지 않는다** — 관심도 없는 책을 XP 때문에 누르게 만드는 유인을 피하기 위함이다.
-- **Final Selection(오늘의 한 권)** — 발견한 책들 중 실제로 읽을 한 권을 결정하는, 독서 관심의 최종 결과.
+- **Final Selection(오늘의 한 권)** — 발견한 책들 중 실제로 읽을 한 권을 결정하는, 독서 관심의 최종 결과. 관심 표시 여부와 최종 선택은 독립적인 행동이다 — 관심 표시하지 않은 책을 오늘의 한 권으로 고를 수도 있고, 이를 막지 않는다.
+- **Exploration Result(탐험 기록)** — Quest를 마친 뒤의 마지막 단계. "그래서 오늘 무엇을 했는가"를 정리하는 화면으로, 점수판이 아니라 **탐험 기록 + 독서 선택의 엔딩**이다. 오늘의 한 권(선택한 책)을 가장 크게, 그 아래 이번 탐험에서 만난 책 목록·관심 수·XP·현재 칭호를 압축된 요약으로 보여준다. BookInfo에서 이미 본 teaser/question 같은 상세 정보는 다시 반복하지 않는다(정보 소비 화면이 아니라 기록 화면).
 
 ## 4. B2B2C
 
@@ -116,7 +119,7 @@ Quest 노출 → 시작 → 책 발견 → 읽고 싶어요 → 오늘의 한 �
 - 책마다 teaser/hook/question (원신흥도서관 36권 전체 작성, 그 외 도서관은 아직 미작성)
 - Mission Narrative(missionTitle/missionNarrative) — 원신흥도서관 3개 Quest × 3 Step 전체 작성, "탐험 단서" 카드(서가 위치/분류/후보 수), 다른 도서관·나머지 Quest는 generic fallback
 - `읽어보고 싶어요`(관심 표시), `/discoveries` 관심 필터
-- Quest 완료 후 **오늘의 한 권** 선택, 결과 화면 반영
+- Quest 완료 후 **오늘의 한 권** 선택, "오늘의 탐험 완료" 결과 화면(선택한 책 Hero + 발견/관심/XP/칭호 요약, 중복 발견 시 문구 구분)
 - `/admin/review` 콘텐츠 검수 표시(읽기 전용), 운영 workflow 안내
 - `/data-source` 데이터 출처 안내
 - Header `처음부터` — 이 브라우저의 Lib Quest 사용자 진행 상태(Quest 세션 전체 + 발견 도감 + 관심 + 오늘의 한 권) 전체 초기화

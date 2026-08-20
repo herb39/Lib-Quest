@@ -5,7 +5,13 @@ import Link from "next/link";
 import type { QuestSummary } from "@/lib/types";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { DiscoveryCard3D } from "@/components/DiscoveryCard3D";
-import { recordDiscovery } from "@/lib/discovery-storage";
+import {
+  recordDiscovery,
+  loadDiscoveryStore,
+  getXp,
+  getExplorerTitle,
+  type DiscoveryStore,
+} from "@/lib/discovery-storage";
 import { loadInterestStore, toggleInterest, isInterested, type InterestStore } from "@/lib/interest-storage";
 import { saveFinalSelection, getFinalSelection, type FinalSelection } from "@/lib/final-selection-storage";
 import { getMissionContent } from "@/lib/mission-content";
@@ -21,6 +27,9 @@ type FoundBook = {
   teaser: string | null;
   hook: string | null;
   question: string | null;
+  /** 이번 Quest 세션에서 도감에 처음 기록된 신규 발견인지 여부. 기존(이 필드 추가 이전) 세션
+   * localStorage에는 없을 수 있어 optional — 없으면 "이번 탐험 XP"를 계산하지 않고 총 XP만 보여준다. */
+  isNew?: boolean;
 };
 
 type SessionState = {
@@ -145,6 +154,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   const [verifying, setVerifying] = useState(false);
   const [interestStore, setInterestStore] = useState<InterestStore>({ version: 1, bookIds: [] });
   const [finalSelection, setFinalSelection] = useState<FinalSelection | null>(null);
+  const [discoveryStore, setDiscoveryStore] = useState<DiscoveryStore>({ version: 1, discoveries: [] });
 
   useEffect(() => {
     // localStorage 기반 익명 세션은 클라이언트에서만 읽을 수 있어 마운트 시 1회 동기화한다.
@@ -157,8 +167,10 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
     // 관심 표시/오늘의 한 권 선택은 QuestSession과 완전히 분리된 별도 저장소에서 읽는다.
      
     setInterestStore(loadInterestStore());
-     
+
     setFinalSelection(getFinalSelection(quest.id));
+
+    setDiscoveryStore(loadDiscoveryStore());
     setHydrated(true);
   }, [quest.id, quest.steps.length]);
 
@@ -396,106 +408,127 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   }
 
   if (isCompleted) {
+    // 이번 화면은 "정보 소비 화면"이 아니라 "탐험 기록 화면"이다 — teaser/question/청구기호 같은
+    // BookInfo에서 이미 본 상세 정보는 다시 반복하지 않고, 오늘의 한 권 + 발견 요약만 정리한다.
+    const chosen = finalSelection ? foundBooks.find((b) => b.id === finalSelection.bookId) : null;
+    // 세션에 isNew가 전부 기록돼 있어야만(이 필드 추가 이전 세션은 없을 수 있음) "이번 탐험에서
+    // 실제로 새로 얻은 XP"를 정확히 계산할 수 있다 — 없으면 억지로 추정하지 않고 총 XP만 보여준다.
+    const hasIsNewData = foundBooks.every((b) => typeof b.isNew === "boolean");
+    const newCount = foundBooks.filter((b) => b.isNew).length;
+    const allNew = hasIsNewData && newCount === foundBooks.length;
+    const interestedCount = foundBooks.filter((b) => isInterested(interestStore, b.id)).length;
+    const totalXp = getXp(discoveryStore);
+    const currentTitle = getExplorerTitle(totalXp);
+    // 이번 탐험에 재발견(duplicate)이 섞여 있으면 "발견 3권"이 "신규 발견 3권"으로 오해되지
+    // 않도록 표현을 구분한다.
+    const metLabel = allNew ? "새로 발견한 책" : "이번 탐험에서 만난 책";
+    const subCopy = allNew
+      ? `${foundBooks.length}권을 발견했고, 그중 한 권을 골랐어요.`
+      : `이번 탐험에서 ${foundBooks.length}권의 책을 만났고, 그중 한 권을 골랐어요.`;
+
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 py-8">
-        {finalSelection && (
-          <div className="lq-animate-in mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">오늘의 선택</p>
-            {(() => {
-              const chosen = foundBooks.find((b) => b.id === finalSelection.bookId);
-              if (!chosen) return null;
-              return (
-                <>
-                  <div className="mx-auto mt-2 h-28 w-20">
-                    <DiscoveryCard3D revealed coverUrl={chosen.coverUrl} size="active" caption={false} />
-                  </div>
-                  <h2 className="mt-2 break-keep text-lg font-bold text-stone-900">{chosen.title}</h2>
-                  {chosen.hook && <p className="mt-1 break-keep text-sm font-medium text-stone-700">{chosen.hook}</p>}
-                  <p className="mt-2 text-xs font-semibold text-amber-700">이제 책을 펼쳐볼까요?</p>
-                </>
-              );
-            })()}
+        <p className="text-center text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          {quest.libraryName} · {quest.title}
+        </p>
+        <h1 className="mt-1 text-center text-2xl font-bold text-stone-900">오늘의 탐험 완료</h1>
+        <p className="mt-1 text-center text-sm text-stone-600">{subCopy}</p>
+
+        {chosen && (
+          <div className="lq-animate-in mt-6 flex flex-col items-center rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">오늘의 한 권</p>
+            <div className="mt-3" style={{ width: "clamp(180px, 48vw, 240px)", aspectRatio: "2 / 3" }}>
+              <DiscoveryCard3D revealed interactive size="active" caption={false} coverUrl={chosen.coverUrl} title={null} />
+            </div>
+            <h2 className="mt-3 break-keep text-lg font-bold text-stone-900">{chosen.title}</h2>
+            {chosen.author && <p className="text-sm text-stone-500">{chosen.author}</p>}
+            {chosen.hook && (
+              <p className="mt-2 line-clamp-2 break-keep text-sm font-medium text-stone-700">{chosen.hook}</p>
+            )}
+            <p className="mt-3 text-xs font-semibold text-amber-700">이제 책을 펼쳐볼까요?</p>
           </div>
         )}
 
-        <div className="lq-animate-in rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-          <p aria-hidden="true" className="text-3xl">
-            🎉
+        <div className="mt-6">
+          <p className="text-xs font-semibold text-stone-400">
+            {metLabel} {foundBooks.length}권
           </p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-            {quest.libraryName}
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-stone-900">퀘스트 완료!</h1>
-          <p className="mt-1 text-sm text-stone-600">{quest.title}</p>
-          <p className="mt-3 text-sm text-stone-600">새로운 책 {foundBooks.length}권을 발견했어요.</p>
+          <ul className="mt-2 grid grid-cols-3 gap-2">
+            {foundBooks.map((book) => {
+              const interested = isInterested(interestStore, book.id);
+              return (
+                <li key={book.id} className="flex flex-col items-center gap-1">
+                  <div className="relative">
+                    <BookThumb coverUrl={book.coverUrl} />
+                    {interested && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] text-white shadow-sm"
+                      >
+                        ♥
+                      </span>
+                    )}
+                  </div>
+                  <p className="w-full truncate text-center text-[11px] text-stone-600">
+                    {book.title}
+                    {interested && <span className="sr-only"> · 읽어보고 싶어요 표시함</span>}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
-          <div className="mt-4 flex justify-center gap-8">
-            <div>
-              <p className="text-lg font-bold text-stone-900">{totalSteps}</p>
-              <p className="text-xs text-stone-500">완료한 미션</p>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-stone-900">{foundBooks.length}</p>
-              <p className="text-xs text-stone-500">발견한 책</p>
-            </div>
+        <dl className="mt-6 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-stone-200 bg-white p-3 text-center shadow-sm">
+            <dt className="text-[11px] text-stone-400">발견</dt>
+            <dd className="mt-0.5 text-lg font-bold text-stone-900">{foundBooks.length}권</dd>
           </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5">
-          {quest.steps.map((s, i) => (
-            <span key={s.id} className="flex items-center gap-1.5">
-              <span className="rounded-full border border-stone-200 bg-white px-2.5 py-1 text-xs font-medium text-stone-600 shadow-sm">
-                {s.title}
-              </span>
-              {i < quest.steps.length - 1 && (
-                <span aria-hidden="true" className="text-stone-300">
-                  →
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-
-        <ul className="mt-6 flex flex-col gap-3">
-          {foundBooks.map((book, i) => (
-            <li key={book.id} className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm">
-              <div className="flex items-start gap-3">
-                <BookThumb coverUrl={book.coverUrl} />
-                <div className="min-w-0 flex-1 pt-0.5">
-                  <p className="text-[11px] font-semibold text-emerald-700">{i + 1}번째 발견</p>
-                  <p className="mt-0.5 break-keep font-semibold text-stone-900">{book.title}</p>
-                  {book.author && <p className="text-sm text-stone-500">{book.author}</p>}
-                  {(book.callNumber || book.shelfLocation) && (
-                    <p className="mt-1 break-keep text-xs text-stone-400">
-                      {[book.callNumber, book.shelfLocation].filter(Boolean).join(" · ")}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+          <div className="rounded-xl border border-stone-200 bg-white p-3 text-center shadow-sm">
+            <dt className="text-[11px] text-stone-400">관심</dt>
+            <dd className="mt-0.5 text-lg font-bold text-stone-900">{interestedCount}권</dd>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-white p-3 text-center shadow-sm">
+            <dt className="text-[11px] text-stone-400">{hasIsNewData ? "이번 탐험 XP" : "현재 XP"}</dt>
+            <dd className="mt-0.5 text-lg font-bold text-stone-900">
+              {hasIsNewData ? `${newCount > 0 ? "+" : ""}${newCount * 10}` : totalXp}
+            </dd>
+          </div>
+          <div className="rounded-xl border border-stone-200 bg-white p-3 text-center shadow-sm">
+            <dt className="text-[11px] text-stone-400">현재 칭호</dt>
+            <dd className="mt-0.5 text-lg font-bold text-stone-900">{currentTitle}</dd>
+          </div>
+        </dl>
+        {hasIsNewData && <p className="mt-2 text-center text-[11px] text-stone-400">총 {totalXp} XP</p>}
 
         <div className="mt-8 flex flex-col gap-2">
           <Link
             href={`/quests?library=${quest.libraryCode}`}
             className="flex h-12 w-full items-center justify-center whitespace-nowrap rounded-xl bg-emerald-600 text-sm font-semibold text-white transition active:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
-            다른 퀘스트 도전하기
+            다른 퀘스트 떠나기
           </Link>
           <Link
-            href="/"
+            href="/discoveries"
             className="flex h-12 w-full items-center justify-center whitespace-nowrap rounded-xl border border-stone-300 text-sm font-semibold text-stone-700 active:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
-            다른 도서관 둘러보기
+            내 발견 도감 보기
           </Link>
-          <button
-            type="button"
-            onClick={handleShare}
-            className="mt-1 flex h-10 w-full items-center justify-center whitespace-nowrap text-xs font-semibold text-stone-500 active:text-stone-700"
-          >
-            {shareStatus === "copied" ? "링크를 복사했어요" : "결과 공유하기"}
-          </button>
+          <div className="mt-1 flex items-center justify-center gap-3">
+            <Link href="/" className="whitespace-nowrap text-xs font-semibold text-stone-500 active:text-stone-700">
+              다른 도서관 둘러보기
+            </Link>
+            <span aria-hidden="true" className="text-stone-300">
+              ·
+            </span>
+            <button
+              type="button"
+              onClick={handleShare}
+              className="whitespace-nowrap text-xs font-semibold text-stone-500 active:text-stone-700"
+            >
+              {shareStatus === "copied" ? "링크를 복사했어요" : "결과 공유하기"}
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -583,6 +616,22 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         const preload = new window.Image();
         preload.src = coverUrl;
       }
+      // QuestSession(진행 상태)과 완전히 분리된 도감(Discovery store)에도 기록한다. foundBook에
+      // isNew를 함께 저장해 두면(세션에 이미 포함된 필드라 새 localStorage key 추가 없음), 나중에
+      // 최종 결과 화면을 새로고침해도 "이번 탐험에서 실제로 새로 얻은 XP"를 정확히 다시 계산할 수 있다.
+      const { store: nextDiscoveryStore, isNew } = recordDiscovery({
+        bookId: result.bookId,
+        libraryCode: quest.libraryCode,
+        questId: quest.id,
+        stepId: currentStep.id,
+        title: result.bookTitle,
+        author: result.bookAuthor ?? null,
+        coverUrl,
+        className: result.bookClassName ?? null,
+        discoveredAt: new Date().toISOString(),
+      });
+      setDiscoveryStore(nextDiscoveryStore);
+
       const foundBook: FoundBook = {
         id: result.bookId,
         title: result.bookTitle,
@@ -593,6 +642,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         teaser: result.teaser ?? null,
         hook: result.hook ?? null,
         question: result.question ?? null,
+        isNew,
       };
       const next: SessionState = {
         currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
@@ -604,18 +654,6 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       setFeedback(null);
       setSession(next);
 
-      // QuestSession(진행 상태)과 완전히 분리된 도감(Discovery store)에도 기록한다.
-      const { isNew } = recordDiscovery({
-        bookId: result.bookId,
-        libraryCode: quest.libraryCode,
-        questId: quest.id,
-        stepId: currentStep.id,
-        title: result.bookTitle,
-        author: result.bookAuthor ?? null,
-        coverUrl,
-        className: result.bookClassName ?? null,
-        discoveredAt: new Date().toISOString(),
-      });
       setSuccessInfo({
         bookId: result.bookId,
         title: result.bookTitle,
