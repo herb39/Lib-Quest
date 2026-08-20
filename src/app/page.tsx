@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getLibraryList } from "@/lib/data";
+import { MyExploration } from "@/components/MyExploration";
+import { LibraryProgress } from "@/components/LibraryProgress";
 
 // 도서관 목록은 DB 상태를 반영해야 하므로 매 요청마다 조회한다.
 export const dynamic = "force-dynamic";
@@ -14,6 +16,10 @@ export default async function Home() {
         도서관이 퀘스트가 되는 순간.
       </h1>
       <p className="mt-3 text-sm text-stone-500">오늘은 어떤 도서관을 탐험해볼까요?</p>
+
+      <div className="mt-5">
+        <MyExploration />
+      </div>
 
       <div className="mt-5 flex flex-col gap-3">
         {libraries.map((lib) => {
@@ -36,6 +42,8 @@ export default async function Home() {
                   <p className="mt-0.5 text-xs text-stone-400">{lib.region}</p>
                 </div>
               </div>
+
+              <LibraryProgress libraryCode={lib.code} bookCount={lib.bookCount} />
 
               <div className="mt-3 flex items-center justify-between">
                 <p className="text-xs text-stone-500">

@@ -13,6 +13,7 @@ export type LibraryListItem = {
   region: string;
   isFeatured: boolean;
   questCount: number;
+  bookCount: number;
 };
 
 /** 메인 화면의 도서관 선택 카드에 쓰는 목록. DB가 없으면 데모 도서관 1곳만 보여준다. */
@@ -27,6 +28,7 @@ export async function getLibraryList(): Promise<{ libraries: LibraryListItem[]; 
           region: "DB 미설정 (데모 데이터)",
           isFeatured: true,
           questCount: DEMO_QUESTS.length,
+          bookCount: 0,
         },
       ],
     };
@@ -35,7 +37,11 @@ export async function getLibraryList(): Promise<{ libraries: LibraryListItem[]; 
   const { prisma } = await import("@/lib/prisma");
   const dbLibraries = await prisma.library.findMany({
     orderBy: { createdAt: "asc" },
-    include: { _count: { select: { quests: { where: { published: true } } } } },
+    include: {
+      _count: {
+        select: { quests: { where: { published: true } }, books: true },
+      },
+    },
   });
 
   const libraries = dbLibraries.map((lib) => {
@@ -46,6 +52,7 @@ export async function getLibraryList(): Promise<{ libraries: LibraryListItem[]; 
       region: meta?.region ?? "",
       isFeatured: meta?.isFeatured ?? false,
       questCount: lib._count.quests,
+      bookCount: lib._count.books,
     };
   });
 

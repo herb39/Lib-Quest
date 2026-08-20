@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import { normalizeIsbn, getDemoQuestById } from "@/lib/mock-data";
+import { getCoverUrl } from "@/lib/covers";
 
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 
 type VerifyResult =
-  | { success: true; bookId: string; bookTitle: string; bookAuthor: string | null }
+  | {
+      success: true;
+      bookId: string;
+      bookTitle: string;
+      bookAuthor: string | null;
+      bookClassName: string | null;
+      bookImageUrl: string | null;
+    }
   | { success: false; message: string };
 
 export async function POST(
@@ -57,7 +65,14 @@ async function verifyAgainstDatabase(
     return { success: false, message: "이 단계의 후보 도서가 아니에요. 다시 확인해주세요." };
   }
 
-  return { success: true, bookId: matched.book.id, bookTitle: matched.book.title, bookAuthor: matched.book.author };
+  return {
+    success: true,
+    bookId: matched.book.id,
+    bookTitle: matched.book.title,
+    bookAuthor: matched.book.author,
+    bookClassName: matched.book.className,
+    bookImageUrl: getCoverUrl(matched.book.isbn13),
+  };
 }
 
 function verifyAgainstDemo(questId: string, stepId: string, normalizedIsbn: string): VerifyResult {
@@ -73,5 +88,12 @@ function verifyAgainstDemo(questId: string, stepId: string, normalizedIsbn: stri
     return { success: false, message: "이 단계의 후보 도서가 아니에요. 다시 확인해주세요." };
   }
 
-  return { success: true, bookId: matched.book.id, bookTitle: matched.book.title, bookAuthor: matched.book.author };
+  return {
+    success: true,
+    bookId: matched.book.id,
+    bookTitle: matched.book.title,
+    bookAuthor: matched.book.author,
+    bookClassName: null,
+    bookImageUrl: getCoverUrl(matched.book.isbn13),
+  };
 }

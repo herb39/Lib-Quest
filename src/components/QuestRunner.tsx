@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { QuestSummary } from "@/lib/types";
 import { BarcodeScanner } from "@/components/BarcodeScanner";
+import { DiscoveryCard3D } from "@/components/DiscoveryCard3D";
+import { recordDiscovery } from "@/lib/discovery-storage";
 
 type FoundBook = {
   id: string;
@@ -11,6 +13,7 @@ type FoundBook = {
   author: string | null;
   callNumber: string | null;
   shelfLocation: string | null;
+  coverUrl: string | null;
 };
 
 type SessionState = {
@@ -23,8 +26,31 @@ type SessionState = {
 type SuccessInfo = {
   title: string;
   author: string | null;
+  coverUrl: string | null;
   isLast: boolean;
+  isNew: boolean;
 };
+
+function BookThumb({ coverUrl }: { coverUrl: string | null }) {
+  const [error, setError] = useState(false);
+  return (
+    <div className="h-16 w-11 shrink-0 overflow-hidden rounded-md bg-stone-100">
+      {coverUrl && !error ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={coverUrl}
+          alt=""
+          onError={() => setError(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-lg text-stone-300" aria-hidden="true">
+          📕
+        </div>
+      )}
+    </div>
+  );
+}
 
 const EMPTY_SESSION: SessionState = { currentStep: 0, foundBooks: [], completedAt: null, started: false };
 
@@ -155,16 +181,29 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
           aria-live="polite"
           className="lq-animate-in w-full rounded-2xl border border-emerald-200 bg-emerald-50 p-6"
         >
-          <div
-            aria-hidden="true"
-            className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-700"
-          >
-            ✓
+          <div className="mx-auto h-40 w-28">
+            <DiscoveryCard3D
+              revealed
+              justRevealed
+              active
+              interactive={false}
+              size="active"
+              coverUrl={successInfo.coverUrl}
+              title={successInfo.title}
+            />
           </div>
-          <p className="mt-3 text-sm font-semibold text-emerald-700">새로운 책을 발견했어요!</p>
+          <p className="mt-3 text-sm font-semibold text-emerald-700">
+            {successInfo.isNew ? "새로운 책을 발견했어요!" : "다시 만난 책이에요"}
+          </p>
           <h2 className="mt-1 break-keep text-lg font-bold text-stone-900">{successInfo.title}</h2>
           {successInfo.author && <p className="mt-0.5 text-sm text-stone-500">{successInfo.author}</p>}
-          <p className="mt-2 text-xs font-semibold text-emerald-600">발견 완료</p>
+          {successInfo.isNew ? (
+            <span className="lq-xp-pop mt-2 inline-block whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+              +10 XP
+            </span>
+          ) : (
+            <p className="mt-2 text-xs font-semibold text-stone-400">도감에는 이미 기록되어 있어요</p>
+          )}
         </div>
 
         <button
@@ -229,13 +268,12 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
 
         <ul className="mt-6 flex flex-col gap-3">
           {foundBooks.map((book, i) => (
-            <li key={book.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+            <li key={book.id} className="rounded-xl border border-stone-200 bg-white p-3 shadow-sm">
               <div className="flex items-start gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
-                  {i + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="break-keep font-semibold text-stone-900">{book.title}</p>
+                <BookThumb coverUrl={book.coverUrl} />
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <p className="text-[11px] font-semibold text-emerald-700">{i + 1}번째 발견</p>
+                  <p className="mt-0.5 break-keep font-semibold text-stone-900">{book.title}</p>
                   {book.author && <p className="text-sm text-stone-500">{book.author}</p>}
                   {(book.callNumber || book.shelfLocation) && (
                     <p className="mt-1 break-keep text-xs text-stone-400">
@@ -340,15 +378,17 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       }
 
       // 발견한 책의 서가 위치/청구기호는 이미 화면에 공개되어 있던 후보 목록에서 찾는다.
-      // (verify API는 정답 후보 전체를 노출하지 않도록 title/author만 최소로 반환한다.)
+      // (verify API는 정답 후보 전체를 노출하지 않도록 title/author/표지 등 최소 정보만 반환한다.)
       const matchedCandidate = currentStep.candidates.find((c) => c.book.id === result.bookId);
       const isLastStep = session.currentStep === totalSteps - 1;
+      const coverUrl: string | null = result.bookImageUrl ?? null;
       const foundBook: FoundBook = {
         id: result.bookId,
         title: result.bookTitle,
         author: result.bookAuthor ?? null,
         callNumber: matchedCandidate?.book.callNumber ?? null,
         shelfLocation: matchedCandidate?.book.shelfLocation ?? null,
+        coverUrl,
       };
       const next: SessionState = {
         currentStep: isLastStep ? session.currentStep : session.currentStep + 1,
@@ -359,7 +399,20 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
       saveSession(quest.id, next);
       setFeedback(null);
       setSession(next);
-      setSuccessInfo({ title: result.bookTitle, author: result.bookAuthor ?? null, isLast: isLastStep });
+
+      // QuestSession(진행 상태)과 완전히 분리된 도감(Discovery store)에도 기록한다.
+      const { isNew } = recordDiscovery({
+        bookId: result.bookId,
+        libraryCode: quest.libraryCode,
+        questId: quest.id,
+        stepId: currentStep.id,
+        title: result.bookTitle,
+        author: result.bookAuthor ?? null,
+        coverUrl,
+        className: result.bookClassName ?? null,
+        discoveredAt: new Date().toISOString(),
+      });
+      setSuccessInfo({ title: result.bookTitle, author: result.bookAuthor ?? null, coverUrl, isLast: isLastStep, isNew });
     } catch {
       setFeedback({ message: "서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요.", isMismatch: false });
     } finally {
@@ -386,21 +439,27 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         <StepDots total={totalSteps} current={session.currentStep} />
       </div>
 
-      {foundBooks.length > 0 && (
-        <div className="mt-3">
-          <p className="text-center text-[11px] font-medium text-stone-400">지금까지의 발견</p>
-          <ul className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            {foundBooks.map((b) => (
-              <li key={b.id} className="flex max-w-[9.5rem] items-center gap-1 text-xs text-stone-400">
-                <span aria-hidden="true" className="text-emerald-600">
-                  ✓
-                </span>
-                <span className="truncate">{b.title}</span>
-              </li>
-            ))}
-          </ul>
+      <div className="mt-3">
+        <p className="text-center text-[11px] font-medium text-stone-400">이번 탐험의 발견</p>
+        <div className="mt-1.5 flex justify-center gap-2">
+          {quest.steps.map((s, i) => {
+            const found = foundBooks[i];
+            const isActive = i === session.currentStep;
+            return (
+              <div key={s.id} className="h-16 w-11 shrink-0">
+                <DiscoveryCard3D
+                  revealed={Boolean(found)}
+                  coverUrl={found?.coverUrl}
+                  title={found?.title}
+                  active={isActive}
+                  interactive={Boolean(found) || isActive}
+                  size="slot"
+                />
+              </div>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       <p className="mt-5 text-xs font-medium text-stone-400">{quest.libraryName}</p>
       <h1 className="mt-0.5 text-lg font-bold text-stone-900">{quest.title}</h1>
@@ -410,21 +469,16 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
         <h2 className="mt-1 text-base font-bold text-stone-900">{currentStep.title}</h2>
         <p className="mt-1.5 text-sm text-stone-600">{currentStep.description}</p>
 
-        <div className="mt-3 rounded-xl bg-stone-50 px-3 py-2.5">
+        <div className="mt-3 flex items-center gap-3 rounded-xl bg-stone-50 p-3">
+          <div className="h-28 w-20 shrink-0">
+            <DiscoveryCard3D revealed={false} active interactive size="active" />
+          </div>
           <p className="text-xs font-medium text-stone-500">
             이 서가에는 발견 가능한 책이{" "}
             <span className="font-semibold text-stone-700">{currentStep.candidates.length}권</span> 있어요.
+            <br />
+            책을 찾아 ISBN을 인증하면 정체가 밝혀져요.
           </p>
-          <div className="mt-2 flex gap-1.5" aria-hidden="true">
-            {currentStep.candidates.map((c) => (
-              <span
-                key={c.book.id}
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sm font-bold text-stone-300 shadow-sm"
-              >
-                ?
-              </span>
-            ))}
-          </div>
         </div>
 
         <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5">
