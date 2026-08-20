@@ -14,7 +14,6 @@ import {
 } from "@/lib/discovery-storage";
 import { loadInterestStore, toggleInterest, isInterested, type InterestStore } from "@/lib/interest-storage";
 import { saveFinalSelection, getFinalSelection, type FinalSelection } from "@/lib/final-selection-storage";
-import { getMissionContent } from "@/lib/mission-content";
 import { useRetryingCoverImage } from "@/lib/use-retrying-cover-image";
 
 type FoundBook = {
@@ -578,7 +577,7 @@ export function QuestRunner({ quest }: { quest: QuestSummary }) {
   // Step 안의 후보 4권은 항상 같은 서가(shelfLocation)/분류(className)를 공유하도록 큐레이션되어
   // 있으므로(청구기호만 후보마다 다름), 첫 번째 후보 값을 Step 전체를 대표하는 탐색 범위로 쓴다.
   const stepClue = currentStep.candidates[0]?.book;
-  const mission = getMissionContent(quest.libraryCode, quest.title, currentStep.order);
+  const mission = currentStep.mission;
 
   async function handleVerify() {
     if (!isbnInput.trim()) {

@@ -16,6 +16,11 @@ export type CandidateSummary = {
   isPrimary: boolean;
 };
 
+export type MissionContentSummary = {
+  missionTitle: string | null;
+  missionNarrative: string | null;
+};
+
 export type StepSummary = {
   id: string;
   order: number;
@@ -23,6 +28,8 @@ export type StepSummary = {
   description: string;
   hint: string | null;
   candidates: CandidateSummary[];
+  /** 운영자가 검수·공개한 Mission Content. 없거나 미공개면 null(QuestRunner가 generic fallback을 쓴다). */
+  mission: MissionContentSummary | null;
 };
 
 export type QuestSummary = {

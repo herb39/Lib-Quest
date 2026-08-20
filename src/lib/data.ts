@@ -117,7 +117,7 @@ export async function getQuestDetail(id: string): Promise<QuestSummary | undefin
       library: true,
       steps: {
         orderBy: { order: "asc" },
-        include: { candidates: { include: { book: true } } },
+        include: { candidates: { include: { book: true } }, missionContent: true },
       },
     },
   });
@@ -139,6 +139,15 @@ export async function getQuestDetail(id: string): Promise<QuestSummary | undefin
       title: step.title,
       description: step.description,
       hint: step.hint,
+      // 검수·공개된 Mission Content만 사용자에게 전달한다 — 미공개 초안은 QuestRunner에
+      // 절대 넘기지 않고 null로 보내(generic fallback 문구를 그대로 쓰게 한다).
+      mission:
+        step.missionContent?.isPublished
+          ? {
+              missionTitle: step.missionContent.missionTitle,
+              missionNarrative: step.missionContent.missionNarrative,
+            }
+          : null,
       candidates: step.candidates.map((c) => ({
         isPrimary: c.isPrimary,
         book: {

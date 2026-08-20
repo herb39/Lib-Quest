@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalizeIsbn, getDemoQuestById } from "@/lib/mock-data";
 import { getCoverUrl } from "@/lib/covers";
-import { getEditorial } from "@/lib/editorial";
 
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 
@@ -58,7 +57,7 @@ async function verifyAgainstDatabase(
 
   const step = await prisma.questStep.findFirst({
     where: { id: stepId, questId },
-    include: { candidates: { include: { book: { include: { library: true } } } } },
+    include: { candidates: { include: { book: { include: { editorial: true } } } } },
   });
 
   if (!step) {
@@ -70,7 +69,9 @@ async function verifyAgainstDatabase(
     return { success: false, message: "이 단계의 후보 도서가 아니에요. 다시 확인해주세요." };
   }
 
-  const editorial = getEditorial(matched.book.library.code, matched.book.isbn13);
+  // 운영자가 검수 완료 후 공개(isPublished=true)한 콘텐츠만 사용자에게 노출한다 — 초안/미공개
+  // 상태는 절대 verify 응답에 포함하지 않는다(BookEditorial이 source of truth, P1).
+  const editorial = matched.book.editorial?.isPublished ? matched.book.editorial : null;
 
   return {
     success: true,

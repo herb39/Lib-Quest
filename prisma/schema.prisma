@@ -36,6 +36,7 @@ model Book {
   source         String   // 데이터 출처 (예: "도서관정보나루 API")
 
   candidates QuestCandidate[]
+  editorial  BookEditorial?
 
   createdAt DateTime @default(now())
 
@@ -71,7 +72,8 @@ model QuestStep {
   description String
   hint        String?
 
-  candidates QuestCandidate[]
+  candidates     QuestCandidate[]
+  missionContent MissionContent?
 
   @@unique([questId, order])
 }
@@ -95,4 +97,47 @@ model QuestSession {
   completedAt DateTime?
 
   createdAt DateTime @default(now())
+}
+
+// 운영자가 /admin/review에서 검수·수정하는 운영 콘텐츠(P1). "검수 완료"와 "이용자 공개"는
+// 서로 다른 축이라 BookEditorial/MissionContent 둘 다 reviewStatus와 isPublished를 별도로 갖는다
+// — 검수는 끝났지만 아직 공개하지 않은 상태가 가능해야 하기 때문이다. isPublished=true는
+// reviewStatus=APPROVED일 때만 서버에서 허용한다(검증은 API 레이어에서 수행, DB 제약은 아님).
+enum ReviewStatus {
+  DRAFT
+  REVIEW_NEEDED
+  APPROVED
+}
+
+// 책 발견 후 보여주는 teaser/hook/question의 운영 콘텐츠. 기존 data/libraries/<libCode>/
+// book-editorial.json은 이 테이블의 초기 baseline(seed/import 원본이자 데모 초기화 기준)으로만
+// 쓰이고, 사용자 화면(verify API)은 이 테이블을 source of truth로 조회한다.
+model BookEditorial {
+  id           String       @id @default(cuid())
+  bookId       String       @unique
+  book         Book         @relation(fields: [bookId], references: [id])
+  hook         String?
+  teaser       String?
+  question     String?
+  reviewStatus ReviewStatus @default(DRAFT)
+  isPublished  Boolean      @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Step을 지시문이 아닌 탐험 서사로 감싸는 missionTitle/missionNarrative의 운영 콘텐츠.
+// data/libraries/<libCode>/quest-missions.json이 초기 baseline이다. BookEditorial과 동일한
+// 검수/공개 정책을 따른다.
+model MissionContent {
+  id               String       @id @default(cuid())
+  questStepId      String       @unique
+  questStep        QuestStep    @relation(fields: [questStepId], references: [id])
+  missionTitle     String?
+  missionNarrative String?
+  reviewStatus     ReviewStatus @default(DRAFT)
+  isPublished      Boolean      @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

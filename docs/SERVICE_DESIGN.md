@@ -50,28 +50,31 @@ Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → D
 도서관/사서 → Lib Quest → 이용자 → 행동 데이터 → 운영 개선
 ```
 
-- **B(도서관/사서)**: 실제 장서 데이터 → 후보 도서 구성 → 콘텐츠 검수 → Quest 운영 → 이용자 반응 분석
+- **B(도서관/사서)**: 실제 장서 데이터 → 후보 도서 구성 → Mission/Editorial 콘텐츠 작성·검수·공개("Lib Quest 운영 콘솔", DB 기반) → 이용자 반응 분석
 - **C(도서관 이용자)**: Quest 선택 → 실제 서가 이동 → 책 발견 → 콘텐츠 확인 → 읽고 싶어요 → 오늘의 한 권 선택
 - **다시 B**: 어떤 책이 발견되었는지 / 관심을 얻었는지 / 최종 선택되었는지를 분석해 다음 Quest 구성에 활용 — **이 analytics 집계·대시보드는 아직 구현되지 않은 roadmap이다** (9절 참고).
 
 ## 5. 운영자 workflow
 
 ```
-Data4Library 후보 → 콘텐츠 작성 → 운영자 검수 → 이용자 공개
+Data4Library 후보 → Quest 후보 구성 → Mission/Editorial 콘텐츠 작성 → 운영자 검수 → 이용자 공개 → 이용자 행동
 ```
 
-`/admin/review`의 각 후보 도서 행에 이 4단계 워크플로 표시가 상단에 노출된다.
+`/admin/review`("Lib Quest 운영 콘솔")가 이 흐름 전체를 하나의 화면에서 보여준다(P1).
 
 **현재 구현된 것:**
-- Data4Library 후보 확인 (표, ISBN 복사)
-- 콘텐츠(teaser/hook/question) **읽기 전용** 확인 — "콘텐츠 보기" expandable 패널, "검수된 콘텐츠"/"콘텐츠 없음" 상태만 표시
+- Data4Library 후보 확인 (도서관 → Quest → Step → 후보 도서 순 탐색, ISBN 복사)
+- **Mission Content(missionTitle/missionNarrative)와 Book Editorial(hook/teaser/question)을 실제 DB(BookEditorial/MissionContent 테이블)에 저장·수정** — `/api/admin/mission-contents/[stepId]`, `/api/admin/book-editorials/[bookId]` write API
+- **검수 상태(초안/검수 필요/검수 완료)와 공개 여부(공개/비공개)를 독립적으로 관리** — 검수 완료 상태에서만 공개 가능하도록 서버에서 검증하고, 이미 검수 완료된 콘텐츠의 본문을 수정하면 자동으로 재검수 필요 상태로 되돌아간다
+- **이용자 화면(verify API, Quest 상세)이 DB의 공개된 콘텐츠만 조회** — 운영자가 공개를 누른 즉시 다음 요청부터 이용자에게 반영된다
+- **도서관 단위 데모 데이터 초기화**(`/api/admin/demo-reset`) — 운영 콘텐츠만 JSON baseline으로 복원, 장서·Quest 구성은 그대로 유지
 
 **아직 구현되지 않은 것 (roadmap):**
-- 운영자가 화면에서 직접 hook/teaser/question을 수정하는 기능
-- 후보 도서 제외/교체
-- 검수 상태(초안/검수 완료)의 실제 저장·변경
+- 운영자 인증/역할 기반 권한(RBAC) — 현재는 URL을 아는 누구나 write 가능한 `DEMO ADMIN` 범위
+- 수정 이력(audit log) — 인증이 없어 "누가 수정했는지"를 의미 있게 기록할 수 없다. `updatedAt`만 남는다
+- 후보 도서 제외/교체, Quest 생성/삭제 — 장서·Quest 구성 자체는 계속 읽기 전용
 
-두 가지 모두 인증/권한 없이 접근 가능한 현재 `/admin/review` 구조에서 쓰기(write) 기능을 그대로 열면 누구나 production 데이터를 바꿀 수 있게 되므로, 이번 단계에서는 의도적으로 구현하지 않았다([OPERATOR_GUIDE.md](OPERATOR_GUIDE.md) 참고).
+인증/권한이 없는 현재 구조에서 장서·Quest 구성까지 쓰기를 열면 누구나 서비스의 근간 데이터를 바꿀 수 있으므로, write 범위를 의도적으로 **운영 콘텐츠(Mission/Editorial)로만 제한**했다([OPERATOR_GUIDE.md](OPERATOR_GUIDE.md) 참고).
 
 ## 6. AI 사용 원칙
 
@@ -120,15 +123,14 @@ Quest 노출 → 시작 → 책 발견 → 읽고 싶어요 → 오늘의 한 �
 - Mission Narrative(missionTitle/missionNarrative) — 원신흥도서관 3개 Quest × 3 Step 전체 작성, "탐험 단서" 카드(서가 위치/분류/후보 수), 다른 도서관·나머지 Quest는 generic fallback
 - `읽어보고 싶어요`(관심 표시), `/discoveries` 관심 필터
 - Quest 완료 후 **오늘의 한 권** 선택, "오늘의 탐험 완료" 결과 화면(선택한 책 Hero + 발견/관심/XP/칭호 요약, 중복 발견 시 문구 구분)
-- `/admin/review` 콘텐츠 검수 표시(읽기 전용), 운영 workflow 안내
+- `/admin/review` "Lib Quest 운영 콘솔" — Mission/Editorial 콘텐츠 편집, 검수 상태·공개 여부 관리, 도서관 단위 데모 데이터 초기화(DB 기반, P1)
 - `/data-source` 데이터 출처 안내
 - Header `처음부터` — 이 브라우저의 Lib Quest 사용자 진행 상태(Quest 세션 전체 + 발견 도감 + 관심 + 오늘의 한 권) 전체 초기화
 
 ## 9. Roadmap (아직 구현되지 않음)
 
-- 운영자가 `/admin/review`에서 hook/teaser/question을 직접 편집
-- 운영자 검수 상태(초안/검수완료)의 실제 persistence
-- 후보 도서 제외/교체(운영자 write 기능) — 인증/권한 체계 선행 필요
+- 운영자 인증/역할 기반 권한(RBAC), 수정 이력(audit log)
+- 후보 도서 제외/교체, Quest 생성/삭제(운영자 write 기능) — 인증/권한 체계 선행 필요
 - 익명 analytics 이벤트 수집·집계 대시보드 (이벤트 후보는 아래 참고)
 - 실제 도서관 대출/OPAC 시스템 연계
 - 갈마/가수원/노은도서관 108권 teaser/hook/question 작성

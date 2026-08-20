@@ -34,14 +34,17 @@ Data4Library (itemSrch)
 
 ## 주요 데이터 모델
 
-`prisma/schema.prisma` 기준. 다중 도서관 지원을 위해 스키마를 변경한 적은 없다 — `libraryId` 외래키가 애초에 모든 모델에 있어 도서관을 몇 개 붙이든 구조 변경이 필요 없다. 단일→다중 도서관 확장은 전부 애플리케이션 레이어(`src/lib/config.ts`의 `LIBRARIES` 목록, 각 조회 함수의 `libraryCode` 매개변수, 화면의 도서관 선택 UI)에서 처리한다.
+`prisma/schema.prisma` 기준. 다중 도서관 지원을 위해 스키마를 변경한 적은 없다 — `libraryId` 외래키가 애초에 모든 모델에 있어 도서관을 몇 개 붙이든 구조 변경이 필요 없다. 단일→다중 도서관 확장은 전부 애플리케이션 레이어(`src/lib/config.ts`의 `LIBRARIES` 목록, 각 조회 함수의 `libraryCode` 매개변수, 화면의 도서관 선택 UI)에서 처리한다. (P1에서 운영 콘텐츠를 위해 `BookEditorial`/`MissionContent` 두 모델을 추가한 것이 이 프로젝트의 첫 스키마 변경이다 — 아래 참고.)
 
 - `Library` — 도서관. `code`(libCode, unique), `name`. 현재 4곳이 등록되어 있다 (아래 "Data4Library 수집" 참고).
-- `Book` — 실제 수집 도서. `isbn13`, `title`, `author`, `classNo`/`className`(KDC), `callNumber`, `shelfLocation`, `registeredAt`, `source`. `@@unique([libraryId, isbn13])`라 같은 ISBN이 다른 도서관에 각각 존재할 수 있다.
+- `Book` — 실제 수집 도서. `isbn13`, `title`, `author`, `classNo`/`className`(KDC), `callNumber`, `shelfLocation`, `registeredAt`, `source`. `@@unique([libraryId, isbn13])`라 같은 ISBN이 다른 도서관에 각각 존재할 수 있다. `editorial BookEditorial?`(1:1, optional) 역참조를 갖는다.
 - `Quest` — 퀘스트. `title`, `description`, `theme`, `estimatedMinutes`, `difficulty`, `published`
-- `QuestStep` — 퀘스트 단계. `order`, `title`, `description`, `hint`
+- `QuestStep` — 퀘스트 단계. `order`, `title`, `description`, `hint`. `missionContent MissionContent?`(1:1, optional) 역참조를 갖는다.
 - `QuestCandidate` — 단계별 후보 도서 (`QuestStep` ↔ `Book`, `isPrimary`)
 - `QuestSession` — 스키마에는 존재하지만 **현재 애플리케이션 코드에서 실제로 사용하지 않는다.** 진행 상태는 클라이언트 `localStorage`로 관리한다 (아래 "ISBN 검증 구조 / 세션 정책" 참고). 추후 서버 세션이 필요해지면 확장할 자리로 남겨둔 것.
+- `BookEditorial`(P1) — `bookId`(1:1, unique) + `hook`/`teaser`/`question` + `reviewStatus`(`ReviewStatus`) + `isPublished`. 운영자가 `/admin/review`에서 편집하는 책 소개 콘텐츠의 DB source of truth.
+- `MissionContent`(P1) — `questStepId`(1:1, unique) + `missionTitle`/`missionNarrative` + `reviewStatus` + `isPublished`. 동일한 정책의 Step 안내 콘텐츠.
+- `ReviewStatus`(enum) — `DRAFT` | `REVIEW_NEEDED` | `APPROVED`. `isPublished`(Boolean)와 별도 축이다 — "검수 완료했지만 아직 비공개"가 가능해야 한다는 운영 요구사항 때문에 하나의 상태값으로 합치지 않았다.
 
 ## 프로젝트 구조
 
@@ -52,9 +55,12 @@ src/
     quests/page.tsx          # 퀘스트 목록 (DB 조회)
     quests/[id]/page.tsx     # 퀘스트 상세 (DB 조회) + QuestRunner
     quests/error.tsx         # /quests 세그먼트 공용 에러 화면
-    admin/review/page.tsx    # 운영자 검수 화면 (읽기 전용)
+    admin/review/page.tsx    # 운영 콘솔 페이지 (서버 컴포넌트: 데이터 조회만, 실제 화면은 AdminConsole)
     data-source/page.tsx     # 데이터 출처 화면
     api/quests/[questId]/steps/[stepId]/verify/route.ts  # ISBN 서버 판정 API
+    api/admin/book-editorials/[bookId]/route.ts   # Book Editorial 저장/검수/공개 PATCH
+    api/admin/mission-contents/[stepId]/route.ts  # Mission Content 저장/검수/공개 PATCH
+    api/admin/demo-reset/route.ts                 # 도서관 단위 운영 콘텐츠 baseline 복원 POST
   components/
     Header.tsx                 # 공통 헤더 (좌: Lib Quest 홈 링크, 우: /admin 이외 라우트에서 "처음부터" 전체 초기화 버튼)
     QuestRunner.tsx           # 퀘스트 진행 클라이언트 컴포넌트 (localStorage 세션 + 도감/관심/오늘의 한 권)
@@ -64,27 +70,30 @@ src/
     LibraryProgress.tsx        # 홈 도서관 카드의 "N/전체 발견" 진행도 (client)
     BarcodeScanner.tsx         # ZXing 기반 카메라 바코드 스캐너
     CopyIsbnButton.tsx          # /admin/review 전용 ISBN 클립보드 복사 버튼
+    AdminConsole.tsx            # 운영 콘솔 클라이언트 화면 (Quest/Step navigator + Mission/Editorial 편집기 + 데모 초기화, P1)
   lib/
     config.ts                 # 지원 도서관 목록(LIBRARIES) + 기본 도서관(DEFAULT_LIBRARY_CODE)
     data.ts                   # /(홈), /quests, /quests/[id]용 DB 조회 (DB 없으면 데모 데이터)
-    admin-data.ts              # /admin/review, /data-source용 DB 조회 (데모 대체 없음)
+    admin-data.ts              # /admin/review(운영 콘솔), /data-source용 DB 조회 (데모 대체 없음)
+    admin-content.ts            # /api/admin/* write route 공용 validation/정책(canPublish 등)
+    content-baseline.ts          # book-editorial.json/quest-missions.json baseline reader (import·reset 스크립트 전용)
     mock-data.ts               # 로컬 개발 전용 데모 데이터 (실데이터 아님)
     prisma.ts                  # Prisma Client 싱글턴 (adapter-pg)
     types.ts                   # 화면용 공용 타입
     covers.ts / cover-urls.json     # ISBN → 표지 이미지 URL 정적 조회 (raw snapshot 기반)
-    editorial.ts               # ISBN → teaser/hook/question 정적 조회 (book-editorial.json 기반)
-    mission-content.ts          # (도서관, 퀘스트 제목, step order) → missionTitle/missionNarrative 정적 조회 (quest-missions.json 기반)
     discovery-storage.ts        # 발견 도감 localStorage (QuestSession과 분리)
     interest-storage.ts         # "읽어보고 싶어요" 관심 표시 localStorage (도감과 별도 개념)
     final-selection-storage.ts   # Quest별 "오늘의 한 권" 선택 localStorage
     reset-user-state.ts          # Header "처음부터" 전용 — Lib Quest 소유 localStorage key만 선택 삭제
 prisma/
   schema.prisma
-  migrations/                 # 라이브 DB 연결 없이 `migrate diff`로 생성한 초기 마이그레이션 포함
+  migrations/                 # 라이브 DB 연결 없이 `migrate diff`로 생성한 마이그레이션들(shadow DB 불필요)
   seed.ts                     # data/libraries/* 폴더를 전부 순회하며 시드
 scripts/
   lookup-library.ts           # Data4Library libSrch로 실제 libCode 조회
   fetch-library-books.ts      # Data4Library itemSrch로 실제 도서 수집 (data/libraries/<libCode>/에 저장)
+  import-editorial-content.ts # book-editorial.json/quest-missions.json → BookEditorial/MissionContent DB 최초 시드(idempotent)
+  update-quest-descriptions.ts # Quest.description(퀘스트 목록 teaser)만 JSON 기준으로 갱신하는 일회성 스크립트
 data/
   README.md                   # 수집 절차 상세, 도서관별 수집 이력, 검토 후 제외한 도서관 목록
   snapshots/                  # itemSrch 원본 응답 (파일명에 libCode 포함, authKey 미포함)
@@ -176,22 +185,26 @@ Data4Library `itemSrch` 원본 응답에는 `bookImageURL` 필드로 실제 표�
 - **fallback 독립성**: `useRetryingCoverImage`는 `DiscoveryCard3D`/`BookThumb` 인스턴스마다 독립된 local state(useState/useRef)라 한 카드의 실패가 다른 카드에 전혀 영향을 주지 않는다(`/discoveries` grid 한 장 실패가 grid 전체를 깨뜨리지 않음, Discovery Hero/BookInfo/Final Selection도 표지 실패와 무관하게 제목/저자/hook/관심/CTA 등 텍스트 콘텐츠와 3D 책의 spine/pages/back 레이어는 항상 정상 렌더링된다).
 - **외부 CDN 직접 의존 유지 결정**: 이번 조사에서 host 불안정성의 증거를 찾지 못했으므로, 서버 proxy(`/api/book-cover`)나 142개 이미지 자체 재호스팅 없이 **외부 URL 직접 사용 + retry/fallback**(대안 A) 그대로 유지한다. proxy는 Vercel bandwidth·구현 복잡성이 늘고, 자체 재호스팅은 저작권/재배포 근거가 불명확한 이미지를 복제하는 리스크가 있다 — 둘 다 지금 단계에서 정당화할 증거가 없다. referrerPolicy/crossOrigin도 실제 차단이 관찰되지 않아 추가하지 않았다(불필요한 속성 추가가 오히려 기존에 잘 보이던 이미지를 깨뜨릴 수 있음). Service Worker/PWA 캐시는 이 프로젝트에 아예 없다(`manifest.json`은 아이콘/메타데이터 전용, `navigator.serviceWorker.register` 호출 없음).
 
-### 편집 콘텐츠 (`src/lib/editorial.ts`, `data/libraries/<libCode>/book-editorial.json`)
+### Book Editorial / Mission Content — DB가 source of truth (P1)
 
-책 발견 직후 보여주는 teaser(짧은 소개)/hook(끌리는 이유 한 줄)/question(읽기 전 질문)은 Lib Quest가 실제 제목·부제·저자·KDC 분류만 근거로 직접 작성한 정적 콘텐츠다. Data4Library API는 줄거리/키워드 필드를 제공하지 않으므로(`class_no`/`class_nm`/`bookname`/`authors` 등만 존재), 소설류는 구체적 줄거리를 상상하지 않고 장르·작가 소개 수준으로 제한했다. `getEditorial(libraryCode, isbn13)`이 해당 도서관 JSON을 찾아 반환하며, 없으면 `null`(빈 콘텐츠를 억지로 채우지 않음). 현재 대전 원신흥도서관 36권만 작성되어 있다(`data/README.md` 참고).
+책 발견 직후 보여주는 teaser(짧은 소개)/hook(끌리는 이유 한 줄)/question(읽기 전 질문), 그리고 Step 진입 시 보여주는 missionTitle/missionNarrative는 **Lib Quest가 실제 제목·부제·저자·KDC 분류만 근거로 직접 작성한 정적 콘텐츠**다(Data4Library는 줄거리/키워드 필드를 제공하지 않으므로 소설류는 구체적 줄거리를 상상하지 않고 장르·작가 소개 수준으로 제한). P1 이전에는 이 콘텐츠가 `data/libraries/<libCode>/book-editorial.json`, `quest-missions.json` 파일 자체가 런타임 조회 대상이었지만, P1부터는 **`BookEditorial`/`MissionContent` Prisma 모델이 runtime source of truth**이고, JSON은 초기 시드값/데모 복원 기준(baseline)으로만 남는다.
 
-### Mission Narrative (`src/lib/mission-content.ts`, `data/libraries/<libCode>/quest-missions.json`)
+**Mission Content(발견 이전)와 Book Editorial(발견 이후)은 서로 다른 콘텐츠다:**
 
-Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 지시문이 아니라, 앞 Step에서 자연스럽게 이어지는 짧은 탐험 서사(`missionTitle`/`missionNarrative`)로 감싼다. **Mission Editorial(발견 이전)과 Book Editorial(발견 이후)은 서로 다른 콘텐츠다:**
-
-| | Mission Editorial(`mission-content.ts`) | Book Editorial(`editorial.ts`) |
+| | Mission Content | Book Editorial |
 | --- | --- | --- |
 | 언제 보여주는가 | 책을 찾기 전(Step 진입 시) | 책을 발견한 후(verify 성공 시) |
 | 무엇에 대한 콘텐츠인가 | Quest/Step 자체의 분위기·서사 | 특정 책 한 권의 소개 |
 | 정답 정보인가 | 아니다 — 공개해도 안전 | 그렇다 — 인증 전 redaction 대상 |
-| 연결 키 | (도서관 코드, 퀘스트 제목, step order) | ISBN |
+| DB 모델 | `MissionContent`(`questStepId` 1:1) | `BookEditorial`(`bookId` 1:1) |
 
-실제 행동 지시("무엇을 찾아야 하는지")는 이 파일이 다루지 않고 항상 실제 `QuestStep.description`을 그대로 보여준다 — narrative는 그 앞을 감싸는 분위기일 뿐이다. quest/step identity는 재시드하면 바뀌는 cuid 대신 (도서관 코드, 퀘스트 제목, step order) 조합으로 연결한다(DEMO_GUIDE가 퀘스트를 항상 제목으로 안내하는 것과 같은 이유). 콘텐츠가 없는 Quest/Step은 generic fallback("새로운 탐사지역" / "이번에는 새로운 책 한 권을 발견해볼까요?")으로 대체되어 깨지지 않는다. 현재 대전 원신흥도서관의 3개 Quest × 3 Step(9개) 전체가 작성되어 있고, 그 외 도서관/Quest는 fallback을 사용한다.
+실제 행동 지시("무엇을 찾아야 하는지")는 이 모델들이 다루지 않고 항상 실제 `QuestStep.description`을 그대로 보여준다 — Mission Content는 그 앞을 감싸는 분위기일 뿐이다.
+
+**검수 상태와 공개 여부는 서로 다른 축**이다(`ReviewStatus` enum: `DRAFT`/`REVIEW_NEEDED`/`APPROVED`, 그리고 별도 `isPublished: Boolean`). "검수는 끝났지만 아직 공개하지 않음"이 가능해야 하기 때문이다. 서버는 `isPublished=true`를 `reviewStatus=APPROVED`일 때만 허용한다(`src/lib/admin-content.ts`의 `canPublish`).
+
+**사용자 화면 lookup**: `getQuestDetail()`(`src/lib/data.ts`)이 각 Step에 대해 `missionContent`가 `isPublished`일 때만 `mission` 필드로 채워 `QuestRunner`에 전달하고(미공개/없음이면 `null` → QuestRunner의 generic fallback 문구), verify API(`/api/quests/[questId]/steps/[stepId]/verify`)는 매칭된 책의 `editorial`이 `isPublished`일 때만 hook/teaser/question을 응답에 넣는다. **미공개(DRAFT/REVIEW_NEEDED) 콘텐츠가 사용자 화면에 노출되는 경로는 없다** — `/admin/review`만 검수 목적으로 모든 상태를 그대로 보여준다.
+
+**JSON baseline의 역할**: `data/libraries/<libCode>/book-editorial.json`, `quest-missions.json`은 이제 두 곳에서만 읽힌다(`src/lib/content-baseline.ts`) — (1) `scripts/import-editorial-content.ts`: 최초 1회 DB에 넣는 시드, 이미 row가 있으면 건너뛰는 idempotent 스크립트. (2) `/api/admin/demo-reset`: 운영자가 수정한 내용을 이 baseline으로 되돌리는 초기화. 현재 대전 원신흥도서관만 baseline이 있다(book editorial 36건, mission content 9건) — import 후 DB에 정확히 그 수만큼 `reviewStatus=APPROVED, isPublished=true`로 들어간다.
 
 ### 발견 도감 / 관심 / 오늘의 한 권 (localStorage, 서로 분리된 3개 저장소)
 
@@ -295,6 +308,30 @@ npm run db:seed             # 실데이터만 시드
 - 같은 도서관에 같은 title의 Quest가 이미 있으면 다시 만들지 않고 건너뛴다 — 여러 번 실행하거나 도서관을 하나씩 추가해도 기존 Quest가 중복 생성되지 않는다.
 - **production DB에 대해 `migrate reset`을 실행하거나 mock/생성 데이터를 시드하는 스크립트는 두지 않았다.** 마이그레이션은 항상 `migrate deploy`(기존 마이그레이션 파일 적용)만 사용하며, 기존 데이터를 삭제하는 로직은 없다.
 - **`Quest.description`(퀘스트 목록 카드의 teaser 문구)의 source of truth는 `data/libraries/<libCode>/quest-curation.json`의 `quests[].description`이다.** 단, 위 규칙대로 seed는 이미 존재하는 Quest를 건너뛰므로, **JSON만 고쳐서 재배포해도 이미 시드된 production 값은 바뀌지 않는다.** 기존 row의 description만 갱신해야 할 때는 `npx tsx scripts/update-quest-descriptions.ts`를 실행한다 — (libraryId, title) 기준으로 `description` 필드만 `updateMany`하며 Step/Candidate/Book 등 다른 관계는 전혀 건드리지 않는 일회성 스크립트다.
+
+### Migration 생성 방식 (shadow DB 없이)
+
+이 프로젝트는 Neon 무료 티어 하나만 쓰고 별도 shadow database가 없어서, `prisma migrate dev`(shadow DB 필요) 대신 **라이브 DB를 직접 `--from-config-datasource`로 diff**해서 마이그레이션 SQL을 생성한다(Prisma 7 CLI 기준, 예전 `--from-url` 플래그는 제거됨):
+
+```bash
+npx prisma migrate diff \
+  --from-config-datasource \
+  --to-schema prisma/schema.prisma \
+  --script > prisma/migrations/<timestamp>_설명/migration.sql
+npx prisma migrate deploy   # 생성된 마이그레이션을 실제로 적용
+```
+
+생성된 SQL은 반드시 적용 전에 직접 읽고 **additive-only인지(컬럼/테이블 삭제나 타입 변경이 없는지)** 확인한다. P1에서 추가한 `20260820120000_add_editorial_mission_content` 마이그레이션은 `CREATE TYPE`(enum) + `CREATE TABLE` × 2 + `CREATE UNIQUE INDEX` × 2 + `ADD FOREIGN KEY` × 2뿐이며, 기존 테이블에 대한 `ALTER`/`DROP`이 전혀 없다 — 기존 데이터에 영향을 주지 않는 순수 추가 변경이다.
+
+### 운영 콘텐츠 write API (`/api/admin/*`, P1)
+
+- `PATCH /api/admin/book-editorials/[bookId]`, `PATCH /api/admin/mission-contents/[stepId]` — 각각 `hook/teaser/question`, `missionTitle/missionNarrative`와 `reviewStatus`/`isPublished`를 받는다. **클라이언트 payload를 그대로 Prisma에 넘기지 않고**([src/lib/admin-content.ts](../src/lib/admin-content.ts)) 필드별로 화이트리스트 후 sanitize(trim, 빈 문자열→null, 길이 제한 — hook 160/teaser 500/question 240/missionTitle 60/missionNarrative 300자, 기존 baseline 콘텐츠의 최장 길이보다 넉넉히 크게 잡아 기존 데이터를 깨뜨리지 않는다)한다.
+- **공개 조건**: `isPublished=true`는 (요청에 포함된 값이든 기존 저장값이든) 최종 `reviewStatus`가 `APPROVED`일 때만 허용한다. 아니면 400과 함께 "검수 완료 후 공개할 수 있어요."를 반환한다.
+- **본문 수정 시 자동 재검수**: 요청이 텍스트 필드만 담고 있고(`reviewStatus`/`isPublished`를 명시적으로 보내지 않음) 기존 상태가 `APPROVED`였다면, 서버가 자동으로 `REVIEW_NEEDED` + `isPublished=false`로 되돌린다. 반대로 요청이 `reviewStatus`/`isPublished`를 명시하면 그 값이 우선한다 — Admin UI는 저장/검수 필요/검수 완료/공개/비공개 5개 버튼이 각각 다른 조합의 필드를 보내는 방식으로 이 정책을 구현한다(모든 버튼이 현재 textarea 값을 함께 보내 미저장 입력을 잃지 않는다).
+- **create-on-first-save**: `bookId`/`questStepId`에 해당하는 row가 없어도 `upsert`로 그 자리에서 새로 만든다 — 콘텐츠가 아직 없는 책/Step도 운영자가 바로 입력해 저장할 수 있다.
+- **에러 처리**: Prisma 에러 원문은 클라이언트에 노출하지 않는다. 서버는 `console.error`로 상세를 남기고, 클라이언트에는 "저장하지 못했어요. 다시 시도해주세요." 같은 안전한 메시지만 반환한다.
+- `POST /api/admin/demo-reset` — body의 `libraryCode`를 `src/lib/config.ts`의 `LIBRARIES` 목록으로만 whitelist한다(클라이언트가 임의 문자열/경로를 넘기게 하지 않음). 이 도서관의 `BookEditorial`/`MissionContent`를 **Prisma `$transaction` 안에서 전부 delete 후 JSON baseline으로 재생성**한다(일부만 반영되는 상태 방지). `Library`/`Book`/`Quest`/`QuestStep`/`QuestCandidate`는 절대 건드리지 않는다. `GET` 핸들러를 export하지 않아 실수로 GET 요청이 와도 자동 405가 된다.
+- 이 write API들에는 **인증이 없다**(공모전 데모 범위). 대신 write 가능한 대상을 운영 콘텐츠 두 모델로만 제한하고, delete는 오직 `demo-reset`의 도서관 단위 delete+recreate 트랜잭션 하나뿐이며 그 대상도 같은 두 모델뿐이다 — Book/Quest/QuestStep/QuestCandidate에 대한 write 경로는 어떤 API에도 없다.
 
 ## Mock 정책
 

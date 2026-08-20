@@ -41,6 +41,7 @@ export const DEMO_QUESTS: QuestSummary[] = [
         title: "첫 번째 서가로",
         description: "종합자료실 2층, 청구기호 813.7 서가에서 한강 작가의 책을 찾아보세요.",
         hint: "표지에 채식이나 흰색 이미지가 있을 수 있어요.",
+        mission: null,
         candidates: [
           { book: 채식주의자, isPrimary: true },
           { book: 소년이온다, isPrimary: false },
@@ -53,6 +54,7 @@ export const DEMO_QUESTS: QuestSummary[] = [
         title: "베스트셀러를 찾아서",
         description: "같은 서가에서 100만 부 이상 팔린 한국 소설을 찾아보세요.",
         hint: "제목에 '82년생'이 들어가는 책이에요.",
+        mission: null,
         candidates: [
           { book: 김지영, isPrimary: true },
           { book: 달러구트, isPrimary: false },
@@ -64,6 +66,7 @@ export const DEMO_QUESTS: QuestSummary[] = [
         title: "SF 감성 소설",
         description: "한국 SF 소설로 유명한 김초엽 작가의 책을 찾아 완료하세요.",
         hint: "온실이나 빛의 속도 같은 단어가 제목에 있어요.",
+        mission: null,
         candidates: [
           { book: 온실, isPrimary: true },
           { book: 빛의속도, isPrimary: false },
