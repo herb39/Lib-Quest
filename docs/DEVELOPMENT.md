@@ -220,7 +220,7 @@ lq-book-scene      perspective(1100px)만 담당
 - **hidden ↔ revealed**: `revealed` prop으로 표지 레이어 크로스페이드. `justRevealed`가 true면 마운트 후 짧은 지연을 두고 `lq-book-reveal`에 `lq-book-materialize` 키프레임(약 0.9초 — 뒤로 살짝 물러났다 떠오르며 정착, `translateZ`+`scale`만 사용)을 재생하고 그 순간 표지가 크로스페이드된다. 이미 발견된 슬롯/도감 책은 애니메이션 없이 바로 최종 상태로 그린다.
 - **ground shadow**: 책 아래 별도 `lq-book-shadow` 엘리먼트(정적 `radial-gradient` + `filter: blur`)가 materialize와 같은 타이밍에 opacity/scale만 애니메이션한다(blur 값 자체는 애니메이션하지 않음 — 매 프레임 blur 재계산은 성능 비용이 크다).
 - **PC pointer tilt**: `pointermove`(mouse만) 기준 카드 중심 대비 오프셋을 계산해 `requestAnimationFrame`으로 스로틀링한 뒤 `lq-book-interact` ref의 `style.transform`을 직접 갱신한다(React state로 매 프레임 리렌더하지 않음). 이 tilt는 `lq-book-pose`의 고정 자세와는 별도 레이어라 서로 곱해져(중첩 3D transform) 자연스럽게 더해진다.
-- **모바일 touch tilt**: `pointermove`를 추적하지 않고 `pointerdown` 시점 위치로 한 번만 기울인 뒤 `pointerup/cancel`에서 원위치한다. `touch-action: pan-y`를 명시해 세로 스크롤을 절대 막지 않는다.
+- **모바일 touch tilt**: `pointerdown` 시점 위치로 즉시 한 번 기울인 뒤, 이후 `pointermove`를 계속 추적해 손가락 위치를 따라간다(각도 범위는 데스크톱보다 좁은 rotateX ±3deg / rotateY ±4deg). `pointerup/cancel`에서 원위치. `preventDefault()`/`setPointerCapture()`는 사용하지 않고 `touch-action: pan-y`만 유지한다 — 제스처가 세로 스크롤로 판단되면 브라우저가 자체적으로 `pointercancel`을 보내 추적이 멈추므로 스크롤을 절대 가로막지 않는다. (이전 버전은 `pointerdown` 시점에만 한 번 기울이고 `pointermove`는 추적하지 않았는데, 실기기에서 "손가락을 움직여도 책이 반응하지 않는다"는 문제로 이어져 continuous tracking으로 교체했다.)
 - **idle motion**: 현재 탐색 중인 hidden 책(`active && !revealed`)에만 `lq-book-reveal` 레이어에 은은한 CSS keyframe(translateY/rotate) 적용, 상호작용 중에는 클래스 자체를 떼어 정지한다.
 - **reduced motion**: `prefers-reduced-motion` 감지 시 idle/materialize/shadow 애니메이션과 tilt transition을 전부 제거하고, 표지 크로스페이드(0.35s opacity transition)만으로 상태 전환을 표현한다.
 - **성능**: `will-change: transform`은 상호작용 중이거나 idle 대상인 책에만 조건부로 붙인다(`lq-book-will-change` 클래스) — 도감 grid의 정적인 책 수십 장에 항상 걸어두지 않는다. 애니메이션은 `transform`/`opacity`만 사용(매 프레임 width/height/blur 재계산 없음).
@@ -266,6 +266,7 @@ npm run db:seed             # 실데이터만 시드
 - 큐레이션(`quest-curation.json`)이 같은 폴더의 `collected-books.json`에 없는 ISBN을 참조하거나, 한 단계의 candidate가 3개 미만이거나, 같은 단계에 중복 ISBN이 있으면 seed가 즉시 실패한다.
 - 같은 도서관에 같은 title의 Quest가 이미 있으면 다시 만들지 않고 건너뛴다 — 여러 번 실행하거나 도서관을 하나씩 추가해도 기존 Quest가 중복 생성되지 않는다.
 - **production DB에 대해 `migrate reset`을 실행하거나 mock/생성 데이터를 시드하는 스크립트는 두지 않았다.** 마이그레이션은 항상 `migrate deploy`(기존 마이그레이션 파일 적용)만 사용하며, 기존 데이터를 삭제하는 로직은 없다.
+- **`Quest.description`(퀘스트 목록 카드의 teaser 문구)의 source of truth는 `data/libraries/<libCode>/quest-curation.json`의 `quests[].description`이다.** 단, 위 규칙대로 seed는 이미 존재하는 Quest를 건너뛰므로, **JSON만 고쳐서 재배포해도 이미 시드된 production 값은 바뀌지 않는다.** 기존 row의 description만 갱신해야 할 때는 `npx tsx scripts/update-quest-descriptions.ts`를 실행한다 — (libraryId, title) 기준으로 `description` 필드만 `updateMany`하며 Step/Candidate/Book 등 다른 관계는 전혀 건드리지 않는 일회성 스크립트다.
 
 ## Mock 정책
 

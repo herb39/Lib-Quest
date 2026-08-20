@@ -2,7 +2,7 @@
   "quests": [
     {
       "title": "익숙한 문학, 낯선 이야기",
-      "description": "도서전자실 문학 서가를 오가며 한국 소설, 영미 소설, 그리고 소설이 아닌 낯선 글까지 만나보는 퀘스트입니다.",
+      "description": "소설로 시작해서, 마지막엔 소설이 아닌 낯선 문장까지 만나봐요.",
       "theme": "문학",
       "estimatedMinutes": 15,
       "difficulty": "easy",
@@ -48,7 +48,7 @@
     },
     {
       "title": "서로 다른 서가로 떠나는 지식 여행",
-      "description": "사회과학, 자연과학, 예술 서가를 차례로 옮겨 다니며 전혀 다른 세 권을 찾는 퀘스트입니다.",
+      "description": "한 걸음 옮길 때마다 전혀 다른 주제가 기다리고 있어요.",
       "theme": "분야탐색",
       "estimatedMinutes": 20,
       "difficulty": "normal",
@@ -94,7 +94,7 @@
     },
     {
       "title": "짧은 시간, 세 권의 발견",
-      "description": "철학, 역사, 실용과학 서가를 빠르게 오가며 짧은 시간 안에 세 권을 발견하는 퀘스트입니다.",
+      "description": "잠깐이면 충분해요. 오늘 그냥 지나쳤을 세 권을 만나보세요.",
       "theme": "속전속결",
       "estimatedMinutes": 10,
       "difficulty": "hard",

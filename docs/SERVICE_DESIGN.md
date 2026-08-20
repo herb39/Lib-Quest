@@ -31,6 +31,7 @@ Quest 선택 → Mission Narrative(탐험 동기) → 실제 서가 탐험 → D
 
 게임화는 독서를 대신하는 목적이 아니라 **사용자가 낯선 장서에 접근하게 만드는 동기 장치**다.
 
+- **Quest teaser(`Quest.description`, 퀘스트 목록 카드)** — 클릭 **이전**의 호기심. "이 퀘스트가 무엇을 하는지" 설명하는 문구가 아니라 눌러보고 싶게 만드는 1~2줄 teaser다. Mission Narrative(탐험 동기)·Book Editorial(독서 호기심)과 역할이 겹치지 않도록 구분한다.
 - **Mission Narrative** — 발견 **이전**의 기대감. Step 안내를 "일본소설을 찾아보세요 / 찾아갈 곳: 종합자료실" 같은 업무 지시문이 아니라, 앞선 Step에서 자연스럽게 이어지는 짧은 탐험 서사(missionTitle/missionNarrative)로 감싼다. 단, 실제로 무엇을 찾아야 하는지는 절대 숨기지 않는다 — narrative 아래 "이번 미션"에 실제 Step 조건을 그대로 명시한다([mission-content.ts](../src/lib/mission-content.ts)).
 - **탐험 단서** — 위치 정보를 목적이 아니라 단서로 취급한다. 서가 위치/분류(className)는 한 Step의 후보 전체에 공통되므로 안전하게 보여주고, 후보마다 다른 정확한 청구기호는 정답을 사실상 특정할 수 있어 인증 전에는 보여주지 않는다([DEVELOPMENT.md](DEVELOPMENT.md)의 "인증 전 데이터 redaction" 참고).
 - **3D Book Discovery** — 발견 **순간**의 보상. ISBN 인증 성공 직후에는 큰 책 오브젝트와 제목/저자/XP만 보여주고, hook/teaser/question 같은 정보는 절대 함께 띄우지 않는다 — 발견의 임팩트가 정보에 묻히지 않도록 화면 자체를 분리했다.

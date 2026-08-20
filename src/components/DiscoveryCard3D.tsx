@@ -33,8 +33,10 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
-const TILT_MAX_Y = 6; // rotateY deg, pointer 추가분
-const TILT_MAX_X = 4; // rotateX deg, pointer 추가분
+const TILT_MAX_Y = 6; // 데스크톱 rotateY deg, pointer 추가분
+const TILT_MAX_X = 4; // 데스크톱 rotateX deg, pointer 추가분
+const TOUCH_TILT_MAX_Y = 4; // 모바일 rotateY deg — 데스크톱보다 좁게, 화면이 흔들리는 느낌 방지
+const TOUCH_TILT_MAX_X = 3; // 모바일 rotateX deg
 
 /**
  * 책 한 권의 "숨김 ↔ 발견" 상태를 표현하는 순수 CSS 3D 오브젝트.
@@ -95,20 +97,30 @@ export function DiscoveryCard3D({
     setInteracting(true);
   }
 
-  function handlePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
-    if (!interactive || reducedMotion || e.pointerType !== "mouse") return;
-    const rect = rectRef.current;
-    if (!rect) return;
-    const clientX = e.clientX;
-    const clientY = e.clientY;
+  function applyTilt(clientX: number, clientY: number, rect: DOMRect, maxX: number, maxY: number, scale: number) {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       const px = (clientX - rect.left) / rect.width;
       const py = (clientY - rect.top) / rect.height;
-      const rotateY = (px - 0.5) * TILT_MAX_Y * 2;
-      const rotateX = -(py - 0.5) * TILT_MAX_X * 2;
-      setTilt(rotateX, rotateY, 1.02);
+      const rotateY = (px - 0.5) * maxY * 2;
+      const rotateX = -(py - 0.5) * maxX * 2;
+      setTilt(rotateX, rotateY, scale);
     });
+  }
+
+  function handlePointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!interactive || reducedMotion) return;
+    const rect = rectRef.current;
+    if (!rect) return;
+    if (e.pointerType === "mouse") {
+      applyTilt(e.clientX, e.clientY, rect, TILT_MAX_X, TILT_MAX_Y, 1.02);
+      return;
+    }
+    // 모바일: pointerdown에서 저장해둔 rect 기준으로 손가락 위치를 계속 따라간다.
+    // preventDefault를 호출하지 않고 touch-action: pan-y를 유지하므로, 제스처가 세로
+    // 스크롤로 판단되면 브라우저가 자체적으로 pointercancel을 보내 추적이 자연스럽게 멈춘다.
+    if (!interacting) return;
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, 1.015);
   }
 
   function handlePointerLeave(e: ReactPointerEvent<HTMLDivElement>) {
@@ -118,22 +130,24 @@ export function DiscoveryCard3D({
     }
   }
 
-  // 모바일: 세로 스크롤을 막지 않기 위해 pointermove는 추적하지 않고,
-  // 누른 위치 기준 한 번만 살짝 기울인 뒤 손을 떼면 원위치로 되돌린다.
+  // 모바일: 누른 위치 기준으로 즉시 한 번 기울이고, 이후 pointermove로 계속 따라간다.
+  // 세로 스크롤을 막지 않기 위해 setPointerCapture/preventDefault는 사용하지 않는다 —
+  // Hero Book이 화면의 상당 부분을 차지해 제스처 도중 손가락이 영역을 벗어나는 경우가
+  // 드물어, capture 없이도 실사용에서 충분히 자연스럽게 따라온다.
   function handlePointerDown(e: ReactPointerEvent<HTMLDivElement>) {
     if (!interactive || reducedMotion || e.pointerType === "mouse") return;
     const rect = interactRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
+    rectRef.current = rect;
     setInteracting(true);
-    setTilt(-(py - 0.5) * TILT_MAX_X, (px - 0.5) * TILT_MAX_Y, 1.015);
+    applyTilt(e.clientX, e.clientY, rect, TOUCH_TILT_MAX_X, TOUCH_TILT_MAX_Y, 1.015);
   }
 
   function handlePointerUpOrCancel(e: ReactPointerEvent<HTMLDivElement>) {
     if (e.pointerType === "mouse") return;
     setInteracting(false);
     resetTilt();
+    rectRef.current = null;
   }
 
   // justRevealed인 책은 마운트 시 숨김 상태로 그린 뒤 다음 tick에 revealed로 전환해
