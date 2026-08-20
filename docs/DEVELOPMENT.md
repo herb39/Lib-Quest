@@ -222,10 +222,13 @@ lq-book-scene      perspective(1100px)만 담당
       ├ lq-book-back    translateZ(-depth)      뒤표지 — generic neutral gradient
       ├ lq-book-pages   translateZ(-depth*0.45) 페이지 단면 — ivory/warm-white repeating-gradient
       ├ lq-book-spine   translateZ(-depth*0.75) 책등 — 어두운 gradient (실제 책등 정보 없음, 두께감 목적)
-      └ lq-book-cover   translateZ(0)           표지 — 가장 큰 면, cover-layer 2장을 opacity crossfade
+      └ lq-book-cover   translateZ(0)           표지 — 가장 큰 면
+        └ lq-book-cover-clip (transform 없음)     hidden/revealed cover-layer 2장을 opacity crossfade → img
 ```
 
-`--lq-depth`는 size별 CSS 변수(hero 22px / active 12px / grid 8px / slot 3px)로 책 두께를 조절한다. 표지(`lq-book-cover`) 안에는 hidden(`?` + "숨겨진 책") / revealed(실제 이미지 또는 fallback) 두 레이어가 겹쳐 있고 `opacity` transition으로 크로스페이드한다 — flip처럼 180도 회전시키지 않는다(뒤표지/책등이 실제 정보 없이 두께 표현용이라 회전시켜도 얻을 게 없고, "숨겨진 책 → 발견된 책"은 회전보다 "눈앞에 나타나는" materialize 쪽이 더 자연스럽다).
+`--lq-depth`는 size별 CSS 변수(hero 22px / active 12px / grid 8px / slot 3px)로 책 두께를 조절한다. 표지 안에는 hidden(`?` + "숨겨진 책") / revealed(실제 이미지 또는 fallback) 두 레이어가 겹쳐 있고 `opacity` transition으로 크로스페이드한다 — flip처럼 180도 회전시키지 않는다(뒤표지/책등이 실제 정보 없이 두께 표현용이라 회전시켜도 얻을 게 없고, "숨겨진 책 → 발견된 책"은 회전보다 "눈앞에 나타나는" materialize 쪽이 더 자연스럽다).
+
+**iOS WebKit 호환성: 표지 클리핑을 transform에서 분리.** `lq-book-back`/`lq-book-pages`/`lq-book-spine`는 `lq-book-face lq-book-face-clip` 클래스로 `position:absolute` + `overflow:hidden`/`border-radius` + 자기 자신의 `translateZ`를 한 요소에 그대로 합쳐 두지만(정적 gradient라 안전), **표지(`lq-book-cover`)만 다르게 구성한다** — `lq-book-cover` 자체는 `transform: translateZ(0)`만 갖고 `overflow`는 `visible`로 두며, 클리핑(`overflow:hidden` + `border-radius`)은 transform이 전혀 없는 자식 `lq-book-cover-clip`으로 분리했다. 실기기(iPhone Safari/네이버 인앱 WebKit)에서 **일반 `<img>`(BookThumb 등)는 정상 표시되는데 3D 계층 안의 표지만 안 보이는** 문제가 보고되어 조사한 결과, `preserve-3d` 조상 안에서 "`transform` + `overflow:hidden`을 동시에 가진 요소"의 자식으로 비동기 로드되는 `<img>`(+ opacity crossfade)가 들어가면 WebKit이 해당 서브트리를 제대로 compositing/repaint하지 못해 이미지만 그려지지 않는 사례가 알려져 있다(예: WebKit bug tracker의 `transform-style: preserve-3d` + `overflow` 관련 다수 리포트) — 정확히 동일한 재현으로 단정하지는 않지만 증상과 구조가 일치한다. `<img>` 자체에는 애초부터 transform이 없었으므로, 이번 수정의 핵심은 "클리핑 요소"와 "3D 위치 요소"를 분리해 그 둘을 같은 노드에 두지 않는 것이다. `backface-visibility`는 애초에 어디에도 쓰인 적이 없다(180도 완전 flip을 하지 않는 구조라 불필요, 확인 완료). `-webkit-` prefix도 현재 iOS 버전대에서 표준 속성만으로 충분하다고 판단해 추가하지 않았다 — 이번 문제는 vendor prefix 부재가 아니라 DOM/CSS 구조 자체의 문제였다.
 
 - **hidden ↔ revealed**: `revealed` prop으로 표지 레이어 크로스페이드. `justRevealed`가 true면 마운트 후 짧은 지연을 두고 `lq-book-reveal`에 `lq-book-materialize` 키프레임(약 0.9초 — 뒤로 살짝 물러났다 떠오르며 정착, `translateZ`+`scale`만 사용)을 재생하고 그 순간 표지가 크로스페이드된다. 이미 발견된 슬롯/도감 책은 애니메이션 없이 바로 최종 상태로 그린다.
 - **ground shadow**: 책 아래 별도 `lq-book-shadow` 엘리먼트(정적 `radial-gradient` + `filter: blur`)가 materialize와 같은 타이밍에 opacity/scale만 애니메이션한다(blur 값 자체는 애니메이션하지 않음 — 매 프레임 blur 재계산은 성능 비용이 크다).

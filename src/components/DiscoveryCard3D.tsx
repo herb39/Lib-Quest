@@ -54,7 +54,16 @@ const TOUCH_TILT_SENSITIVITY = 1.2;
  *   └ lq-book-interact (ref: pointer tilt/idle 전용 — JS가 style.transform을 직접 갱신)
  *     └ lq-book-reveal  (발견 순간의 1회성 materialize 애니메이션 전용)
  *       └ lq-book-pose    (책의 고정 기본 각도: rotateX(3) rotateY(-10) rotateZ(-1))
- *         └ 표지/책등/페이지/뒤표지 레이어
+ *         ├ 책등/페이지/뒤표지 (lq-book-face + lq-book-face-clip, 정적 gradient라 clip과 transform을 같이 둬도 안전)
+ *         └ 표지 lq-book-cover (transform: translateZ(0)만, overflow 없음)
+ *             └ lq-book-cover-clip (transform 없는 2D 래퍼 — 여기서만 overflow:hidden + border-radius)
+ *                 └ hidden/revealed 크로스페이드 레이어 → img (img 자체는 transform 없음)
+ *
+ * lq-book-cover에서 클리핑을 분리한 이유: iOS WebKit은 preserve-3d 계층 안에서
+ * "transform + overflow:hidden"을 동시에 가진 요소의 자식 <img>가 비동기 로드/opacity
+ * transition을 거칠 때 compositing이 누락되어 이미지만 안 보이는 경우가 있다(실기기에서
+ * 실제로 재현됨 — 일반 <img>는 정상, 3D 계층 안의 표지만 미표시). transform은 lq-book-cover가,
+ * 클리핑은 transform 없는 lq-book-cover-clip이 맡도록 분리해 이 조합을 피한다.
  */
 export function DiscoveryCard3D({
   revealed,
@@ -211,42 +220,48 @@ export function DiscoveryCard3D({
           }`}
         >
           <div className="lq-book-pose">
-            <div className="lq-book-face lq-book-back" aria-hidden="true" />
-            <div className="lq-book-face lq-book-pages" aria-hidden="true" />
-            <div className="lq-book-face lq-book-spine" aria-hidden="true" />
+            <div className="lq-book-face lq-book-face-clip lq-book-back" aria-hidden="true" />
+            <div className="lq-book-face lq-book-face-clip lq-book-pages" aria-hidden="true" />
+            <div className="lq-book-face lq-book-face-clip lq-book-spine" aria-hidden="true" />
+            {/* lq-book-cover 자체는 클리핑 없이 3D 위치(translateZ)만 담당하고, 실제 표지
+                콘텐츠(hidden/revealed 크로스페이드 + img)는 transform이 없는 lq-book-cover-clip
+                안에 둔다 — WebKit 3D compositing 이슈 회피(위 CSS 주석 참고). */}
             <div className="lq-book-face lq-book-cover">
-              <div className={`lq-book-cover-layer ${!displayRevealed ? "is-visible" : ""}`}>
-                <span aria-hidden="true" className="lq-book-mark">
-                  ?
-                </span>
-                {size !== "slot" && <p className="mt-1 text-[11px] font-medium text-stone-400">숨겨진 책</p>}
-              </div>
-              <div className={`lq-book-cover-layer ${displayRevealed ? "is-visible" : ""}`}>
-                {coverUrl && coverStatus !== "failed" ? (
-                  // 외부 표지 이미지 호스트가 여러 곳(aladin/naver)이라 next/image remotePatterns를
-                  // 무분별하게 넓히는 대신 일반 img로 안전하게 처리한다. key={retryKey}는 재시도 시
-                  // 엘리먼트를 리마운트해 실제 네트워크 재요청을 강제하기 위함(useRetryingCoverImage 참고).
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={retryKey}
-                    src={coverUrl}
-                    alt=""
-                    onError={handleError}
-                    onLoad={handleLoad}
-                    loading={size === "grid" ? "lazy" : "eager"}
-                    decoding="async"
-                    className={`h-full w-full object-cover transition-opacity duration-200 ${
-                      coverStatus === "loaded" ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-stone-100 text-stone-400">
-                    <span aria-hidden="true" className="text-xl">
-                      📕
-                    </span>
-                    {size !== "slot" && <span className="text-[10px]">표지 이미지 없음</span>}
-                  </div>
-                )}
+              <div className="lq-book-cover-clip">
+                <div className={`lq-book-cover-layer ${!displayRevealed ? "is-visible" : ""}`}>
+                  <span aria-hidden="true" className="lq-book-mark">
+                    ?
+                  </span>
+                  {size !== "slot" && <p className="mt-1 text-[11px] font-medium text-stone-400">숨겨진 책</p>}
+                </div>
+                <div className={`lq-book-cover-layer ${displayRevealed ? "is-visible" : ""}`}>
+                  {coverUrl && coverStatus !== "failed" ? (
+                    // 외부 표지 이미지 호스트가 여러 곳(aladin/naver)이라 next/image remotePatterns를
+                    // 무분별하게 넓히는 대신 일반 img로 안전하게 처리한다. key={retryKey}는 재시도 시
+                    // 엘리먼트를 리마운트해 실제 네트워크 재요청을 강제하기 위함(useRetryingCoverImage 참고).
+                    // img 자체에는 transform을 절대 주지 않는다(3D 위치는 조상 lq-book-cover가 담당).
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={retryKey}
+                      src={coverUrl}
+                      alt=""
+                      onError={handleError}
+                      onLoad={handleLoad}
+                      loading={size === "grid" ? "lazy" : "eager"}
+                      decoding="async"
+                      className={`h-full w-full object-cover transition-opacity duration-200 ${
+                        coverStatus === "loaded" ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-stone-100 text-stone-400">
+                      <span aria-hidden="true" className="text-xl">
+                        📕
+                      </span>
+                      {size !== "slot" && <span className="text-[10px]">표지 이미지 없음</span>}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
